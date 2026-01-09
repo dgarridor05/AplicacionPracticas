@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-h)6q4sk4jppgp4)8kq0=$_*&9s7kgoi0_3j^&fhud6h1#!r_+!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ['*']
 
@@ -96,12 +96,31 @@ if DATABASE_URL:
         'default': dj_database_url.parse(DATABASE_URL)
     }
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    # Configuración específica para Vercel (SQLite workaround)
+    # Vercel filesystem es read-only, excepto /tmp
+    # Copiamos la db a /tmp para poder escribir en ella
+    import shutil
+    
+    DB_FILE = BASE_DIR / 'db.sqlite3'
+    if os.getenv('VERCEL'):
+        TMP_DB_FILE = Path('/tmp/db.sqlite3')
+        if not TMP_DB_FILE.exists():
+            if DB_FILE.exists():
+                shutil.copyfile(DB_FILE, TMP_DB_FILE)
+        
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': TMP_DB_FILE,
+            }
         }
-    }
+    else:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': DB_FILE,
+            }
+        }
 
 
 # Password validation
