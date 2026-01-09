@@ -1,18 +1,8 @@
 {
-    "builds": [
+    "rewrites": [
         {
-            "src": "relaciona/wsgi.py",
-            "use": "@vercel/python",
-            "config": {
-                "maxLambdaSize": "15mb",
-                "runtime": "python3.12"
-            }
-        }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "relaciona/wsgi.py"
+            "source": "/(.*)",
+            "destination": "relaciona/wsgi.py"
         }
     ]
 }
