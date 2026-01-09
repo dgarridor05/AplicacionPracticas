@@ -2,10 +2,10 @@ services:
   - type: web
     name: relaciona-app
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn nombre_proyecto.wsgi
+    buildCommand: ./build.sh
+    startCommand: gunicorn relaciona.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
-        value: nombre_proyecto.settings
+        value: relaciona.settings
       - key: PYTHON_VERSION
         value: 3.11
