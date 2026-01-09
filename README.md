@@ -14,6 +14,7 @@ A continuación se detallan las modificaciones técnicas implementadas para aseg
     *   Creado `vercel.json` con configuración de runtime (Python 3.12).
     *   Ajustado `relaciona/wsgi.py` exponiendo la variable `app` para el entorno serverless.
     *   **Solución Base de Datos**: Se implementó una lógica en `settings.py` que detecta el entorno Vercel y copia la base de datos `db.sqlite3` a `/tmp/` (directorio temporal escribible) para evitar errores de "Read-only database".
+*   **Dockerización**: Se incluyó un `Dockerfile` optimizado para despliegue en contenedores (Northflank, Railway, etc.).
 
 ### 2. Base de Datos
 *   **Persistencia**: Se incluyó el archivo `db.sqlite3` en el control de versiones (Git) para garantizar que el despliegue tenga una estructura de datos inicial.
