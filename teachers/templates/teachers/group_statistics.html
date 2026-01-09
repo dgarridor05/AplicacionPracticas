@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Estadísticas del grupo{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2 class="mb-4">📊 Estadísticas VARK – <span class="text-success">{{ group.name }}</span></h2>
+
+  {% if vark_data %}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <p class="mb-3">
+          Esta gráfica muestra cuántos alumnos del grupo han sido clasificados en
+          cada estilo de aprendizaje.
+        </p>
+        <div class="text-center">
+          <canvas id="varkChart" width="400" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      Aún no hay datos suficientes para generar estadísticas. Espera a que al
+      menos un alumno realice el test VARK.
+    </div>
+  {% endif %}
+
+  <a href="{% url 'group_detail' group.id %}" class="btn btn-secondary">← Volver a detalles del grupo</a>
+</div>
+
+{% if vark_data %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('varkChart').getContext('2d');
+    const varkChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: {{ labels|safe }},
+        datasets: [{
+          label: 'Estilos de aprendizaje',
+          data: {{ data|safe }},
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.6)',   // Visual
+            'rgba(255, 206, 86, 0.6)',   // Auditivo
+            'rgba(153, 102, 255, 0.6)',  // Lectura/Escritura
+            'rgba(75, 192, 192, 0.6)'    // Kinestésico
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(75, 192, 192, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#198754',
+              font: {
+                size: 14
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0
+            },
+            title: {
+              display: true,
+              text: 'Número de alumnos',
+              color: '#198754',
+              font: {
+                size: 13,
+                weight: 'bold'
+              }
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Estilo de aprendizaje',
+              color: '#198754',
+              font: {
+                size: 13,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+{% endif %}
+{% endblock %}

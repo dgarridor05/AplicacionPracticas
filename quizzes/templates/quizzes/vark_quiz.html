@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Test VARK{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-lg border-0">
+    <div class="card-body">
+      <h2 class="text-center text-success mb-4">{{ questionnaire.title }}</h2>
+
+      <form method="POST">
+        {% csrf_token %}
+        {% for question in questions %}
+          <div class="mb-5">
+            <h5 class="fw-semibold">{{ forloop.counter }}. {{ question.text }}</h5>
+            <div class="mt-3">
+              {% for option in question.options.all %}
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="question_{{ question.id }}" value="{{ option.id }}" id="option_{{ option.id }}" required>
+                  <label class="form-check-label" for="option_{{ option.id }}">
+                    {{ option.text }}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <hr>
+        {% endfor %}
+
+        <div class="d-flex justify-content-between mt-4">
+          <a href="{% url 'student_home' %}" class="btn btn-outline-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-success">Enviar respuestas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

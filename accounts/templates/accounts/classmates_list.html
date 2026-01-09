@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Compañeros de clase{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2 class="mb-4 text-center">Compañeros que comparten su perfil</h2>
+
+    {% if classmates %}
+      <div class="list-group mb-4 shadow-sm">
+        {% for classmate in classmates %}
+          <a href="{% url 'public_student_profile' classmate.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            {{ classmate.nickname|default:classmate.username }}
+            <span class="badge bg-success text-white">Ver perfil</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="alert alert-info text-center">
+        Ningún compañero ha compartido su perfil todavía.
+      </div>
+    {% endif %}
+
+    <div class="text-center">
+      <a href="{% url 'student_home' %}" class="btn btn-outline-success">Volver al panel</a>
+    </div>
+  </div>
+{% endblock %}

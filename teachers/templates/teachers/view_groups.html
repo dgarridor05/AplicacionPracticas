@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mis grupos{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <h2 class="mb-4">Mis grupos</h2>
+
+      {% if groups %}
+        <div class="list-group mb-4">
+          {% for group in groups %}
+            <div class="list-group-item py-3 d-flex justify-content-between align-items-center shadow-sm">
+              <div>
+                <h5 class="mb-1">{{ group.name }}</h5>
+                <small class="text-muted">{{ group.students.count }} alumno{{ group.students.count|pluralize }}</small>
+              </div>
+              <div class="btn-group">
+                <a href="{% url 'group_detail' group.id %}" class="btn btn-sm btn-outline-success">Detalles</a>
+                <a href="{% url 'group_statistics' group.id %}" class="btn btn-sm btn-outline-success">Estadísticas</a>
+                <a href="{% url 'edit_group' group.id %}" class="btn btn-sm btn-outline-success">Editar</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-warning">No has creado ningún grupo aún.</div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between">
+        <a href="{% url 'create_group' %}" class="btn btn-success">Crear nuevo grupo</a>
+        <a href="{% url 'teacher_home' %}" class="btn btn-secondary">← Volver al panel</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

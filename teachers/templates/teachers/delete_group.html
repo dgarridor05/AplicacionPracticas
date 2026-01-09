@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Eliminar grupo{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-danger shadow-sm">
+      <div class="card-body">
+        <h2 class="text-danger mb-4">
+          ¿Estás seguro de que deseas eliminar el grupo <strong>"{{ group.name }}"</strong>?
+        </h2>
+        <form method="post" class="d-flex gap-3">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+          <a href="{% url 'group_detail' group.id %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

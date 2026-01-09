@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg p-4" style="width: 100%; max-width: 450px;">
+    <h2 class="text-center mb-4 text-success">Iniciar sesión</h2>
+
+    {% if form.errors %}
+      <div class="alert alert-danger text-center">
+        Nombre de usuario o contraseña incorrectos.
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="id_username" class="form-label">Usuario</label>
+        <input type="text" name="username" class="form-control" id="id_username" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="id_password" class="form-label">Contraseña</label>
+        <input type="password" name="password" class="form-control" id="id_password" required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-success">Entrar</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <p class="mb-0">¿No tienes una cuenta?</p>
+      <a href="{% url 'register' %}" class="text-decoration-none text-success fw-semibold">Regístrate aquí</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

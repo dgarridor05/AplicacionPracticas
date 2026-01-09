@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Adivina el alumno{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+
+      <h2 class="mb-4 text-success">¿Quién es este alumno?</h2>
+
+      {% if total %}
+        <div class="alert alert-info">
+          Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
+        </div>
+      {% endif %}
+
+      {% if student.profile_picture %}
+        <img src="{{ student.profile_picture.url }}" class="rounded-circle shadow-sm mb-4" style="width: 200px; height: 200px; object-fit: cover;" alt="Foto del alumno">
+      {% else %}
+        <div class="bg-light rounded-circle d-inline-block mb-4 d-flex align-items-center justify-content-center" style="width: 200px; height: 200px;">
+          <i class="fas fa-user fa-3x text-muted"></i>
+        </div>
+        <p class="text-muted">Este alumno no tiene foto de perfil.</p>
+      {% endif %}
+
+      <form method="POST" class="text-start mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="student_id" value="{{ student.id }}">
+        <div class="mb-3">
+          <label for="answer" class="form-label">Escribe su nombre o apodo:</label>
+          <input type="text" name="answer" id="answer" class="form-control" placeholder="Ej: Marta, Juan..." required>
+        </div>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <button type="submit" class="btn btn-success">Enviar</button>
+          <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">Volver al panel</a>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

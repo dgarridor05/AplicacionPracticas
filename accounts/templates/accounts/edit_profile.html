@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Editar perfil de alumno{% endblock %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title mb-4 text-center">Editar perfil de alumno</h2>
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+              <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                  <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% for error in field.errors %}
+                  <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+
+            <div class="d-flex justify-content-between mt-4">
+              <a href="{% url 'student_home' %}" class="btn btn-outline-secondary">Volver</a>
+              <button type="submit" class="btn btn-success">Guardar cambios</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

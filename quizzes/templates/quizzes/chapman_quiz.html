@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Test de Chapman - Lenguajes del Amor Educativo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h2 class="card-title mb-4">🎓 {{ questionnaire.title }} - Lenguajes del Amor Educativo</h2>
+      
+      <div class="alert alert-info mb-4">
+        <h5><i class="fas fa-info-circle"></i> Instrucciones:</h5>
+        <p class="mb-0">{{ questionnaire.description }} <strong>No pienses demasiado la respuesta</strong>: elige la opción que refleje mejor cómo te sientes valorado/a o apoyado/a por tu profesor/a.</p>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+        {% for question in questions %}
+          <div class="mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0"><strong>Pregunta {{ question.text }}</strong></h6>
+                <small class="text-muted">Elige la opción que más se parece a ti:</small>
+              </div>
+              <div class="card-body">
+                {% for option in question.options.all %}
+                  <div class="form-check mb-3">
+                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" value="{{ option.id }}" id="option_{{ option.id }}" required>
+                    <label class="form-check-label" for="option_{{ option.id }}">
+                      {{ option.text }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-success btn-lg">✅ Enviar respuestas</button>
+          <a href="{% url 'student_home' %}" class="btn btn-secondary btn-lg ms-2">❌ Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

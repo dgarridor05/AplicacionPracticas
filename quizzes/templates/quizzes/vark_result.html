@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Mi resultado VARK{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow border-0">
+      <div class="card-body">
+        <h2 class="card-title mb-4 text-success text-center">
+          Resultado del Test VARK
+        </h2>
+
+        <div class="alert alert-success text-center fs-5" role="alert">
+          Tu estilo de aprendizaje dominante es: <strong>{{ label }}</strong>
+        </div>
+
+        <p class="mb-4 text-muted text-center">{{ description }}</p>
+
+        <h5 class="mt-4 text-success">Consejos de aprendizaje</h5>
+        <ul class="list-group list-group-flush mb-4">
+          {% for tip in tips %}
+            <li class="list-group-item">✅ {{ tip }}</li>
+          {% endfor %}
+        </ul>
+
+        <div class="text-center">
+          <a href="{% url 'student_home' %}" class="btn btn-outline-success">
+            Volver al panel
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

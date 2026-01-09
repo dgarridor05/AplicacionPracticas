@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Adivina los gustos del estudiante{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  
+  {% if total %}
+    <div class="alert alert-info text-center">
+      Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
+    </div>
+  {% endif %}
+
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h2 class="mb-4 text-success">¿Cuáles son los gustos de {{ target_name }}?</h2>
+          
+          <div class="row align-items-center">
+            <div class="col-md-4 mb-3">
+              {% if target_student.profile_picture %}
+                <img src="{{ target_student.profile_picture.url }}" 
+                     class="rounded-circle shadow-sm" 
+                     style="width: 150px; height: 150px; object-fit: cover;" 
+                     alt="Foto de {{ target_name }}">
+              {% else %}
+                <div class="bg-light text-muted p-4 rounded-circle d-inline-block">
+                  Sin foto
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-md-8">
+              <h4 class="text-primary mb-3">{{ target_name }}</h4>
+              <p class="text-muted">
+                Observa la foto y el nombre del estudiante. 
+                <strong>¿Cuál de las siguientes descripciones corresponde a sus gustos reales?</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="target_id" value="{{ target_id }}">
+    <input type="hidden" name="correct_option" value="{{ correct_option }}">
+
+    <div class="row justify-content-center">
+      {% for description in options %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow-sm border-0 option-card">
+            <div class="card-body">
+              <div class="d-flex align-items-start">
+                <span class="badge bg-primary rounded-pill me-3 mt-1 fs-6">
+                  {{ forloop.counter }}
+                </span>
+                <div class="flex-grow-1">
+                  <p class="card-text text-justify lh-lg">{{ description }}</p>
+                  <button type="submit" 
+                          name="selected_option" 
+                          value="{{ forloop.counter }}" 
+                          class="btn btn-outline-success w-100 mt-3">
+                    Seleccionar esta opción
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </form>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">
+      Volver al panel
+    </a>
+  </div>
+
+</div>
+
+<style>
+.option-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.option-card .btn:hover {
+  transform: scale(1.02);
+  transition: transform 0.1s ease-in-out;
+}
+
+.text-justify {
+  text-align: justify;
+}
+</style>
+{% endblock %}

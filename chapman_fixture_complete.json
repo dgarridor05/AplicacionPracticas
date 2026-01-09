@@ -1,0 +1,794 @@
+[
+  {
+    "model": "quizzes.questionnaire",
+    "pk": 2,
+    "fields": {
+      "title": "Chapman",
+      "description": "Test de los Lenguajes del Amor Adaptado al Ámbito Educativo Universitario. Lee cada par de afirmaciones y marca la que más te represente."
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 100,
+    "fields": {
+      "questionnaire": 2,
+      "text": "1"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1000,
+    "fields": {
+      "question": 100,
+      "text": "Me gusta cuando mi profesor/a me deja notas escritas con mensajes positivos.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1001,
+    "fields": {
+      "question": 100,
+      "text": "Me motiva cuando mi profesor/a me dice que soy capaz de lograrlo.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 101,
+    "fields": {
+      "questionnaire": 2,
+      "text": "2"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1002,
+    "fields": {
+      "question": 101,
+      "text": "Aprecio tener tutorías individuales para analizar mis puntos fuertes y débiles.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1003,
+    "fields": {
+      "question": 101,
+      "text": "Me siento apoyado/a cuando el profesorado me ofrece ayuda práctica.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 102,
+    "fields": {
+      "questionnaire": 2,
+      "text": "3"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1004,
+    "fields": {
+      "question": 102,
+      "text": "Me gusta cuando mi profesor/a me da puntos extra.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1005,
+    "fields": {
+      "question": 102,
+      "text": "Disfruto de las charlas largas con mi profesor/a.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 103,
+    "fields": {
+      "questionnaire": 2,
+      "text": "4"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1006,
+    "fields": {
+      "question": 103,
+      "text": "Me siento apoyado/a cuando recibo ayuda en asignaturas difíciles.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1007,
+    "fields": {
+      "question": 103,
+      "text": "Valoro el reconocimiento tipo \"choca la mano\" para que mi profesor/a reconozca mi esfuerzo.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 104,
+    "fields": {
+      "questionnaire": 2,
+      "text": "5"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1008,
+    "fields": {
+      "question": 104,
+      "text": "Me da confianza cuando mi profesor/a me da un toque en el hombro y me dice que puedo con ello.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1009,
+    "fields": {
+      "question": 104,
+      "text": "Me hace sentir valorado/a cuando recibo un regalo (como una mejora de nota) por parte de mi profesor/a.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 105,
+    "fields": {
+      "questionnaire": 2,
+      "text": "6"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1010,
+    "fields": {
+      "question": 105,
+      "text": "Me gusta venir a clase porque mi profesor/a me motiva mucho.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1011,
+    "fields": {
+      "question": 105,
+      "text": "Me ayuda hablar con mi profesor/a cuando tengo un problema.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 106,
+    "fields": {
+      "questionnaire": 2,
+      "text": "7"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1012,
+    "fields": {
+      "question": 106,
+      "text": "Me hace sentir valorado/a cuando mi profesor/a reconoce mi esfuerzo.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1013,
+    "fields": {
+      "question": 106,
+      "text": "Para mí, los reconocimientos tangibles (como premios académicos) son importantes.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 107,
+    "fields": {
+      "questionnaire": 2,
+      "text": "8"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1014,
+    "fields": {
+      "question": 107,
+      "text": "Prefiero sentarme delante en clase.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1015,
+    "fields": {
+      "question": 107,
+      "text": "Me gusta que mi profesor/a me diga que estoy mejorando.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 108,
+    "fields": {
+      "questionnaire": 2,
+      "text": "9"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1016,
+    "fields": {
+      "question": 108,
+      "text": "Me gusta pasar tiempo en clase.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1017,
+    "fields": {
+      "question": 108,
+      "text": "Aprecio los pequeños reconocimientos materiales (como material académico) que me da mi profesor/a.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 109,
+    "fields": {
+      "questionnaire": 2,
+      "text": "10"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1018,
+    "fields": {
+      "question": 109,
+      "text": "Siento que mi profesor/a se preocupa por mí cuando me da buenos consejos.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1019,
+    "fields": {
+      "question": 109,
+      "text": "Las palabras de aceptación de mis profesores son importantes.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 110,
+    "fields": {
+      "questionnaire": 2,
+      "text": "11"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1020,
+    "fields": {
+      "question": 110,
+      "text": "Me gusta estar junto con toda la clase, incluido mi profesor, cuando hacemos un proyecto difícil.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1021,
+    "fields": {
+      "question": 110,
+      "text": "Me reconfortan las palabras de aceptación de mis profesores.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 111,
+    "fields": {
+      "questionnaire": 2,
+      "text": "12"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1022,
+    "fields": {
+      "question": 111,
+      "text": "Me siento apoyado/a cuando el profesorado muestra interés en mi rendimiento.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1023,
+    "fields": {
+      "question": 111,
+      "text": "Me impactan más las acciones de mi profesor/a que sus palabras.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 112,
+    "fields": {
+      "questionnaire": 2,
+      "text": "13"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1024,
+    "fields": {
+      "question": 112,
+      "text": "Valoro los elogios de mi profesor/a e intento evitar decepcionarle.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1025,
+    "fields": {
+      "question": 112,
+      "text": "Varios pequeños detalles me hacen más ilusión que un regalo grande y caro.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 113,
+    "fields": {
+      "questionnaire": 2,
+      "text": "14"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1026,
+    "fields": {
+      "question": 113,
+      "text": "Me siento más cerca de mi profesor/a cuando se interesa personalmente por mí.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1027,
+    "fields": {
+      "question": 113,
+      "text": "Me siento conectado/a cuando mi profesor/a y yo colaboramos en un proyecto difícil.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 114,
+    "fields": {
+      "questionnaire": 2,
+      "text": "15"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1028,
+    "fields": {
+      "question": 114,
+      "text": "Me gusta que mi profesor/a me felicite por mis logros.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1029,
+    "fields": {
+      "question": 114,
+      "text": "Sé que a mi profesor/a le importo cuando intenta sacar lo mejor de mí.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 115,
+    "fields": {
+      "questionnaire": 2,
+      "text": "16"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1030,
+    "fields": {
+      "question": 115,
+      "text": "Me alegra cuando mi profesor/a me responde si le saludo por el pasillo.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1031,
+    "fields": {
+      "question": 115,
+      "text": "Me gusta cuando mi profesor/a me escucha con empatía.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 116,
+    "fields": {
+      "questionnaire": 2,
+      "text": "17"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1032,
+    "fields": {
+      "question": 116,
+      "text": "Valoro especialmente recibir bonificaciones académicas cuando realizo un trabajo que supera las expectativas del profesor/a.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1033,
+    "fields": {
+      "question": 116,
+      "text": "Me siento apoyado/a cuando el profesorado resuelve mis dudas sobre proyectos difíciles.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 117,
+    "fields": {
+      "questionnaire": 2,
+      "text": "18"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1034,
+    "fields": {
+      "question": 117,
+      "text": "Me gusta que mi profesor/a me diga que me veo bien.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1035,
+    "fields": {
+      "question": 117,
+      "text": "Me siento valorado/a cuando mi profesor/a se toma el tiempo de entender cómo me siento.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 118,
+    "fields": {
+      "questionnaire": 2,
+      "text": "19"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1036,
+    "fields": {
+      "question": 118,
+      "text": "Me da confianza que mi profesor/a me asegure que puedo con una tarea complicada.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1037,
+    "fields": {
+      "question": 118,
+      "text": "Las cosas que hace mi profesor/a por mí me hacen sentir querido/a.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 119,
+    "fields": {
+      "questionnaire": 2,
+      "text": "20"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1038,
+    "fields": {
+      "question": 119,
+      "text": "Aprecio mucho todo lo que me enseña mi profesor/a.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1039,
+    "fields": {
+      "question": 119,
+      "text": "Me anima recibir palabras de aliento por parte de mi profesor/a.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 120,
+    "fields": {
+      "questionnaire": 2,
+      "text": "21"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1040,
+    "fields": {
+      "question": 120,
+      "text": "Disfruto mucho cuando mi profesor/a me presta atención solo a mí.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1041,
+    "fields": {
+      "question": 120,
+      "text": "Me gusta cuando mi profesor/a responde a mis dudas sobre un proyecto difícil.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 121,
+    "fields": {
+      "questionnaire": 2,
+      "text": "22"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1042,
+    "fields": {
+      "question": 121,
+      "text": "Me siento valorado/a cuando el profesorado reconoce mi cumpleaños con un gesto de atención personal.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1043,
+    "fields": {
+      "question": 121,
+      "text": "Aprecio especialmente cuando las clases comienzan con reflexiones motivadoras (ya sean escritas o verbales).",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 122,
+    "fields": {
+      "questionnaire": 2,
+      "text": "23"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1044,
+    "fields": {
+      "question": 122,
+      "text": "Me siento apoyado/a cuando el profesorado me orienta y guía en mis proyectos más complejos.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1045,
+    "fields": {
+      "question": 122,
+      "text": "Percibo que el profesorado tiene en cuenta mi progreso cuando evalúa mis trabajos con atención.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 123,
+    "fields": {
+      "questionnaire": 2,
+      "text": "24"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1046,
+    "fields": {
+      "question": 123,
+      "text": "Me agrada que mi profesor/a recuerde mi nombre completo.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1047,
+    "fields": {
+      "question": 123,
+      "text": "Valoro que mi profesor/a me escuche con paciencia cuando participo en clase.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 124,
+    "fields": {
+      "questionnaire": 2,
+      "text": "25"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1048,
+    "fields": {
+      "question": 124,
+      "text": "Me gusta que mi profesor/a dedique tiempo extra para atenderme en una tutoría.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1049,
+    "fields": {
+      "question": 124,
+      "text": "Me reconforta saber que mi profesor/a se preocupa lo suficiente como para ayudarme en el día a día.",
+      "category": "D",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 125,
+    "fields": {
+      "questionnaire": 2,
+      "text": "26"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1050,
+    "fields": {
+      "question": 125,
+      "text": "Me hace sentir especial que mi profesor/a se fije en pequeños cambios en mí sin que yo lo diga.",
+      "category": "E",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1051,
+    "fields": {
+      "question": 125,
+      "text": "Me reconforta que me dé algún consejo cuando no estoy rindiendo bien en clase.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 126,
+    "fields": {
+      "questionnaire": 2,
+      "text": "27"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1052,
+    "fields": {
+      "question": 126,
+      "text": "Me gusta que mi profesor/a exprese aprecio por mi trabajo.",
+      "category": "A",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1053,
+    "fields": {
+      "question": 126,
+      "text": "Me gusta que mi profesor/a me mire mientras le hablo.",
+      "category": "B",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 127,
+    "fields": {
+      "questionnaire": 2,
+      "text": "28"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1054,
+    "fields": {
+      "question": 127,
+      "text": "Valoro el esfuerzo extra del profesor/a por mí.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 1055,
+    "fields": {
+      "question": 127,
+      "text": "Me siento cuidado/a cuando me recuerda que debo distinguir entre lo que está bien y lo que no.",
+      "category": "E",
+      "value": 1
+    }
+  }
+]

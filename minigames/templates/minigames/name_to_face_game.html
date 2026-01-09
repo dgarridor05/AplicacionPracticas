@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Adivina la imagen{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+
+  {% if total %}
+    <div class="alert alert-info text-center">
+      Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
+    </div>
+  {% endif %}
+
+  <div class="text-center mb-4">
+    <h2>¿Quién es <span class="text-success">{{ target_name }}</span>?</h2>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="target_id" value="{{ target_id }}">
+    {% for option in option_ids %}
+      <input type="hidden" name="option_ids" value="{{ option }}">
+    {% endfor %}
+
+    <div class="row justify-content-center">
+      {% for student in options %}
+        <div class="col-6 col-md-3 mb-4">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-body text-center p-2">
+              <p class="fw-semibold mb-2">Opción {{ forloop.counter }}</p>
+              <button type="submit" name="selected_id" value="{{ student.id }}" class="btn btn-outline-success p-0 border-0">
+                {% if student.profile_picture %}
+                  <img src="{{ student.profile_picture.url }}" alt="Alumno" class="img-fluid rounded" style="object-fit: cover; max-height: 200px;">
+                {% else %}
+                  <div class="bg-light text-muted p-5 rounded border">Sin foto</div>
+                {% endif %}
+              </button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </form>
+
+  <div class="text-center">
+    <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary mt-4">Volver al panel</a>
+  </div>
+
+</div>
+{% endblock %}

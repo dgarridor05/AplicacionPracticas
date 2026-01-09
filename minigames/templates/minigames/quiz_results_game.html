@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Adivina los resultados de tests{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  
+  {% if total %}
+    <div class="alert alert-info text-center">
+      Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
+    </div>
+  {% endif %}
+
+  <div class="row justify-content-center mb-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body text-center">
+          <h2 class="mb-4 text-success">¿Cuáles son los resultados de los tests de {{ target_name }}?</h2>
+          
+          <div class="row align-items-center">
+            <div class="col-md-4 mb-3">
+              {% if target_student.profile_picture %}
+                <img src="{{ target_student.profile_picture.url }}" 
+                     class="rounded-circle shadow-sm" 
+                     style="width: 150px; height: 150px; object-fit: cover;" 
+                     alt="Foto de {{ target_name }}">
+              {% else %}
+                <div class="bg-light text-muted p-4 rounded-circle d-inline-block">
+                  Sin foto
+                </div>
+              {% endif %}
+            </div>
+            <div class="col-md-8">
+              <h4 class="text-primary mb-3">{{ target_name }}</h4>
+              <p class="text-muted">
+                Observa la foto y el nombre del estudiante. 
+                <strong>¿Cuáles fueron los resultados de sus tests VARK y Chapman?</strong>
+              </p>
+              <div class="alert alert-light">
+                <small class="text-muted">
+                  <strong>VARK:</strong> Test de estilos de aprendizaje (Visual, Auditivo, Lectura/Escritura, Kinestésico)<br>
+                  <strong>Chapman:</strong> Test de lenguajes del amor
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="hidden" name="target_id" value="{{ target_id }}">
+    <input type="hidden" name="correct_option" value="{{ correct_option }}">
+
+    <div class="row justify-content-center">
+      {% for description in options %}
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 shadow-sm border-0 option-card">
+            <div class="card-body">
+              <div class="d-flex align-items-start">
+                <span class="badge bg-info rounded-pill me-3 mt-1 fs-6">
+                  {{ forloop.counter }}
+                </span>
+                <div class="flex-grow-1">
+                  <div class="results-container">
+                    {% with description|split:"." as parts %}
+                      {% if parts.0 %}
+                        <div class="test-result mb-2">
+                          <span class="badge bg-primary me-2">VARK</span>
+                          <span class="test-text">{{ parts.0|slice:"12:" }}</span>
+                        </div>
+                      {% endif %}
+                      {% if parts.1 %}
+                        <div class="test-result mb-3">
+                          <span class="badge bg-success me-2">Chapman</span>
+                          <span class="test-text">{{ parts.1|slice:"15:" }}</span>
+                        </div>
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                  <button type="submit" 
+                          name="selected_option" 
+                          value="{{ forloop.counter }}" 
+                          class="btn btn-outline-info w-100 mt-3">
+                    Seleccionar esta opción
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </form>
+
+  <div class="text-center mt-4">
+    <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">
+      Volver al panel
+    </a>
+  </div>
+
+</div>
+
+<style>
+.option-card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.2s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+.option-card .btn:hover {
+  transform: scale(1.02);
+  transition: transform 0.1s ease-in-out;
+}
+
+.results-container {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid #17a2b8;
+}
+
+.test-result {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.test-text {
+  color: #495057;
+  font-weight: 500;
+}
+
+.badge {
+  font-size: 0.75em;
+  min-width: 70px;
+}
+</style>
+{% endblock %}

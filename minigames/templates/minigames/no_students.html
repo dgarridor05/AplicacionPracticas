@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Sin estudiantes disponibles{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+      
+      <div class="mb-4">
+        <i class="fas fa-users fa-5x text-muted"></i>
+      </div>
+      
+      <h2 class="mb-4 text-warning">No hay estudiantes disponibles</h2>
+      
+      <div class="alert alert-warning">
+        <p class="mb-0">
+          <strong>Para jugar necesitas:</strong><br>
+          • Al menos un estudiante en tus grupos<br>
+          • Que el estudiante tenga una foto de perfil
+        </p>
+      </div>
+      
+      <div class="mt-4">
+        <p class="text-muted">
+          Asegúrate de que tus estudiantes tengan fotos de perfil subidas 
+          para poder jugar a este minijuego.
+        </p>
+      </div>
+
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+        <a href="{% url 'view_groups' %}" class="btn btn-primary">
+          <i class="fas fa-users"></i> Ver mis grupos
+        </a>
+        <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-home"></i> Volver al inicio
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

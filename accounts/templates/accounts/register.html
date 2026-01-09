@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Registro de alumno{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg p-4" style="width: 100%; max-width: 600px;">
+    <h2 class="text-center mb-4 text-success">Crear cuenta de alumno</h2>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-success">Registrarse</button>
+      </div>
+    </form>
+
+    <div class="text-center mt-4">
+      <p class="mb-0">¿Ya tienes una cuenta?</p>
+      <a href="{% url 'login' %}" class="text-decoration-none text-success fw-semibold">Inicia sesión</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

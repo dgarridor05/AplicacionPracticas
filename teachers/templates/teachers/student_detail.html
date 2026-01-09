@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Perfil del Alumno{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="text-center mb-4">
+    {% if student.profile_picture %}
+      <img src="{{ student.profile_picture.url }}" alt="Foto de perfil" class="img-thumbnail rounded-circle shadow-sm" style="max-width: 150px;">
+    {% else %}
+      <div class="alert alert-secondary">Este alumno no ha subido una foto de perfil.</div>
+    {% endif %}
+  </div>
+
+  <h2 class="mb-4 text-success text-center">Perfil de {{ student.nickname|default:student.username }}</h2>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Nombre de usuario:</strong> {{ student.username }}</li>
+        <li class="list-group-item"><strong>Apodo:</strong> {{ student.nickname }}</li>
+        <li class="list-group-item"><strong>Zona de residencia:</strong> {{ student.residence_area }}</li>
+        <li class="list-group-item"><strong>Fecha de nacimiento:</strong> {{ student.date_of_birth|date:"j \\d\\e F \\d\\e Y" }}</li>
+        <li class="list-group-item"><strong>¿Celebrar cumpleaños?:</strong> {{ student.celebrate_birthday|yesno:"Sí,No" }}</li>
+        <li class="list-group-item"><strong>Método de aprendizaje:</strong> {{ student.learning_style }}</li>
+        <li class="list-group-item"><strong>Refuerzo emocional:</strong> {{ student.emotional_reinforcement }}</li>
+        <li class="list-group-item"><strong>Canción favorita:</strong> {{ student.favorite_song }}</li>
+        <li class="list-group-item"><strong>Artista favorito:</strong> {{ student.favorite_artist }}</li>
+        <li class="list-group-item"><strong>Película favorita:</strong> {{ student.favorite_movie }}</li>
+        <li class="list-group-item"><strong>Motivación:</strong> {{ student.motivation }}</li>
+        <li class="list-group-item"><strong>¿Compartir con la clase?:</strong> {{ student.share_with_class|yesno:"Sí,No" }}</li>
+        <li class="list-group-item">
+          <strong>Estilo VARK:</strong>
+          {% if vark_result %}
+            {% if vark_result.dominant_category == 'V' %}
+              Visual
+            {% elif vark_result.dominant_category == 'A' %}
+              Auditivo
+            {% elif vark_result.dominant_category == 'R' %}
+              Lectura/Escritura
+            {% elif vark_result.dominant_category == 'K' %}
+              Kinestésico
+            {% else %}
+              {{ vark_result.dominant_category }}
+            {% endif %}
+          {% else %}
+            <span class="text-muted">Sin resultado aún</span>
+          {% endif %}
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  {% if group %}
+    <div class="text-center">
+      <a href="{% url 'group_detail' group.id %}" class="btn btn-secondary">← Volver al grupo</a>
+    </div>
+  {% else %}
+    <div class="text-center text-muted">Este alumno no está asignado a ningún grupo.</div>
+  {% endif %}
+</div>
+{% endblock %}

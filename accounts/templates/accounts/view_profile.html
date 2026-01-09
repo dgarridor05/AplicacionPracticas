@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Mi perfil{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4 text-success text-center">Mi perfil</h2>
+
+  <div class="card shadow-lg p-4">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-4 text-center">
+        {% if user.profile_picture %}
+          <img src="{{ user.profile_picture.url }}" alt="Foto de perfil" class="rounded-circle img-fluid border border-success" style="max-width: 180px;">
+        {% else %}
+          <div class="bg-light rounded-circle d-inline-block d-flex align-items-center justify-content-center" style="width: 180px; height: 180px; border: 3px solid #198754;">
+            <i class="fas fa-user fa-3x text-muted"></i>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-8">
+        <h5 class="mb-3 text-success">Información personal</h5>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Nombre completo:</strong> {{ user.full_name|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>Fecha de nacimiento:</strong> {{ user.date_of_birth|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>Género:</strong> {{ user.get_gender_display|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Con que lugar donde has vivido te sientes mas relacionado?:</strong> {{ user.residence_area|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Te gusta celebrar tu cumpleaños?:</strong> {{ user.celebrate_birthday|yesno:"Sí,No" }}</li>
+          <li class="list-group-item"><strong>¿Cual es tu apodo o como te gusta que te llamen?:</strong> {{ user.nickname|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Cúal es tu cancion favorita?:</strong> {{ user.favorite_song|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>¿Cúal es tu artista favorito?:</strong> {{ user.favorite_artist|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Qué pelicula verías una y otra vez?:</strong> {{ user.favorite_movie|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>¿Cual es tu mayor motivación?:</strong> {{ user.motivation|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>¿Quieres compartir esta información con la clase?:</strong> {{ user.share_with_class|yesno:"Sí,No" }}</li>
+          
+          <!-- Resultados de los tests -->
+          <li class="list-group-item bg-light">
+            <strong>Resultados de Tests Psicopedagógicos:</strong>
+          </li>
+          <li class="list-group-item">
+            <strong>Test Chapman (Estilo de Aprendizaje):</strong> 
+            {% if user.chapman_result %}
+              <span class="badge bg-primary">{{ user.chapman_result }}</span>
+            {% else %}
+              <span class="text-muted">Test no realizado</span>
+            {% endif %}
+          </li>
+          <li class="list-group-item">
+            <strong>Test VARK (Modalidades de Aprendizaje):</strong> 
+            {% if user.vark_result %}
+              <span class="badge bg-success">{{ user.vark_result }}</span>
+            {% else %}
+              <span class="text-muted">Test no realizado</span>
+            {% endif %}
+          </li>
+        </ul>
+
+        <div class="mt-4 d-flex justify-content-between">
+          <a href="{% url 'edit_student_profile' %}" class="btn btn-outline-success">Editar perfil</a>
+          <a href="{% url 'student_home' %}" class="btn btn-outline-secondary">Volver al panel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

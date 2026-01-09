@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Minijuego - No hay suficientes alumnos{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+  <h2 class="text-danger">¡Ups!</h2>
+  <p class="lead">Necesitas al menos 4 alumnos con fotos de perfil para jugar a este minijuego.</p>
+  <a href="{% url 'teacher_home' %}" class="btn btn-success mt-3">Volver al inicio</a>
+</div>
+{% endblock %}

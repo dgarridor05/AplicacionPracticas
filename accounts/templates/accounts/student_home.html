@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Panel del Alumno{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg p-4" style="width: 100%; max-width: 500px;">
+    <div class="text-center mb-3">
+      <h2 class="text-success">¡Bienvenido, {{ user.username }}!</h2>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title text-center">Acciones disponibles</h5>
+      <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'view_profile' %}" class="btn btn-outline-success">Ver mi perfil</a>
+        <a href="{% url 'take_vark_quiz' %}" class="btn btn-outline-success">Realizar o repetir el test VARK</a>
+        <a href="{% url 'take_chapman_quiz' %}" class="btn btn-outline-success">Realizar o repetir el test de Chapman</a>
+        <a href="{% url 'vark_result' %}" class="btn btn-outline-success">Ver mi resultado VARK</a>
+        <a href="{% url 'chapman_result' %}" class="btn btn-outline-success">Ver mi resultado del test de Chapman</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Mi resultado Chapman{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title mb-4">🎓 Resultado del Test de Chapman Educativo</h2>
+
+        <div class="text-center mb-4">
+          <h3 class="text-primary">{{ emoji }} {{ label }}</h3>
+        </div>
+
+        <div class="alert alert-info">
+          <p class="mb-0"><strong>Tu lenguaje del amor educativo principal es:</strong></p>
+          <p class="lead mb-0">{{ category }}</p>
+        </div>
+
+        <div class="mt-4">
+          <h5>📝 ¿Qué significa esto?</h5>
+          <p>{{ description }}</p>
+        </div>
+
+        <div class="mt-4">
+          <h5>💡 ¿Cómo usar esta información?</h5>
+          <p>Comparte este resultado con tus profesores para que puedan adaptar su estilo de enseñanza y motivación a lo que mejor funciona contigo. Esto puede mejorar significativamente tu experiencia de aprendizaje.</p>
+        </div>
+
+        <div class="text-center mt-4">
+          <a href="{% url 'student_home' %}" class="btn btn-secondary me-2">Volver al panel</a>
+          <a href="{% url 'take_chapman_quiz' %}" class="btn btn-outline-primary">Repetir test</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

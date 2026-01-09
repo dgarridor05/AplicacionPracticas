@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Panel del Profesor{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+  <div class="card shadow-lg p-4" style="width: 100%; max-width: 550px;">
+    <div class="text-center mb-3">
+      <h2 class="text-success">¡Bienvenido, {{ user.username }}!</h2>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title text-center">¿Qué deseas hacer?</h5>
+      <div class="d-grid gap-3 mt-4">
+        <a href="{% url 'view_groups' %}" class="btn btn-success">Ver mis grupos</a>
+        <a href="{% url 'create_group' %}" class="btn btn-outline-success">Crear nuevo grupo</a>
+        <a href="{% url 'face_guess_game' %}" class="btn btn-outline-success">Minijuego: Adivina el nombre</a>
+        <a href="{% url 'name_to_face_game' %}" class="btn btn-outline-success">Minijuego: Adivina la imagen</a>
+        <a href="{% url 'student_interests_game' %}" class="btn btn-outline-success">Minijuego de intereses</a>
+        <a href="{% url 'quiz_results_game' %}" class="btn btn-outline-success">Minijuego de resultados de test</a>
+        <a href="{% url 'student_complete_profile_game' %}" class="btn btn-outline-success">Minijuego: Perfil Completo</a>
+        <a href="{% url 'hangman_game' %}" class="btn btn-outline-success">🎯 Minijuego: Ahorcado</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
