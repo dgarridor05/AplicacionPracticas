@@ -89,38 +89,15 @@ WSGI_APPLICATION = 'relaciona.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+    # Database
+    # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.config(
+            default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+            conn_max_age=600
+        )
     }
-else:
-    # Configuración específica para Vercel (SQLite workaround)
-    # Vercel filesystem es read-only, excepto /tmp
-    # Copiamos la db a /tmp para poder escribir en ella
-    import shutil
-    
-    DB_FILE = BASE_DIR / 'db.sqlite3'
-    if os.getenv('VERCEL'):
-        TMP_DB_FILE = Path('/tmp/db.sqlite3')
-        if not TMP_DB_FILE.exists():
-            if DB_FILE.exists():
-                shutil.copyfile(DB_FILE, TMP_DB_FILE)
-        
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': TMP_DB_FILE,
-            }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': DB_FILE,
-            }
-        }
 
 
 # Password validation
