@@ -107,10 +107,14 @@ WSGI_APPLICATION = 'relaciona.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'relaciona-alumnos',
+        'USER': 'Adsuar',
+        'PASSWORD': 'Adsuar12012026',
+        'HOST': 'relaciona-alumnos.cnlwkjmfxizn.eu-west-3.rds.amazonaws.com',
+        'PORT': '5432',
+    }
 }
 
 
