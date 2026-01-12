@@ -34,12 +34,14 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://conocer-alumnos.vercel.app',
     'https://*.elasticbeanstalk.com',
+    'http://52.47.166.127',
+    'http://52.47.166.127:8000',
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
 
 
 # Application definition
