@@ -1,6 +1,28 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
 
-install_log.txt
-.DS_Store
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment variables (SECRETS)
+.env
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Logs
 *.log
+install_log.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
