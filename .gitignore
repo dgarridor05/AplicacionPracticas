@@ -10,6 +10,7 @@ env/
 
 # Environment variables (SECRETS)
 .env
+.venv.*
 
 # Django
 db.sqlite3
