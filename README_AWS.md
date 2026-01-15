@@ -57,3 +57,26 @@ Actualmente el proyecto usa **SQLite** (`db.sqlite3`).
 *   **En Docker/Elastic Beanstalk, el sistema de archivos es efímero.**
 *   Esto significa que si la aplicación se reinicia o haces un nuevo despliegue, **la base de datos se borrará y perderás los usuarios y datos creados**.
 *   Para solucionar esto en producción, deberías conectar la app a una base de datos externa como **AWS RDS (PostgreSQL)**. AWS también ofrece una capa gratuita para RDS, pero requiere configuración adicional en `settings.py`.
+
+## 🗄️ Configuración de Base de Datos (PostgreSQL)
+
+Para conectar tu aplicación a una base de datos PostgreSQL (como AWS RDS), debes configurar las variables de entorno en Elastic Beanstalk (Configuration > Software).
+
+Puedes usar una sola variable `DATABASE_URL` (recomendado) o variables individuales.
+
+**Opción A: Usando DATABASE_URL (Recomendado)**
+
+Formato: `postgres://USUARIO:CONTRASEÑA@HOST:PUERTO/NOMBRE_DB`
+
+Ejemplo:
+`DATABASE_URL`: `postgres://miusuario:mypassword@mi-rds-instance.aws-region.rds.amazonaws.com:5432/mi_db`
+
+**Opción B: Variables Individuales**
+
+*   `DB_NAME`: Nombre de la base de datos
+*   `DB_USER`: Usuario
+*   `DB_PASSWORD`: Contraseña
+*   `DB_HOST`: Host (Endpoint de RDS)
+*   `DB_PORT`: Puerto (por defecto 5432)
+
+Recuerda asegurarte de que el **Security Group** de tu RDS permita el tráfico entrante desde el Security Group de tu instancia de Elastic Beanstalk en el puerto 5432.
