@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')##CAMBIADO POR SEGURIDAD!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'##CAMBIADO POR SEGURIDAD!!
 
-ALLOWED_HOSTS = ['52.47.166.127', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['52.47.166.127', 'localhost', '127.0.0.1', '.elasticbeanstalk.com']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
