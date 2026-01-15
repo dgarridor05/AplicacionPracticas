@@ -105,15 +105,20 @@ WSGI_APPLICATION = 'relaciona.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-##Esto sirve para que si no tienes postgreSQL en local uses sqlite
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
+}
+
+# Configuracion para conectar a PostgreSQL (local o produccion)
+# Prioriza la variable DATABASE_URL, luego intenta con variables individuales si no estamos en DEBUG
+db_from_env = dj_database_url.config(conn_max_age=500)
+if db_from_env:
+    DATABASES['default'].update(db_from_env)
+elif not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
