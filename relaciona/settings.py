@@ -13,9 +13,15 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 import dj_database_url
 from pathlib import Path
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Initialize environ
+env = environ.Env()
+# Read .env file if it exists
+environ.Env.read_env(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,13 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')##CAMBIADO POR SEGURIDAD!
+SECRET_KEY = env('SECRET_KEY')##CAMBIADO POR SEGURIDAD!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'##CAMBIADO POR SEGURIDAD!!
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = env.bool('DEBUG', default=False)##CAMBIADO POR SEGURIDAD!!
 
-ALLOWED_HOSTS = ['52.47.166.127', 'localhost', '127.0.0.1', '.elasticbeanstalk.com']
-
+#ALLOWED_HOSTS = ['52.47.166.127', 'localhost', '127.0.0.1', '.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://conocer-alumnos.vercel.app',
@@ -108,14 +115,7 @@ WSGI_APPLICATION = 'relaciona.wsgi.application'
 
 # Reemplaza todo tu bloque de DATABASES por este:
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT', '5432'),
-    }
+    'default': env.db('DATABASE_URL'),
 }
 
 
