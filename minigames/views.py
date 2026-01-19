@@ -330,7 +330,7 @@ def quiz_results_game(request):
 def hangman_game(request):
     """
     Juego tipo ahorcado donde se ve la foto del estudiante y hay que adivinar su nombre.
-    Se permiten máximo 4 letras incorrectas antes de perder.
+    Se permiten máximo 6 letras incorrectas antes de perder.
     """
     groups = ClassGroup.objects.filter(teacher=request.user)
     students = UserProfile.objects.filter(
@@ -350,12 +350,21 @@ def hangman_game(request):
 
     # Inicializar estado del juego si no existe
     if 'hangman_current_student' not in request.session:
-        # Nuevo juego
-        student = random.choice(students)
-        # Usar full_name si existe, sino username
+        # --- MEJORA: EVITAR REPETICIÓN ---
+        last_student_id = request.session.get('hangman_last_student_id')
+        
+        # Filtramos para que no salga el mismo de la última vez
+        available_students = students.exclude(id=last_student_id) if last_student_id else students
+        
+        # Si por alguna razón solo hay 1 alumno con foto, usamos la lista original
+        if not available_students.exists():
+            available_students = students
+
+        student = random.choice(available_students)
         target_name = (student.full_name or student.username).upper()
         
         request.session['hangman_current_student'] = student.id
+        request.session['hangman_last_student_id'] = student.id  # Guardamos para la próxima partida
         request.session['hangman_target_name'] = target_name
         request.session['hangman_guessed_letters'] = []
         request.session['hangman_incorrect_letters'] = []
@@ -366,7 +375,6 @@ def hangman_game(request):
         action = request.POST.get('action')
         
         if action == 'new_game':
-            # Reiniciar para nuevo juego
             del request.session['hangman_current_student']
             return redirect('hangman_game')
         
@@ -383,7 +391,6 @@ def hangman_game(request):
                         guessed_letters.append(letter)
                         request.session['hangman_guessed_letters'] = guessed_letters
                         
-                        # Verificar si se ha completado la palabra
                         if all(char in guessed_letters or not char.isalpha() for char in target_name):
                             request.session['hangman_won'] = True
                             request.session['hangman_game_over'] = True
@@ -394,8 +401,8 @@ def hangman_game(request):
                         incorrect_letters.append(letter)
                         request.session['hangman_incorrect_letters'] = incorrect_letters
                         
-                        # Verificar si se perdió (4 letras incorrectas)
-                        if len(incorrect_letters) >= 4:
+                        # --- MEJORA: 6 OPORTUNIDADES ---
+                        if len(incorrect_letters) >= 6:
                             request.session['hangman_game_over'] = True
                             request.session['hangman_won'] = False
                             request.session['hangman_total'] += 1
@@ -405,7 +412,7 @@ def hangman_game(request):
             else:
                 messages.error(request, "Por favor, introduce una letra válida.")
 
-    # Obtener datos actuales del juego
+    # El resto del código se mantiene igual...
     try:
         current_student = UserProfile.objects.get(id=request.session['hangman_current_student'])
     except UserProfile.DoesNotExist:
@@ -418,13 +425,11 @@ def hangman_game(request):
     game_over = request.session['hangman_game_over']
     won = request.session['hangman_won']
 
-    # Crear la palabra con guiones y letras adivinadas
     displayed_name = ''.join(
         char if char in guessed_letters or not char.isalpha() else '_'
         for char in target_name
     )
 
-    # Generar alphabet para mostrar botones
     alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     used_letters = set(guessed_letters + incorrect_letters)
 
@@ -435,7 +440,7 @@ def hangman_game(request):
         'guessed_letters': guessed_letters,
         'incorrect_letters': incorrect_letters,
         'incorrect_count': len(incorrect_letters),
-        'max_incorrect': 4,
+        'max_incorrect': 6,  # Actualizado a 6 para el HTML
         'game_over': game_over,
         'won': won,
         'alphabet': alphabet,
