@@ -9,10 +9,24 @@
     <div class="row g-4 align-items-center">
       <div class="col-md-4 text-center">
         {% if user.profile_picture %}
-          <img src="{{ user.profile_picture.url }}" alt="Foto de perfil" class="rounded-circle img-fluid border border-success" style="max-width: 180px;">
+          <img src="{{ user.profile_picture.url }}" alt="Foto de perfil" class="rounded-circle img-fluid border border-success" style="max-width: 180px; width: 180px; height: 180px; object-fit: cover;">
         {% else %}
           <div class="bg-light rounded-circle d-inline-block d-flex align-items-center justify-content-center" style="width: 180px; height: 180px; border: 3px solid #198754;">
             <i class="fas fa-user fa-3x text-muted"></i>
+          </div>
+        {% endif %}
+
+        {% if user.spotify_embed_url %}
+          <div class="mt-4">
+            <h6 class="text-success fw-bold mb-2 small"><i class="fab fa-spotify"></i> Mi Banda Sonora</h6>
+            <iframe style="border-radius:12px" 
+                    src="{{ user.spotify_embed_url }}" 
+                    width="100%" height="80" 
+                    frameBorder="0" 
+                    allowfullscreen="" 
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                    loading="lazy">
+            </iframe>
           </div>
         {% endif %}
       </div>
@@ -23,17 +37,25 @@
           <li class="list-group-item"><strong>Nombre completo:</strong> {{ user.full_name|default:"No especificado" }}</li>
           <li class="list-group-item"><strong>Fecha de nacimiento:</strong> {{ user.date_of_birth|default:"No especificada" }}</li>
           <li class="list-group-item"><strong>Género:</strong> {{ user.get_gender_display|default:"No especificado" }}</li>
-          <li class="list-group-item"><strong>¿Con que lugar donde has vivido te sientes mas relacionado?:</strong> {{ user.residence_area|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Con qué lugar donde has vivido te sientes más relacionado?:</strong> {{ user.residence_area|default:"No especificado" }}</li>
           <li class="list-group-item"><strong>¿Te gusta celebrar tu cumpleaños?:</strong> {{ user.celebrate_birthday|yesno:"Sí,No" }}</li>
-          <li class="list-group-item"><strong>¿Cual es tu apodo o como te gusta que te llamen?:</strong> {{ user.nickname|default:"No especificado" }}</li>
-          <li class="list-group-item"><strong>¿Cúal es tu cancion favorita?:</strong> {{ user.favorite_song|default:"No especificada" }}</li>
-          <li class="list-group-item"><strong>¿Cúal es tu artista favorito?:</strong> {{ user.favorite_artist|default:"No especificado" }}</li>
-          <li class="list-group-item"><strong>¿Qué pelicula verías una y otra vez?:</strong> {{ user.favorite_movie|default:"No especificada" }}</li>
-          <li class="list-group-item"><strong>¿Cual es tu mayor motivación?:</strong> {{ user.motivation|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>¿Cuál es tu apodo o cómo te gusta que te llamen?:</strong> {{ user.nickname|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Cuál es tu canción favorita?:</strong> {{ user.favorite_song|default:"No especificada" }}</li>
+          
+          {% if user.spotify_link %}
+            <li class="list-group-item text-muted small"><i class="fas fa-link me-1"></i> Enlace de Spotify guardado correctamente.</li>
+          {% endif %}
+
+          <li class="list-group-item"><strong>¿Cuál es tu artista favorito?:</strong> {{ user.favorite_artist|default:"No especificado" }}</li>
+          <li class="list-group-item"><strong>¿Qué película verías una y otra vez?:</strong> {{ user.favorite_movie|default:"No especificada" }}</li>
+          <li class="list-group-item"><strong>¿Cuál es tu mayor motivación?:</strong> {{ user.motivation|default:"No especificada" }}</li>
+          
+          <li class="list-group-item"><strong>¿Por qué estás más agradecido?:</strong> {{ user.gratitude|default:"Aún no has compartido esto" }}</li>
+          <li class="list-group-item"><strong>Tu recuerdo más feliz:</strong> {{ user.happy_memory|default:"Aún no has compartido esto" }}</li>
+          
           <li class="list-group-item"><strong>¿Quieres compartir esta información con la clase?:</strong> {{ user.share_with_class|yesno:"Sí,No" }}</li>
           
-          <!-- Resultados de los tests -->
-          <li class="list-group-item bg-light">
+          <li class="list-group-item bg-light mt-2">
             <strong>Resultados de Tests Psicopedagógicos:</strong>
           </li>
           <li class="list-group-item">
