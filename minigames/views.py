@@ -7,6 +7,9 @@ import random
 from django.contrib import messages
 from django.shortcuts import redirect
 from datetime import datetime
+import unicodedata
+from django.shortcuts import render, redirect
+
 
 @login_required
 def face_guess_game(request):
@@ -326,11 +329,18 @@ def quiz_results_game(request):
         'total': request.session['quiz_results_total']
     })
 
+def normalize_char(char):
+    """Convierte caracteres con tilde en su versión base (ej: Á -> A)"""
+    if not char:
+        return ""
+    return ''.join(c for c in unicodedata.normalize('NFD', char)
+                  if unicodedata.category(c) != 'Mn').upper()
+
 @login_required
 def hangman_game(request):
     """
     Juego tipo ahorcado donde se ve la foto del estudiante y hay que adivinar su nombre.
-    Se permiten máximo 6 letras incorrectas antes de perder.
+    Soporta tildes y permite máximo 6 letras incorrectas.
     """
     groups = ClassGroup.objects.filter(teacher=request.user)
     students = UserProfile.objects.filter(
@@ -350,13 +360,9 @@ def hangman_game(request):
 
     # Inicializar estado del juego si no existe
     if 'hangman_current_student' not in request.session:
-        # --- MEJORA: EVITAR REPETICIÓN ---
         last_student_id = request.session.get('hangman_last_student_id')
-        
-        # Filtramos para que no salga el mismo de la última vez
         available_students = students.exclude(id=last_student_id) if last_student_id else students
         
-        # Si por alguna razón solo hay 1 alumno con foto, usamos la lista original
         if not available_students.exists():
             available_students = students
 
@@ -364,7 +370,7 @@ def hangman_game(request):
         target_name = (student.full_name or student.username).upper()
         
         request.session['hangman_current_student'] = student.id
-        request.session['hangman_last_student_id'] = student.id  # Guardamos para la próxima partida
+        request.session['hangman_last_student_id'] = student.id
         request.session['hangman_target_name'] = target_name
         request.session['hangman_guessed_letters'] = []
         request.session['hangman_incorrect_letters'] = []
@@ -387,11 +393,13 @@ def hangman_game(request):
                 incorrect_letters = request.session['hangman_incorrect_letters']
                 
                 if letter not in guessed_letters and letter not in incorrect_letters:
-                    if letter in target_name:
+                    # Comprobamos contra la versión sin tildes del nombre
+                    if letter in normalize_char(target_name):
                         guessed_letters.append(letter)
                         request.session['hangman_guessed_letters'] = guessed_letters
                         
-                        if all(char in guessed_letters or not char.isalpha() for char in target_name):
+                        # Verificación de victoria ignorando tildes
+                        if all(normalize_char(char) in guessed_letters or not char.isalpha() for char in target_name):
                             request.session['hangman_won'] = True
                             request.session['hangman_game_over'] = True
                             request.session['hangman_correct'] += 1
@@ -401,7 +409,6 @@ def hangman_game(request):
                         incorrect_letters.append(letter)
                         request.session['hangman_incorrect_letters'] = incorrect_letters
                         
-                        # --- MEJORA: 6 OPORTUNIDADES ---
                         if len(incorrect_letters) >= 6:
                             request.session['hangman_game_over'] = True
                             request.session['hangman_won'] = False
@@ -412,7 +419,6 @@ def hangman_game(request):
             else:
                 messages.error(request, "Por favor, introduce una letra válida.")
 
-    # El resto del código se mantiene igual...
     try:
         current_student = UserProfile.objects.get(id=request.session['hangman_current_student'])
     except UserProfile.DoesNotExist:
@@ -425,8 +431,9 @@ def hangman_game(request):
     game_over = request.session['hangman_game_over']
     won = request.session['hangman_won']
 
+    # Mostramos la letra con su tilde original si la versión base ha sido adivinada
     displayed_name = ''.join(
-        char if char in guessed_letters or not char.isalpha() else '_'
+        char if normalize_char(char) in guessed_letters or not char.isalpha() else '_'
         for char in target_name
     )
 
@@ -440,7 +447,7 @@ def hangman_game(request):
         'guessed_letters': guessed_letters,
         'incorrect_letters': incorrect_letters,
         'incorrect_count': len(incorrect_letters),
-        'max_incorrect': 6,  # Actualizado a 6 para el HTML
+        'max_incorrect': 6,
         'game_over': game_over,
         'won': won,
         'alphabet': alphabet,
