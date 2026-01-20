@@ -1,100 +1,126 @@
 {% extends "base.html" %}
-{% block title %}Adivina los gustos del estudiante{% endblock %}
+{% block title %}Adivina los gustos | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  
-  {% if total %}
-    <div class="alert alert-info text-center">
-      Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
-    </div>
-  {% endif %}
-
-  <div class="row justify-content-center mb-4">
-    <div class="col-md-8">
-      <div class="card shadow-sm border-0">
-        <div class="card-body text-center">
-          <h2 class="mb-4 text-success">¿Cuáles son los gustos de {{ target_name }}?</h2>
-          
-          <div class="row align-items-center">
-            <div class="col-md-4 mb-3">
-              {% if target_student.profile_picture %}
-                <img src="{{ target_student.profile_picture.url }}" 
-                     class="rounded-circle shadow-sm" 
-                     style="width: 150px; height: 150px; object-fit: cover;" 
-                     alt="Foto de {{ target_name }}">
-              {% else %}
-                <div class="bg-light text-muted p-4 rounded-circle d-inline-block">
-                  Sin foto
-                </div>
-              {% endif %}
+<div class="container mt-4">
+    
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6 text-center">
+            <div class="px-4 py-2 bg-white shadow-sm rounded-pill border d-inline-block">
+                <i class="fas fa-star text-warning me-2"></i>
+                <span class="text-muted fw-bold">Racha:</span> 
+                <span class="ms-1 fw-bold text-dark">{{ correct }} / {{ total }}</span>
             </div>
-            <div class="col-md-8">
-              <h4 class="text-primary mb-3">{{ target_name }}</h4>
-              <p class="text-muted">
-                Observa la foto y el nombre del estudiante. 
-                <strong>¿Cuál de las siguientes descripciones corresponde a sus gustos reales?</strong>
-              </p>
-            </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
 
-  <form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="target_id" value="{{ target_id }}">
-    <input type="hidden" name="correct_option" value="{{ correct_option }}">
-
-    <div class="row justify-content-center">
-      {% for description in options %}
-        <div class="col-md-6 mb-4">
-          <div class="card h-100 shadow-sm border-0 option-card">
-            <div class="card-body">
-              <div class="d-flex align-items-start">
-                <span class="badge bg-primary rounded-pill me-3 mt-1 fs-6">
-                  {{ forloop.counter }}
-                </span>
-                <div class="flex-grow-1">
-                  <p class="card-text text-justify lh-lg">{{ description }}</p>
-                  <button type="submit" 
-                          name="selected_option" 
-                          value="{{ forloop.counter }}" 
-                          class="btn btn-outline-success w-100 mt-3">
-                    Seleccionar esta opción
-                  </button>
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-10">
+            <div class="card shadow border-0 overflow-hidden" style="border-radius: 20px;">
+                <div class="row g-0 align-items-center bg-white">
+                    <div class="col-md-4 text-center p-4" style="background-color: #f8fff9;">
+                        {% if target_student.profile_picture %}
+                            <img src="{{ target_student.profile_picture.url }}" 
+                                 class="rounded-circle shadow" 
+                                 style="width: 160px; height: 160px; object-fit: cover; border: 4px solid white;" 
+                                 alt="Foto de {{ target_name }}">
+                        {% else %}
+                            <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" 
+                                 style="width: 160px; height: 160px; border: 4px solid white;">
+                                <i class="fas fa-user fa-4x"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8 p-4">
+                        <h2 class="fw-bold mb-2" style="color: var(--bs-primary);">¿Quién es {{ target_name }}?</h2>
+                        <p class="text-muted fs-5 mb-0">
+                            Hemos mezclado sus gustos con los de otros compañeros. <br>
+                            <strong>¿Podrás identificar la descripción 100% real?</strong>
+                        </p>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      {% endfor %}
     </div>
-  </form>
 
-  <div class="text-center mt-4">
-    <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">
-      Volver al panel
-    </a>
-  </div>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="row g-4">
+            {% for description in options %}
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0 interest-card position-relative">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="badge rounded-circle bg-success d-flex align-items-center justify-content-center shadow-sm" 
+                                 style="width: 35px; height: 35px; font-size: 1.1rem;">
+                                {{ forloop.counter }}
+                            </div>
+                            <div class="ms-3 text-muted small fw-bold text-uppercase mt-1">Opción sugerida</div>
+                        </div>
+                        
+                        <p class="card-text lh-base text-secondary mb-4" style="font-size: 1.05rem; text-align: justify;">
+                            "{{ description }}"
+                        </p>
+                        
+                        <button type="submit" 
+                                name="selected_option" 
+                                value="{{ forloop.counter }}" 
+                                class="btn btn-success w-100 py-2 shadow-sm rounded-3">
+                            <i class="fas fa-check-circle me-2"></i> Esta es su descripción
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+
+    <div class="text-center mt-5 pt-4 border-top">
+        <a href="{% url 'student_interests_game' %}" class="btn btn-link text-decoration-none text-muted">
+            <i class="fas fa-redo me-1"></i> Saltar este alumno
+        </a>
+        <span class="mx-3 text-light">|</span>
+        <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary px-4">
+            <i class="fas fa-home me-2"></i> Volver al panel
+        </a>
+    </div>
 
 </div>
 
 <style>
-.option-card:hover {
-  transform: translateY(-2px);
-  transition: transform 0.2s ease-in-out;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
-}
+    .interest-card {
+        transition: all 0.3s ease;
+        border-radius: 15px;
+        background-color: #ffffff;
+    }
 
-.option-card .btn:hover {
-  transform: scale(1.02);
-  transition: transform 0.1s ease-in-out;
-}
+    .interest-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.1) !important;
+        background-color: #fcfdfc;
+    }
 
-.text-justify {
-  text-align: justify;
-}
+    /* Estilo para las comillas decorativas */
+    .card-text::before {
+        content: "\f10d";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        color: #e0eee4;
+        font-size: 2rem;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        opacity: 0.5;
+    }
+
+    .btn-success {
+        background-color: #198754;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background-color: #146c43;
+        transform: scale(1.02);
+    }
 </style>
 {% endblock %}

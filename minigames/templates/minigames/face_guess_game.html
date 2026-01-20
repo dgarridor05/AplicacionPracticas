@@ -1,42 +1,87 @@
 {% extends "base.html" %}
-{% block title %}Adivina el alumno{% endblock %}
+{% block title %}Adivina el Alumno | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <div class="card shadow-sm border-0">
-    <div class="card-body text-center">
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow border-0" style="border-radius: 15px;">
+                <div class="card-body p-5 text-center">
+                    
+                    <h2 class="mb-4 fw-bold" style="color: var(--bs-primary);">
+                        <i class="fas fa-question-circle"></i> ¿Quién es?
+                    </h2>
 
-      <h2 class="mb-4 text-success">¿Quién es este alumno?</h2>
+                    <div class="d-flex justify-content-center mb-4">
+                        <div class="px-4 py-2 bg-light rounded-pill border">
+                            <span class="text-muted small uppercase fw-bold">Puntuación:</span>
+                            <span class="ms-2 fw-bold text-dark">{{ correct }} / {{ total }}</span>
+                        </div>
+                    </div>
 
-      {% if total %}
-        <div class="alert alert-info">
-          Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
+                    <div class="position-relative d-inline-block mb-4">
+                        {% if student.profile_picture %}
+                            <img src="{{ student.profile_picture.url }}" 
+                                 class="rounded-circle shadow" 
+                                 style="width: 220px; height: 220px; object-fit: cover; border: 5px solid white; outline: 2px solid #198754;" 
+                                 alt="Foto del alumno">
+                        {% else %}
+                            <div class="bg-light rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto" 
+                                 style="width: 220px; height: 220px; border: 5px solid white; outline: 2px solid #dee2e6;">
+                                <i class="fas fa-user fa-5x text-muted"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST" class="mt-2" autocomplete="off">
+                        {% csrf_token %}
+                        <input type="hidden" name="student_id" value="{{ student.id }}">
+                        
+                        <div class="mb-4">
+                            <label for="answer" class="form-label fw-bold text-muted">Escribe su nombre, apellido o apodo:</label>
+                            <input type="text" 
+                                   name="answer" 
+                                   id="answer" 
+                                   class="form-control form-control-lg text-center" 
+                                   placeholder="???" 
+                                   required 
+                                   autofocus>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                <i class="fas fa-paper-plane me-2"></i> Comprobar
+                            </button>
+                            <div class="d-flex gap-2 mt-2">
+                                <a href="{% url 'face_guess_game' %}" class="btn btn-outline-secondary flex-grow-1">
+                                    <i class="fas fa-redo"></i> Saltar
+                                </a>
+                                <a href="{% url 'teacher_home' %}" class="btn btn-light flex-grow-1 border">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            
+            <p class="text-center mt-4 text-muted small">
+                <i class="fas fa-info-circle"></i> No importa si usas mayúsculas o tildes.
+            </p>
         </div>
-      {% endif %}
-
-      {% if student.profile_picture %}
-        <img src="{{ student.profile_picture.url }}" class="rounded-circle shadow-sm mb-4" style="width: 200px; height: 200px; object-fit: cover;" alt="Foto del alumno">
-      {% else %}
-        <div class="bg-light rounded-circle d-inline-block mb-4 d-flex align-items-center justify-content-center" style="width: 200px; height: 200px;">
-          <i class="fas fa-user fa-3x text-muted"></i>
-        </div>
-        <p class="text-muted">Este alumno no tiene foto de perfil.</p>
-      {% endif %}
-
-      <form method="POST" class="text-start mt-4">
-        {% csrf_token %}
-        <input type="hidden" name="student_id" value="{{ student.id }}">
-        <div class="mb-3">
-          <label for="answer" class="form-label">Escribe su nombre o apodo:</label>
-          <input type="text" name="answer" id="answer" class="form-control" placeholder="Ej: Marta, Juan..." required>
-        </div>
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-          <button type="submit" class="btn btn-success">Enviar</button>
-          <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">Volver al panel</a>
-        </div>
-      </form>
-
     </div>
-  </div>
 </div>
+
+<style>
+    /* Efecto de foco en el input con el color de RELACIONA */
+    .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+    }
+    
+    .card {
+        background-color: #ffffff;
+    }
+</style>
 {% endblock %}

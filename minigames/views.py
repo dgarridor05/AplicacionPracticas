@@ -9,7 +9,15 @@ from django.shortcuts import redirect
 from datetime import datetime
 import unicodedata
 from django.shortcuts import render, redirect
+from datetime import date
 
+def normalize_text(text):
+    """Elimina tildes, espacios extra y lo pasa a minúsculas."""
+    if not text:
+        return ""
+    text = unicodedata.normalize('NFD', text)
+    text = "".join([c for c in text if unicodedata.category(c) != 'Mn'])
+    return text.lower().strip()
 
 @login_required
 def face_guess_game(request):
@@ -23,39 +31,55 @@ def face_guess_game(request):
     if not students.exists():
         return render(request, 'minigames/no_students.html')
 
-    # Inicializar contadores si no existen en la sesión
+    # Inicializar contadores
     if 'face_guess_correct' not in request.session:
         request.session['face_guess_correct'] = 0
     if 'face_guess_total' not in request.session:
         request.session['face_guess_total'] = 0
 
     if request.method == 'POST':
-        student_id = request.POST.get('student_id')
-        answer = request.POST.get('answer', '').strip().lower()
+        # Recuperamos el ID que guardamos en la sesión al cargar la página
+        target_id = request.session.get('face_guess_target_id')
+        answer = normalize_text(request.POST.get('answer', ''))
 
         try:
-            student = UserProfile.objects.get(id=student_id)
+            student = UserProfile.objects.get(id=target_id)
         except UserProfile.DoesNotExist:
-            messages.error(request, "Alumno no encontrado.")
+            messages.error(request, "Error al recuperar el alumno.")
             return redirect('face_guess_game')
 
-        correct_names = [student.username.lower()]
-        if student.nickname:
-            correct_names.append(student.nickname.lower())
+        # Creamos una lista de posibles respuestas válidas normalizadas
+        valid_answers = [
+            normalize_text(student.username),
+            normalize_text(student.first_name),
+            normalize_text(student.last_name),
+            normalize_text(student.full_name),
+            normalize_text(student.nickname),
+        ]
+        # Eliminamos valores vacíos de la lista
+        valid_answers = [a for a in valid_answers if a]
 
         request.session['face_guess_total'] += 1
-        if answer in correct_names:
+        
+        if answer in valid_answers:
             request.session['face_guess_correct'] += 1
-            messages.success(request, "¡Correcto!")
+            messages.success(request, f"¡Correcto! Es {student.full_name or student.username}")
         else:
-            messages.error(request, f"Incorrecto. Era: {student.nickname or student.username}")
+            messages.error(request, f"Incorrecto. Era: {student.full_name or student.username}")
 
         return redirect('face_guess_game')
 
-    student = random.choice(students)
+    # --- Lógica para seleccionar alumno (Anti-repetición) ---
+    last_id = request.session.get('face_guess_last_id')
+    available_students = students.exclude(id=last_id) if last_id and students.count() > 1 else students
+    target_student = random.choice(available_students)
+
+    # Guardamos en sesión tanto para el POST como para la siguiente ronda
+    request.session['face_guess_target_id'] = target_student.id
+    request.session['face_guess_last_id'] = target_student.id
 
     return render(request, 'minigames/face_guess_game.html', {
-        'student': student,
+        'student': target_student,
         'correct': request.session['face_guess_correct'],
         'total': request.session['face_guess_total']
     })
@@ -63,7 +87,6 @@ def face_guess_game(request):
 @login_required
 def name_to_face_game(request):
     groups = ClassGroup.objects.filter(teacher=request.user)
-
     students = UserProfile.objects.filter(
         role='student',
         student_groups__in=groups,
@@ -71,10 +94,9 @@ def name_to_face_game(request):
     ).exclude(profile_picture='').distinct()
 
     if students.count() < 4:
-        messages.warning(request, "Se necesitan al menos 4 alumnos con foto de perfil para jugar.")
+        messages.warning(request, "Se necesitan al menos 4 alumnos con foto para jugar.")
         return render(request, 'minigames/not_enough_students.html')
 
-    # Inicializar contadores si no existen
     if 'name_to_face_correct' not in request.session:
         request.session['name_to_face_correct'] = 0
     if 'name_to_face_total' not in request.session:
@@ -82,46 +104,58 @@ def name_to_face_game(request):
 
     if request.method == 'POST':
         selected_id = request.POST.get('selected_id')
-        target_id = request.POST.get('target_id')
-        option_ids = request.POST.getlist('option_ids')
+        # MEJORA: Obtenemos el ID correcto de la sesión (Seguridad)
+        target_id = request.session.get('name_to_face_target_id')
 
         request.session['name_to_face_total'] += 1
-        if selected_id == target_id:
+        
+        if str(selected_id) == str(target_id):
             request.session['name_to_face_correct'] += 1
-            messages.success(request, "¡Correcto!")
+            messages.success(request, "¡Correcto! Has reconocido al alumno.")
         else:
             try:
-                correct_index = option_ids.index(target_id)
-                position = int(correct_index) + 1
-                messages.error(request, f"Incorrecto. La respuesta correcta era la opción {position}.")
-            except ValueError:
-                messages.error(request, "Error al identificar la opción correcta.")
+                target_student = UserProfile.objects.get(id=target_id)
+                wrong_student = UserProfile.objects.get(id=selected_id)
+                messages.error(request, f"Incorrecto. Elegiste a {wrong_student.full_name or wrong_student.username}, pero buscábamos a {target_student.full_name or target_student.username}.")
+            except:
+                messages.error(request, "Incorrecto. No era ese alumno.")
 
         return redirect('name_to_face_game')
 
-    target = random.choice(students)
-    options = random.sample(list(students.exclude(id=target.id)), 3)
+    # MEJORA: Sistema anti-repetición
+    last_id = request.session.get('name_to_face_last_id')
+    available_students = students.exclude(id=last_id) if last_id and students.count() > 1 else students
+    
+    target = random.choice(available_students)
+    
+    # Guardamos en sesión el objetivo para validar en el POST
+    request.session['name_to_face_target_id'] = target.id
+    request.session['name_to_face_last_id'] = target.id
+
+    # Seleccionamos 3 señuelos
+    decoys = students.exclude(id=target.id)
+    options = random.sample(list(decoys), 3)
     options.append(target)
     random.shuffle(options)
 
     return render(request, 'minigames/name_to_face_game.html', {
-        'target_name': target.nickname or target.username,
-        'target_id': str(target.id),
+        # MEJORA: Priorizamos nombre completo para un lenguaje más natural
+        'target_name': target.full_name or target.nickname or target.username,
         'options': options,
-        'option_ids': [str(option.id) for option in options],
         'correct': request.session['name_to_face_correct'],
         'total': request.session['name_to_face_total']
     })
 
+def calculate_age(birth_date):
+    if not birth_date: return "desconocida"
+    today = datetime.today()
+    return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
 @login_required
 def student_interests_game(request):
-    """
-    Juego donde el profesor ve la foto y nombre de un estudiante,
-    y debe adivinar cuáles son sus gustos personales entre 4 opciones.
-    """
     groups = ClassGroup.objects.filter(teacher=request.user)
     
-    # Filtrar estudiantes que tengan todos los campos necesarios
+    # Estudiantes con perfil completo
     students = UserProfile.objects.filter(
         role='student',
         student_groups__in=groups,
@@ -131,19 +165,12 @@ def student_interests_game(request):
         favorite_song__isnull=False,
         motivation__isnull=False,
         date_of_birth__isnull=False
-    ).exclude(
-        profile_picture='',
-        favorite_artist='',
-        favorite_movie='',
-        favorite_song='',
-        motivation=''
-    ).distinct()
+    ).exclude(profile_picture='', favorite_artist='', favorite_movie='', favorite_song='', motivation='').distinct()
 
     if students.count() < 4:
-        messages.warning(request, "Se necesitan al menos 4 alumnos con información completa de gustos para jugar.")
+        messages.warning(request, "Necesitas al menos 4 alumnos con el perfil completo.")
         return render(request, 'minigames/not_enough_students.html')
 
-    # Inicializar contadores si no existen
     if 'interests_correct' not in request.session:
         request.session['interests_correct'] = 0
     if 'interests_total' not in request.session:
@@ -151,78 +178,61 @@ def student_interests_game(request):
 
     if request.method == 'POST':
         selected_option = request.POST.get('selected_option')
-        target_id = request.POST.get('target_id')
-        correct_option = request.POST.get('correct_option')
+        # Seguridad: Recuperamos la respuesta correcta de la sesión
+        correct_option = request.session.get('interests_correct_pos')
 
         request.session['interests_total'] += 1
-        if selected_option == correct_option:
+        if str(selected_option) == str(correct_option):
             request.session['interests_correct'] += 1
-            messages.success(request, "¡Correcto! Has identificado bien los gustos del estudiante.")
+            messages.success(request, "¡Increíble! Conoces muy bien sus intereses.")
         else:
-            messages.error(request, f"Incorrecto. La respuesta correcta era la opción {correct_option}.")
-
+            messages.error(request, f"Esa no era. La opción correcta era la {correct_option}.")
+        
         return redirect('student_interests_game')
 
-    # Seleccionar estudiante objetivo
-    target = random.choice(students)
+    # Anti-repetición
+    last_id = request.session.get('interests_last_id')
+    available = students.exclude(id=last_id) if last_id else students
+    target = random.choice(available)
+    request.session['interests_last_id'] = target.id
+
+    # Función para crear descripción
+    def get_desc(s):
+        age = calculate_age(s.date_of_birth)
+        return (f"Tiene {age} años. Su motivación es: {s.motivation}. "
+                f"Le encanta '{s.favorite_song}', su artista es {s.favorite_artist} "
+                f"y su película favorita es '{s.favorite_movie}'.")
+
+    # Crear la opción correcta
+    correct_description = get_desc(target)
     
-    # Crear la descripción correcta
-    def create_interest_description(student):
-        """Crea una descripción narrativa de los gustos del estudiante"""
-        age = calculate_age(student.date_of_birth) if student.date_of_birth else "edad desconocida"
+    # Crear 3 opciones falsas (mentiras mezcladas)
+    other_students = list(students.exclude(id=target.id))
+    fake_options = []
+    
+    while len(fake_options) < 3:
+        # Mezclamos datos de otros para crear una descripción falsa
+        s1, s2, s3, s4 = random.sample(other_students, 4) if len(other_students) >= 4 else random.choices(other_students, k=4)
         
-        description = f"Tiene {age} años y su motivación es: {student.motivation}. "
-        description += f"Le encanta escuchar '{student.favorite_song}', "
-        description += f"su artista favorito es {student.favorite_artist} y su película favorita es '{student.favorite_movie}'."
+        age = calculate_age(s1.date_of_birth)
+        f_desc = (f"Tiene {age} años. Su motivación es: {s2.motivation}. "
+                  f"Le encanta '{s3.favorite_song}', su artista es {s4.favorite_artist} "
+                  f"y su película favorita es '{s1.favorite_movie}'.")
         
-        return description
-    
-    def calculate_age(birth_date):
-        """Calcula la edad a partir de la fecha de nacimiento"""
-        today = datetime.today()
-        return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-    
-    # Crear descripciones falsas mezclando datos de otros estudiantes
-    def create_fake_descriptions(target_student, all_students):
-        """Crea 3 descripciones falsas mezclando datos reales de otros estudiantes"""
-        fake_descriptions = []
-        other_students = list(all_students.exclude(id=target_student.id))
-        
-        for i in range(3):
-            # Seleccionar datos aleatorios de diferentes estudiantes
-            song_student = random.choice(other_students)
-            artist_student = random.choice(other_students)
-            movie_student = random.choice(other_students)
-            motivation_student = random.choice(other_students)
-            birth_student = random.choice(other_students)
-            
-            age = calculate_age(birth_student.date_of_birth) if birth_student.date_of_birth else "edad desconocida"
-            
-            fake_desc = f"Tiene {age} años y su motivación es: {motivation_student.motivation}. "
-            fake_desc += f"Le encanta escuchar '{song_student.favorite_song}', "
-            fake_desc += f"su artista favorito es {artist_student.favorite_artist} y su película favorita es '{movie_student.favorite_movie}'."
-            
-            fake_descriptions.append(fake_desc)
-        
-        return fake_descriptions
-    
-    # Crear todas las opciones
-    correct_description = create_interest_description(target)
-    fake_descriptions = create_fake_descriptions(target, students)
-    
-    # Combinar y mezclar opciones
-    all_options = fake_descriptions + [correct_description]
+        if f_desc not in fake_options and f_desc != correct_description:
+            fake_options.append(f_desc)
+
+    # Mezclar todo
+    all_options = fake_options + [correct_description]
     random.shuffle(all_options)
     
-    # Encontrar la posición de la opción correcta
-    correct_position = all_options.index(correct_description) + 1
-    
+    # Guardar posición correcta en sesión (del 1 al 4)
+    request.session['interests_correct_pos'] = all_options.index(correct_description) + 1
+
     return render(request, 'minigames/student_interests_game.html', {
         'target_student': target,
-        'target_name': target.nickname or target.username,
-        'target_id': str(target.id),
+        'target_name': target.full_name or target.nickname or target.username,
         'options': all_options,
-        'correct_option': str(correct_position),
         'correct': request.session['interests_correct'],
         'total': request.session['interests_total']
     })
@@ -468,43 +478,44 @@ def student_complete_profile_game(request):
     if students.count() < 4:
         return render(request, 'minigames/not_enough_students.html')
 
-    # Inicializar contadores si no existen en la sesión
+    # Inicializar contadores en la sesión
     if 'complete_profile_correct' not in request.session:
         request.session['complete_profile_correct'] = 0
     if 'complete_profile_total' not in request.session:
         request.session['complete_profile_total'] = 0
 
     if request.method == 'POST':
-        student_id = request.POST.get('student_id')
-        selected_option = request.POST.get('selected_option')
-
-        try:
-            correct_student = UserProfile.objects.get(id=student_id)
-        except UserProfile.DoesNotExist:
-            messages.error(request, "Alumno no encontrado.")
-            return redirect('student_complete_profile_game')
+        # Obtenemos el ID del estudiante que el profesor ha seleccionado como correcto
+        selected_student_id = request.POST.get('selected_student_id')
+        # Obtenemos el ID que el servidor guardó como el correcto en este turno
+        target_id = request.session.get('complete_profile_target_id')
 
         request.session['complete_profile_total'] += 1
         
-        if selected_option == '0':  # La opción correcta siempre será la 0
+        if str(selected_student_id) == str(target_id):
             request.session['complete_profile_correct'] += 1
             messages.success(request, "¡Correcto! Has identificado todos los datos del alumno.")
         else:
-            messages.error(request, f"Incorrecto. Los datos correctos eran del estudiante: {correct_student.full_name or correct_student.username}")
+            try:
+                correct_obj = UserProfile.objects.get(id=target_id)
+                nombre_correcto = correct_obj.full_name or correct_obj.username
+            except:
+                nombre_correcto = "el alumno indicado"
+            messages.error(request, f"Incorrecto. Los datos pertenecían a: {nombre_correcto}")
 
         return redirect('student_complete_profile_game')
 
-    # Seleccionar estudiante objetivo
-    target_student = random.choice(students)
+    # --- MEJORA 1: ANTI-REPETICIÓN ---
+    last_id = request.session.get('complete_profile_last_id')
+    available_students = students.exclude(id=last_id) if last_id and students.count() > 1 else students
+    target_student = random.choice(available_students)
     
-    # Obtener resultados de tests del estudiante objetivo
-    target_results = UserResult.objects.filter(user=target_student)
-    
-    # Crear datos completos del estudiante objetivo
+    # Guardamos el ID correcto en la sesión para validarlo en el POST
+    request.session['complete_profile_target_id'] = target_student.id
+    request.session['complete_profile_last_id'] = target_student.id
+
     def get_student_complete_data(student):
         results = UserResult.objects.filter(user=student)
-        
-        # Obtener resultados de tests
         chapman_result = "No realizado"
         vark_result = "No realizado"
         
@@ -514,14 +525,13 @@ def student_complete_profile_game(request):
             elif "VARK" in result.questionnaire.title:
                 vark_result = result.get_dominant_category_display()
         
-        # Calcular edad a partir de fecha de nacimiento
         age = "No especificada"
         if student.date_of_birth:
-            from datetime import date
             today = date.today()
             age = today.year - student.date_of_birth.year - ((today.month, today.day) < (student.date_of_birth.month, student.date_of_birth.day))
         
         return {
+            'student_id': student.id, # IMPORTANTE: Guardamos el ID para identificar la opción
             'full_name': student.full_name or f"{student.first_name} {student.last_name}",
             'username': student.username,
             'nickname': student.nickname or "Sin apodo",
@@ -538,51 +548,40 @@ def student_complete_profile_game(request):
             'motivation': student.motivation or "No especificada"
         }
 
-    # Datos correctos del estudiante objetivo
+    # Datos correctos
     correct_data = get_student_complete_data(target_student)
 
-    # Obtener otros 3 estudiantes para crear opciones incorrectas
+    # Generar opciones incorrectas (Decoys)
     other_students = students.exclude(id=target_student.id)
     decoy_students = random.sample(list(other_students), min(3, len(other_students)))
 
-    # Crear 4 opciones mezclando datos
     options = []
-    
-    # Opción correcta (posición 0)
+    # Añadimos la opción correcta
     options.append(correct_data)
     
-    # Opciones incorrectas (mezclar datos de otros estudiantes)
+    # Añadimos las incorrectas mezclando datos para subir la dificultad
     for i, decoy in enumerate(decoy_students):
         decoy_data = get_student_complete_data(decoy)
-        
-        # Mezclar algunos datos correctos con incorrectos para hacer más difícil
         mixed_data = correct_data.copy()
         
-        # Cambiar algunos campos por datos incorrectos
-        if i == 0:  # Cambiar nombre y tests
+        # El ID de la opción DEBE ser el del decoy para que sea incorrecto al comparar
+        mixed_data['student_id'] = decoy.id 
+        
+        if i == 0:
             mixed_data['full_name'] = decoy_data['full_name']
             mixed_data['username'] = decoy_data['username']
-            mixed_data['chapman_result'] = decoy_data['chapman_result']
-            mixed_data['vark_result'] = decoy_data['vark_result']
-        elif i == 1:  # Cambiar datos personales
+        elif i == 1:
             mixed_data['age'] = decoy_data['age']
-            mixed_data['gender'] = decoy_data['gender']
-            mixed_data['date_of_birth'] = decoy_data['date_of_birth']
-            mixed_data['emotional_reinforcement'] = decoy_data['emotional_reinforcement']
-        else:  # Cambiar gustos y preferencias
-            mixed_data['nickname'] = decoy_data['nickname']
-            mixed_data['favorite_artist'] = decoy_data['favorite_artist']
             mixed_data['favorite_movie'] = decoy_data['favorite_movie']
-            mixed_data['favorite_song'] = decoy_data['favorite_song']
-            mixed_data['learning_style'] = decoy_data['learning_style']
-            mixed_data['motivation'] = decoy_data['motivation']
+        else:
+            mixed_data['favorite_artist'] = decoy_data['favorite_artist']
+            mixed_data['vark_result'] = decoy_data['vark_result']
             
         options.append(mixed_data)
 
-    # Mezclar las opciones (excepto la primera que debe mantenerse como correcta)
-    incorrect_options = options[1:]
-    random.shuffle(incorrect_options)
-    options = [options[0]] + incorrect_options
+    # --- MEJORA 2: ALEATORIEDAD REAL ---
+    # Mezclamos TODAS las opciones para que la correcta no esté siempre arriba
+    random.shuffle(options)
 
     return render(request, 'minigames/student_complete_profile_game.html', {
         'target_student': target_student,

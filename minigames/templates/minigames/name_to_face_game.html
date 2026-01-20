@@ -1,49 +1,101 @@
 {% extends "base.html" %}
-{% block title %}Adivina la imagen{% endblock %}
+{% block title %}¿Quién es quién? | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-
-  {% if total %}
-    <div class="alert alert-info text-center">
-      Aciertos: <strong>{{ correct }}</strong> de <strong>{{ total }}</strong> intentos
-    </div>
-  {% endif %}
-
-  <div class="text-center mb-4">
-    <h2>¿Quién es <span class="text-success">{{ target_name }}</span>?</h2>
-  </div>
-
-  <form method="POST">
-    {% csrf_token %}
-    <input type="hidden" name="target_id" value="{{ target_id }}">
-    {% for option in option_ids %}
-      <input type="hidden" name="option_ids" value="{{ option }}">
-    {% endfor %}
-
-    <div class="row justify-content-center">
-      {% for student in options %}
-        <div class="col-6 col-md-3 mb-4">
-          <div class="card shadow-sm border-0 h-100">
-            <div class="card-body text-center p-2">
-              <p class="fw-semibold mb-2">Opción {{ forloop.counter }}</p>
-              <button type="submit" name="selected_id" value="{{ student.id }}" class="btn btn-outline-success p-0 border-0">
-                {% if student.profile_picture %}
-                  <img src="{{ student.profile_picture.url }}" alt="Alumno" class="img-fluid rounded" style="object-fit: cover; max-height: 200px;">
-                {% else %}
-                  <div class="bg-light text-muted p-5 rounded border">Sin foto</div>
-                {% endif %}
-              </button>
+<div class="container mt-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6 text-center">
+            <div class="alert alert-secondary shadow-sm rounded-pill d-inline-block px-4">
+                <i class="fas fa-trophy text-warning me-2"></i>
+                Puntuación: <strong>{{ correct }}</strong> / {{ total }}
             </div>
-          </div>
         </div>
-      {% endfor %}
     </div>
-  </form>
 
-  <div class="text-center">
-    <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary mt-4">Volver al panel</a>
-  </div>
+    <div class="text-center mb-5">
+        <h1 class="display-6 fw-bold">¿Quién es <span class="text-success border-bottom border-3 border-success">{{ target_name }}</span>?</h1>
+        <p class="text-muted mt-2">Selecciona la foto que corresponde al nombre</p>
+    </div>
 
+    <form method="POST" id="game-form">
+        {% csrf_token %}
+        <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
+            {% for student in options %}
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 option-card">
+                    <button type="submit" name="selected_id" value="{{ student.id }}" class="btn p-0 border-0 h-100 w-100">
+                        <div class="card-body p-2 d-flex flex-column">
+                            <div class="badge bg-light text-dark mb-2 align-self-start">Ficha {{ forloop.counter }}</div>
+                            
+                            <div class="image-container overflow-hidden rounded shadow-sm">
+                                {% if student.profile_picture %}
+                                    <img src="{{ student.profile_picture.url }}" 
+                                         alt="Alumno" 
+                                         class="img-fluid" 
+                                         style="aspect-ratio: 1/1; object-fit: cover; width: 100%;">
+                                {% else %}
+                                    <div class="bg-light text-muted d-flex align-items-center justify-content-center" 
+                                         style="aspect-ratio: 1/1; width: 100%;">
+                                        <i class="fas fa-user-slash fa-3x"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mt-3 text-success fw-bold select-label">
+                                <i class="fas fa-mouse-pointer me-1"></i> Seleccionar
+                            </div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+
+    <div class="text-center mt-5 pt-3 border-top">
+        <a href="{% url 'name_to_face_game' %}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-sync-alt"></i> Siguiente nombre
+        </a>
+        <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-home"></i> Volver al panel
+        </a>
+    </div>
 </div>
+
+<style>
+    /* Estilo para que las tarjetas parezcan elementos de juego */
+    .option-card {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+    }
+
+    .option-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
+        background-color: #f8fff9;
+    }
+
+    .image-container img {
+        transition: transform 0.5s ease;
+    }
+
+    .option-card:hover .image-container img {
+        transform: scale(1.1);
+    }
+
+    .select-label {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .option-card:hover .select-label {
+        opacity: 1;
+    }
+
+    .option-card .btn:focus {
+        outline: 3px solid #198754;
+        box-shadow: none;
+    }
+</style>
 {% endblock %}

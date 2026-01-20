@@ -7,38 +7,36 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="card">
+            <div class="card shadow">
                 <div class="card-header bg-info text-white text-center">
                     <h3><i class="fas fa-user-graduate"></i> Juego: ¿Conoces el Perfil Completo?</h3>
-                    <p class="mb-0">Observa la foto y selecciona la opción que contenga TODOS los datos correctos del estudiante</p>
+                    <p class="mb-0">Observa la foto y selecciona la ficha que creas que le pertenece <strong>completamente</strong>.</p>
                 </div>
                 
                 <div class="card-body">
-                    <!-- Estadísticas -->
                     <div class="row mb-4">
                         <div class="col-md-12">
                             <div class="alert alert-secondary text-center">
-                                <strong>Puntuación:</strong> {{ correct }} de {{ total }}
+                                <strong>Puntuación de la sesión:</strong> {{ correct }} de {{ total }} aciertos
                             </div>
                         </div>
                     </div>
 
-                    <!-- Foto del estudiante -->
                     <div class="row mb-4">
                         <div class="col-md-12 text-center">
-                            <div class="card border-primary">
+                            <div class="card border-primary mx-auto" style="max-width: 400px;">
                                 <div class="card-header bg-primary text-white">
-                                    <h5><i class="fas fa-camera"></i> ¿De quién es este perfil completo?</h5>
+                                    <h5 class="mb-0"><i class="fas fa-camera"></i> ¿Quién es este alumno/a?</h5>
                                 </div>
                                 <div class="card-body">
                                     {% if target_student.profile_picture %}
                                         <img src="{{ target_student.profile_picture.url }}" 
                                              alt="Foto del estudiante" 
-                                             class="img-fluid rounded-circle mb-3"
-                                             style="width: 200px; height: 200px; object-fit: cover; border: 4px solid #007bff;">
+                                             class="img-fluid rounded-circle mb-2"
+                                             style="width: 180px; height: 180px; object-fit: cover; border: 5px solid #007bff;">
                                     {% else %}
-                                        <div class="bg-light rounded-circle d-inline-block mb-3" 
-                                             style="width: 200px; height: 200px; display: flex; align-items: center; justify-content: center;">
+                                        <div class="bg-light rounded-circle d-inline-block mb-2" 
+                                             style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; border: 5px solid #dee2e6;">
                                             <i class="fas fa-user fa-5x text-muted"></i>
                                         </div>
                                     {% endif %}
@@ -47,39 +45,30 @@
                         </div>
                     </div>
 
-                    <!-- Opciones de respuesta -->
-                    <form method="post" class="mt-4">
+                    <form method="post" id="gameForm" class="mt-4">
                         {% csrf_token %}
-                        <input type="hidden" name="student_id" value="{{ target_student.id }}">
-                        
                         <div class="row">
                             {% for option in options %}
                             <div class="col-md-6 mb-3">
-                                <div class="card h-100 option-card" style="cursor: pointer;" onclick="selectOption({{ forloop.counter0 }})">
-                                    <div class="card-header bg-light">
-                                        <h6 class="mb-0">
-                                            <input type="radio" name="selected_option" value="{{ forloop.counter0 }}" id="option{{ forloop.counter0 }}" class="me-2">
-                                            <label for="option{{ forloop.counter0 }}" style="cursor: pointer;">
-                                                <strong>Opción {{ forloop.counter }}</strong>
-                                            </label>
-                                        </h6>
+                                <div class="card h-100 option-card" id="card-{{ option.student_id }}" onclick="selectOption('{{ option.student_id }}')">
+                                    <div class="card-header d-flex align-items-center">
+                                        <input type="radio" name="selected_student_id" value="{{ option.student_id }}" id="radio-{{ option.student_id }}" class="me-2">
+                                        <label class="mb-0 fw-bold" style="cursor: pointer;">Opción {{ forloop.counter }}</label>
                                     </div>
                                     <div class="card-body">
                                         <div class="student-info">
-                                            <p><strong><i class="fas fa-user"></i> Nombre completo:</strong> {{ option.full_name }}</p>
-                                            <p><strong><i class="fas fa-smile"></i> Apodo:</strong> {{ option.nickname }}</p>
-                                            <p><strong><i class="fas fa-birthday-cake"></i> Edad:</strong> {{ option.age }} años</p>
-                                            <p><strong><i class="fas fa-calendar"></i> Fecha de nacimiento:</strong> {{ option.date_of_birth }}</p>
-                                            <p><strong><i class="fas fa-music"></i> Artista favorito:</strong> {{ option.favorite_artist }}</p>
-                                            <p><strong><i class="fas fa-film"></i> Película favorita:</strong> {{ option.favorite_movie }}</p>
-                                            <p><strong><i class="fas fa-headphones"></i> Canción favorita:</strong> {{ option.favorite_song }}</p>
-                                            <p><strong><i class="fas fa-brain"></i> Test Chapman:</strong> 
-                                                <span class="badge bg-primary">{{ option.chapman_result }}</span>
-                                            </p>
-                                            <p><strong><i class="fas fa-graduation-cap"></i> Test VARK:</strong> 
-                                                <span class="badge bg-success">{{ option.vark_result }}</span>
-                                            </p>
-                                            <p><strong><i class="fas fa-star"></i> Motivación:</strong> {{ option.motivation }}</p>
+                                            <p><i class="fas fa-user text-muted"></i> <strong>Nombre:</strong> {{ option.full_name }}</p>
+                                            <p><i class="fas fa-smile text-muted"></i> <strong>Apodo:</strong> {{ option.nickname }}</p>
+                                            <p><i class="fas fa-birthday-cake text-muted"></i> <strong>Edad:</strong> {{ option.age }} años</p>
+                                            <p><i class="fas fa-music text-muted"></i> <strong>Artista:</strong> {{ option.favorite_artist }}</p>
+                                            <p><i class="fas fa-film text-muted"></i> <strong>Película:</strong> {{ option.favorite_movie }}</p>
+                                            
+                                            <div class="mt-3">
+                                                <span class="badge bg-primary me-1">Chapman: {{ option.chapman_result }}</span>
+                                                <span class="badge bg-success">VARK: {{ option.vark_result }}</span>
+                                            </div>
+                                            
+                                            <p class="mt-3 small text-muted"><i class="fas fa-star"></i> <strong>Motivación:</strong> {{ option.motivation|truncatechars:50 }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -88,19 +77,18 @@
                         </div>
 
                         <div class="text-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-check"></i> Confirmar Respuesta
+                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow">
+                                <i class="fas fa-check-circle"></i> Confirmar Mi Elección
                             </button>
                         </div>
                     </form>
 
-                    <!-- Botón para nueva pregunta -->
-                    <div class="text-center mt-3">
-                        <a href="{% url 'student_complete_profile_game' %}" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> Nueva Pregunta
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <a href="{% url 'student_complete_profile_game' %}" class="btn btn-light">
+                            <i class="fas fa-redo"></i> Cambiar Alumno
                         </a>
                         <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary ms-2">
-                            <i class="fas fa-home"></i> Volver al panel
+                            <i class="fas fa-home"></i> Volver al Inicio
                         </a>
                     </div>
                 </div>
@@ -111,54 +99,63 @@
 
 <style>
 .option-card {
-    transition: all 0.3s ease;
-    border: 2px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
+    border: 2px solid #edf2f7;
+    border-radius: 12px;
 }
 
 .option-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 4px 8px rgba(0,123,255,.3);
-    transform: translateY(-2px);
+    border-color: #cbd5e0;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .option-card.selected {
     border-color: #007bff;
-    background-color: #f8f9fa;
+    background-color: #f0f7ff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+}
+
+.option-card.selected .card-header {
+    background-color: #007bff !important;
+    color: white;
 }
 
 .student-info p {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    font-size: 0.88rem;
 }
 
-.student-info strong {
-    color: #495057;
+.student-info i {
+    width: 20px;
 }
 </style>
 
 <script>
-function selectOption(optionIndex) {
-    // Limpiar selecciones previas
+function selectOption(studentId) {
+    // 1. Quitar clase 'selected' de todas las tarjetas
     document.querySelectorAll('.option-card').forEach(card => {
         card.classList.remove('selected');
     });
     
-    // Seleccionar la opción clickeada
-    const selectedCard = document.querySelectorAll('.option-card')[optionIndex];
-    selectedCard.classList.add('selected');
+    // 2. Añadir clase 'selected' a la tarjeta actual
+    const selectedCard = document.getElementById('card-' + studentId);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
     
-    // Marcar el radio button
-    const radioButton = document.getElementById('option' + optionIndex);
-    radioButton.checked = true;
+    // 3. Marcar el radio button correspondiente
+    const radio = document.getElementById('radio-' + studentId);
+    if (radio) {
+        radio.checked = true;
+    }
 }
 
-// Agregar event listeners para los radio buttons
+// Permitir que hacer clic directamente en el radio también active la visualización
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('input[name="selected_option"]').forEach((radio, index) => {
+    document.querySelectorAll('input[name="selected_student_id"]').forEach((radio) => {
         radio.addEventListener('change', function() {
-            if (this.checked) {
-                selectOption(index);
-            }
+            selectOption(this.value);
         });
     });
 });
