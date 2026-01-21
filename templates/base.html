@@ -1,121 +1,285 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}RELACIONA{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>{% block title %}RELACIONA{% endblock %}</title>
+    <!-- Viewport optimizado para Apps: evita zoom en inputs y mejora tactilidad -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts: Montserrat (Deportivo/Títulos) & Open Sans (Psicológico/Lectura) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            /* Paleta de Colores Deportiva-Psicológica */
+            --color-green: #1A8E53;   /* Salud, vitalidad */
+            --color-orange: #F7931E;  /* Energía, optimismo */
+            --color-blue: #0078AE;    /* Confianza, serenidad */
+            --color-pink: #E5679A;    /* Empatía, conexión */
+            
+            --bg-body: #f8f9fa;       /* Gris muy suave de fondo */
+            --text-main: #2c3e50;
+            --text-muted: #6c757d;
 
-  <style>
-    :root {
-      --bs-primary: #198754;
-      --bs-primary-light: #e8f5e9;
-    }
+            --border-radius-xl: 20px;
+            --border-radius-lg: 15px;
+            
+            /* Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.85); /* Fondo base cristal */
+            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+            --glass-blur: blur(12px);
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.05); /* Sombra difusa "App-like" */
+            --shadow-nav: 0 -5px 20px rgba(0,0,0,0.06); 
+        }
 
-    body {
-      background-color: #f6fff7;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+        /* --- GLOBAL STYLES --- */
+        body {
+            background-color: var(--bg-body);
+            font-family: 'Open Sans', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* Padding bottom en móvil para la barra de navegación */
+            padding-bottom: 85px; 
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent; /* Elimina flash azul en móvil */
+        }
 
-    .navbar {
-      background-color: var(--bs-primary);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+        h1, h2, h3, h4, h5, h6, .navbar-brand, .btn, .nav-label {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Ajuste de enlaces */
+        a { text-decoration: none; }
 
-    .navbar-brand,
-    .nav-link,
-    .navbar-text {
-      color: #fff !important;
-      font-weight: 600;
-    }
+        /* --- CONTENEDORES & TARJETAS --- */
+        .container {
+            max-width: 960px;
+        }
 
-    .navbar-brand:hover,
-    .nav-link:hover {
-      opacity: 0.9;
-    }
+        .card, .game-card {
+            border: none;
+            border-radius: var(--border-radius-xl);
+            background: white;
+            box-shadow: var(--shadow-soft);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden; /* Para bordes redondeados perfectos */
+        }
+        
+        .card:active, .btn:active, .nav-item-mobile:active {
+            transform: scale(0.98); /* Micro-interacción de "pulsado" */
+        }
 
-    .container {
-      max-width: 960px;
-    }
+        /* --- BOTONES APP-STYLE --- */
+        .btn {
+            border-radius: 50px; /* Botones muy redondeados (píldora) */
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: none;
+            transition: all 0.2s ease;
+        }
 
-    /* Mejora visual para las alertas de los juegos */
-    .alert {
-      border: none;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
+        .btn-primary { background-color: var(--color-green); color: white; }
+        .btn-secondary { background-color: var(--color-blue); color: white; }
+        .btn-success { background-color: var(--color-green); color: white; } /* Alias visual */
+        .btn-info { background-color: var(--color-blue); color: white; }
+        .btn-warning { background-color: var(--color-orange); color: white; }
+        .btn-danger { background-color: var(--color-pink); color: white; }
 
-    .alert-success {
-      background-color: #d1e7dd;
-      color: #0f5132;
-    }
+        /* --- NAVIGATION BARS --- */
 
-    .alert-error, .alert-danger {
-      background-color: #f8d7da;
-      color: #842029;
-    }
+        /* 1. TOP NAVBAR (Solo Desktop/Tablet) */
+        .navbar-desktop {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.4rem;
+            letter-spacing: -0.5px;
+            color: var(--color-green) !important;
+        }
 
-    footer {
-      margin-top: auto; /* Empuja el footer al final */
-      padding: 2rem 0;
-      border-top: 1px solid #dee2e6;
-      color: #6c757d;
-      font-size: 0.875rem;
-      text-align: center;
-    }
+        /* 2. BOTTOM NAVIGATION BAR (Solo Móvil) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 75px; /* Altura cómoda para pulgares */
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-top: var(--glass-border);
+            box-shadow: var(--shadow-nav);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1050;
+            padding-bottom: env(safe-area-inset-bottom); /* Respetar área segura iPhone X+ */
+        }
 
-    /* Clase auxiliar para tarjetas de juego */
-    .game-card {
-      border-radius: 15px;
-      border: none;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-    }
-  </style>
+        .nav-item-mobile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #b0bec5; /* Gris suave inactivo */
+            font-size: 0.75rem;
+            flex: 1;
+            height: 100%;
+            transition: color 0.3s ease;
+        }
 
-  {% block extra_head %}{% endblock %}
+        .nav-item-mobile i {
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .nav-item-mobile.active {
+            color: var(--color-green);
+        }
+        
+        .nav-item-mobile.active i {
+            transform: translateY(-2px); /* Pequeño salto al estar activo */
+        }
+        
+        /* Logout específico en rojo/rosa sutil */
+        .nav-item-mobile.logout-btn.active { color: var(--color-pink); }
+
+
+        /* --- ALERTAS --- */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+        .alert-success { background-color: #e8f5e9; color: var(--color-green); border-left: 5px solid var(--color-green); }
+        .alert-error, .alert-danger { background-color: #fce4ec; color: var(--color-pink); border-left: 5px solid var(--color-pink); }
+        .alert-warning { background-color: #fff3e0; color: var(--color-orange); border-left: 5px solid var(--color-orange); }
+
+
+        /* --- UTILITY CLASSES --- */
+        .rounded-pill-box { border-radius: 50px; }
+        .text-green { color: var(--color-green) !important; }
+        .bg-green { background-color: var(--color-green) !important; }
+        .text-orange { color: var(--color-orange); }
+        .text-blue { color: var(--color-blue); }
+        .text-pink { color: var(--color-pink); }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        
+        @media (min-width: 992px) {
+            body { 
+                padding-bottom: 0; /* Quitar padding bottom en desktop */
+                background-color: #f4f6f8; /* Un poco más oscuro en desktop para contrastar con cards blancas */
+            }
+            .bottom-nav { display: none; } /* Ocultar barra inferior */
+            .navbar-desktop { display: block; } /* Mostrar barra superior */
+            .mobile-header { display: none; } /* Ocultar header móvil */
+        }
+
+        @media (max-width: 991.98px) {
+            .navbar-desktop { display: none; } /* Ocultar barra superior clásica en móvil apps */
+            /* En móvil, a veces queremos un header simple con el logo, opcional */
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1rem;
+                background: transparent;
+            }
+        }
+    </style>
+
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-  <nav class="navbar navbar-expand-lg mb-4">
-    <div class="container-fluid">
+  <!-- MOBILE HEADER (Título simple en la parte superior) -->
+  <header class="mobile-header d-lg-none mt-2 mb-2">
+      <h4 class="m-0 fw-bold text-green"><i class="fas fa-handshake me-2"></i>RELACIONA</h4>
+  </header>
+
+  <!-- DESKTOP NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-desktop">
+    <div class="container">
       {% if user.is_authenticated %}
         {% if user.role == 'teacher' %}
-          <a class="navbar-brand" href="{% url 'teacher_home' %}">
-            <i class="fas fa-handshake me-2"></i>RELACIONA
-          </a>
+          <a class="navbar-brand" href="{% url 'teacher_home' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
         {% else %}
-          <a class="navbar-brand" href="{% url 'login' %}">
-            <i class="fas fa-handshake me-2"></i>RELACIONA
-          </a>
+          <a class="navbar-brand" href="{% url 'student_home' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
         {% endif %}
       {% else %}
-        <a class="navbar-brand" href="{% url 'login' %}">
-          <i class="fas fa-handshake me-2"></i>RELACIONA
-        </a>
+        <a class="navbar-brand" href="{% url 'login' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
       {% endif %}
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#desktopMenu">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse justify-content-end" id="desktopMenu">
+          <ul class="navbar-nav gap-3 align-items-center">
+              {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <span class="navbar-text text-muted fw-semibold">Hola, {{ user.first_name }}</span>
+                </li>
+                {% if user.role == 'student' %}
+                    <li class="nav-item"><a href="{% url 'student_home' %}" class="nav-link text-dark">Inicio</a></li>
+                    <li class="nav-item"><a href="{% url 'view_student_profile' %}" class="nav-link text-dark">Mi Perfil</a></li>
+                {% elif user.role == 'teacher' %}
+                    <li class="nav-item"><a href="{% url 'teacher_home' %}" class="nav-link text-dark">Panel</a></li>
+                {% endif %}
+                <li class="nav-item">
+                    <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-4">Salir</a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                    <a href="{% url 'login' %}" class="btn btn-primary rounded-pill px-4">Entrar</a>
+                </li>
+              {% endif %}
+          </ul>
+      </div>
     </div>
   </nav>
 
-  <main class="container">
+  <!-- MAIN CONTENT -->
+  <main class="container py-3">
     {% if messages %}
-      <div class="mt-3">
+      <div class="mb-4">
         {% for message in messages %}
-          {# Ajuste de tag para errores de Django a clases de Bootstrap #}
-          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm" role="alert">
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center" role="alert">
             {% if message.tags == 'success' %}
-              <i class="fas fa-check-circle me-2"></i>
+              <i class="fas fa-check-circle me-3 fs-4"></i>
             {% elif message.tags == 'error' or message.tags == 'danger' %}
-              <i class="fas fa-exclamation-triangle me-2"></i>
+              <i class="fas fa-exclamation-circle me-3 fs-4"></i>
+            {% else %}
+               <i class="fas fa-info-circle me-3 fs-4"></i>
             {% endif %}
-            {{ message }}
+            <div>{{ message }}</div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
           </div>
         {% endfor %}
@@ -125,12 +289,41 @@
     {% block content %}
     {% endblock %}
   </main>
+  
+  
+  <!-- BOTTOM NAVIGATION BAR (MOBILE ONLY) -->
+  {% if user.is_authenticated %}
+  <nav class="bottom-nav d-lg-none">
+      <!-- 1. INICIO -->
+      <a href="{% if user.role == 'teacher' %}{% url 'teacher_home' %}{% else %}{% url 'student_home' %}{% endif %}" 
+         class="nav-item-mobile {% if request.resolver_match.url_name in 'student_home,teacher_home' %}active{% endif %}">
+          <i class="fas fa-home"></i>
+          <span class="nav-label">Inicio</span>
+      </a>
 
-  <footer>
-    <div class="container">
-      &copy; {{ now|date:"Y" }} <strong>RELACIONA</strong>. Todos los derechos reservados.
-    </div>
-  </footer>
+      <!-- 2. ACTIVIDADES / ALUMNOS (Dependiendo del rol) -->
+      {% if user.role == 'student' %}
+      <a href="{% url 'classmates_list' %}" 
+         class="nav-item-mobile {% if 'clase' in request.path %}active{% endif %}">
+          <i class="fas fa-users"></i>
+          <span class="nav-label">Clase</span>
+      </a>
+      {% endif %}
+
+      <!-- 3. PERFIL -->
+      <a href="{% url 'view_student_profile' %}" 
+         class="nav-item-mobile {% if 'perfil' in request.path %}active{% endif %}">
+          <i class="fas fa-user-circle"></i>
+          <span class="nav-label">Perfil</span>
+      </a>
+
+      <!-- 4. SALIR -->
+      <a href="{% url 'logout' %}" class="nav-item-mobile logout-btn">
+          <i class="fas fa-sign-out-alt"></i>
+          <span class="nav-label">Salir</span>
+      </a>
+  </nav>
+  {% endif %}
 
 </body>
 </html>
