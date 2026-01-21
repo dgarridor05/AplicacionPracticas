@@ -1,13 +1,10 @@
-from django.shortcuts import render
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from .forms import RegisterForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import StudentProfileForm
-from django.db.models import Q
+from .forms import RegisterForm, StudentProfileForm
 from .models import UserProfile
-from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 def register_view(request):
     if request.method == 'POST':
@@ -27,7 +24,6 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            # Redirigir según el rol
             if user.role == 'student':
                 return redirect('student_home')
             elif user.role == 'teacher':
@@ -51,7 +47,7 @@ def teacher_home(request):
 @login_required
 def edit_student_profile(request):
     if request.user.role != 'student':
-        return redirect('login')  # o mostrar error
+        return redirect('login')
 
     if request.method == 'POST':
         form = StudentProfileForm(request.POST, request.FILES, instance=request.user)
@@ -67,10 +63,12 @@ def edit_student_profile(request):
 @login_required
 def view_student_profile(request):
     if request.user.role != 'student':
-        return redirect('login')  # o redirigir a otro sitio si no es alumno, cambiar mas adelante
+        return redirect('login')
 
+    # Enviamos 'student' para que la plantilla sea compatible con la del profesor
     return render(request, 'accounts/view_profile.html', {
-        'user': request.user
+        'user': request.user,
+        'student': request.user
     })
 
 @login_required
@@ -89,7 +87,11 @@ def public_classmates_list(request):
 
 @login_required
 def public_student_profile(request, student_id):
-    student = get_object_or_404(UserProfile, id=student_id, role='student', share_with_class=True)
+    # Lógica mejorada: Si es profesor, ve el perfil aunque share_with_class sea False
+    if request.user.role == 'teacher':
+        student = get_object_or_404(UserProfile, id=student_id, role='student')
+    else:
+        student = get_object_or_404(UserProfile, id=student_id, role='student', share_with_class=True)
 
     return render(request, 'accounts/public_student_profile.html', {
         'student': student
@@ -97,4 +99,5 @@ def public_student_profile(request, student_id):
 
 @login_required
 def view_profile(request):
-    return render(request, 'accounts/view_profile.html')
+    # Redirigimos a la vista detallada que ya tiene la lógica
+    return redirect('view_student_profile')
