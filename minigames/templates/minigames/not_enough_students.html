@@ -3,9 +3,29 @@
 {% block title %}Minijuego - No hay suficientes alumnos{% endblock %}
 
 {% block content %}
-<div class="container text-center mt-5">
-  <h2 class="text-danger">¡Ups!</h2>
-  <p class="lead">Necesitas al menos 4 alumnos con fotos de perfil para jugar a este minijuego.</p>
-  <a href="{% url 'teacher_home' %}" class="btn btn-success mt-3">Volver al inicio</a>
+<div class="container mt-5" style="max-width: 600px;">
+  <div class="card shadow-soft border-0" style="border-radius: var(--border-radius-xl);">
+    <div class="card-body p-5 text-center">
+
+      <div class="mb-4">
+        <div class="d-inline-block p-3 rounded-circle" style="background-color: #fce4ec;">
+          <i class="fas fa-exclamation-triangle fa-4x" style="color: var(--color-red);"></i>
+        </div>
+      </div>
+
+      <h3 class="fw-bold mb-3" style="color: var(--color-red);">¡Ups! No hay suficientes</h3>
+
+      <p class="lead text-muted btn-lg mb-4" style="font-size: 1.1rem;">
+        Necesitas al menos <strong>4 alumnos</strong> con fotos de perfil para jugar a este minijuego.
+      </p>
+
+      <div class="d-grid">
+        <a href="{% url 'teacher_home' %}" class="btn btn-success btn-lg rounded-pill shadow-sm fw-bold">
+          <i class="fas fa-check-circle me-2"></i> Volver al inicio
+        </a>
+      </div>
+
+    </div>
+  </div>
 </div>
 {% endblock %}

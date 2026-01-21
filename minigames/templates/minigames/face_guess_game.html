@@ -2,86 +2,80 @@
 {% block title %}Adivina el Alumno | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow border-0" style="border-radius: 15px;">
-                <div class="card-body p-5 text-center">
-                    
-                    <h2 class="mb-4 fw-bold" style="color: var(--bs-primary);">
-                        <i class="fas fa-question-circle"></i> ¿Quién es?
-                    </h2>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm border-0" style="border-radius: var(--border-radius-xl);">
+        <div class="card-body p-4 text-center">
 
-                    <div class="d-flex justify-content-center mb-4">
-                        <div class="px-4 py-2 bg-light rounded-pill border">
-                            <span class="text-muted small uppercase fw-bold">Puntuación:</span>
-                            <span class="ms-2 fw-bold text-dark">{{ correct }} / {{ total }}</span>
-                        </div>
-                    </div>
+            <h2 class="mb-4 fw-bold" style="color: var(--color-blue-dark);">
+                <i class="fas fa-question-circle me-2"></i>¿Quién es?
+            </h2>
 
-                    <div class="position-relative d-inline-block mb-4">
-                        {% if student.profile_picture %}
-                            <img src="{{ student.profile_picture.url }}" 
-                                 class="rounded-circle shadow" 
-                                 style="width: 220px; height: 220px; object-fit: cover; border: 5px solid white; outline: 2px solid #198754;" 
-                                 alt="Foto del alumno">
-                        {% else %}
-                            <div class="bg-light rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto" 
-                                 style="width: 220px; height: 220px; border: 5px solid white; outline: 2px solid #dee2e6;">
-                                <i class="fas fa-user fa-5x text-muted"></i>
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <form method="POST" class="mt-2" autocomplete="off">
-                        {% csrf_token %}
-                        <input type="hidden" name="student_id" value="{{ student.id }}">
-                        
-                        <div class="mb-4">
-                            <label for="answer" class="form-label fw-bold text-muted">Escribe su nombre, apellido o apodo:</label>
-                            <input type="text" 
-                                   name="answer" 
-                                   id="answer" 
-                                   class="form-control form-control-lg text-center" 
-                                   placeholder="???" 
-                                   required 
-                                   autofocus>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
-                                <i class="fas fa-paper-plane me-2"></i> Comprobar
-                            </button>
-                            <div class="d-flex gap-2 mt-2">
-                                <a href="{% url 'face_guess_game' %}" class="btn btn-outline-secondary flex-grow-1">
-                                    <i class="fas fa-redo"></i> Saltar
-                                </a>
-                                <a href="{% url 'teacher_home' %}" class="btn btn-light flex-grow-1 border">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
+            <div class="d-inline-block mb-4 px-4 py-2 bg-light rounded-pill border">
+                <span class="text-muted small fw-bold text-uppercase">Puntuación:</span>
+                <span class="ms-2 fw-bold" style="color: var(--color-blue-dark);">{{ correct }} / {{ total }}</span>
             </div>
-            
-            <p class="text-center mt-4 text-muted small">
-                <i class="fas fa-info-circle"></i> No importa si usas mayúsculas o tildes.
-            </p>
+
+            <div class="position-relative d-inline-block mb-4">
+                {% if student.profile_picture %}
+                <img src="{{ student.profile_picture.url }}" class="rounded-circle shadow"
+                    style="width: 200px; height: 200px; object-fit: cover; border: 5px solid white; outline: 3px solid var(--color-green);"
+                    alt="Foto del alumno">
+                {% else %}
+                <div class="bg-light rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto"
+                    style="width: 200px; height: 200px; border: 5px solid white; outline: 3px solid #dee2e6;">
+                    <i class="fas fa-user fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+
+            <form method="POST" class="mt-2" autocomplete="off">
+                {% csrf_token %}
+                <input type="hidden" name="student_id" value="{{ student.id }}">
+
+                <div class="mb-4">
+                    <label for="answer" class="form-label fw-bold text-muted small text-uppercase">Escribe su nombre o
+                        apodo</label>
+                    <input type="text" name="answer" id="answer"
+                        class="form-control form-control-lg text-center rounded-pill" placeholder="Tu respuesta..."
+                        style="background-color: #f8f9fa; border: 2px solid #e9ecef;" required autofocus>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm">
+                        <i class="fas fa-paper-plane me-2"></i> Comprobar
+                    </button>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-6">
+                            <a href="{% url 'face_guess_game' %}"
+                                class="btn btn-info btn-sm w-100 rounded-pill text-white">
+                                <i class="fas fa-redo me-1"></i> Saltar
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="{% url 'teacher_home' %}"
+                                class="btn btn-outline-secondary btn-sm w-100 rounded-pill">
+                                <i class="fas fa-home me-1"></i> Salir
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
         </div>
     </div>
+
+    <p class="text-center mt-4 text-muted small">
+        <i class="fas fa-info-circle me-1"></i> No importa si usas mayúsculas o tildes.
+    </p>
 </div>
 
 <style>
-    /* Efecto de foco en el input con el color de RELACIONA */
+    /* Estilo específico para input focus usando variable */
     .form-control:focus {
-        border-color: #198754;
-        box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
-    }
-    
-    .card {
-        background-color: #ffffff;
+        border-color: var(--color-green) !important;
+        box-shadow: 0 0 0 0.25rem rgba(26, 142, 83, 0.25) !important;
+        background-color: #fff !important;
     }
 </style>
 {% endblock %}
