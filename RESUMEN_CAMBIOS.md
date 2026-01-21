@@ -69,7 +69,7 @@ Se actualizaron todos los minijuegos para alinearse con el nuevo sistema de dise
 *   **Intereses del Estudiante (`student_interests_game`):** Las opciones de texto ahora son botones estilo tarjeta, fáciles de pulsar.
 *   **Resultados de Tests (`quiz_results_game`):** Visualización mejorada de los resultados VARK y Chapman mediante etiquetas de colores. **Corrección Técnica:** Implementación de filtro personalizado `split` para procesar correctamente las cadenas de texto de resultados.
 *   **Perfil Completo (`student_complete_profile_game`):** Tarjetas de selección con estados activos claros (borde verde y fondo tenue).
-*   **Ahorcado (`hangman_game`):** Teclado virtual responsive con botones grandes. Mejor representación visual del estado del ahorcado y barra de progreso.
+*   **Ahorcado (`hangman_game`):** Teclado virtual responsive y barra de progreso dinámica (implementada mediante JS para compatibilidad total de sintaxis). Mejor representación visual del estado del ahorcado.
 *   **Plantillas de Ayuda:** `no_students.html` y `not_enough_students.html` rediseñadas con iconos de alerta y acciones claras.
 
 ---

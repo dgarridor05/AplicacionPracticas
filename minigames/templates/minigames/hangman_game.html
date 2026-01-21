@@ -40,9 +40,14 @@
             <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
               {% with used=incorrect_count max=max_incorrect %}
               {% widthratio used max 100 as percentage %}
-              <div class="progress-bar {% if percentage|add:'0' > 70 %}bg-danger{% else %}bg-success{% endif %}"
-                role="progressbar" style="width: {{ percentage }}%;" aria-valuenow="{{ used }}" aria-valuemin="0"
-                aria-valuemax="{{ max }}"></div>
+              <div id="hangman-progress"
+                class="progress-bar {% if percentage|add:'0' > 70 %}bg-danger{% else %}bg-success{% endif %}"
+                role="progressbar" data-width="{{ percentage }}" style="transition: width 0.3s ease;"
+                aria-valuenow="{{ used }}" aria-valuemin="0" aria-valuemax="{{ max }}"></div>
+              <script>
+                var pBar = document.getElementById('hangman-progress');
+                pBar.style.width = pBar.getAttribute('data-width') + '%';
+              </script>
               {% endwith %}
             </div>
             <div class="ms-3 fw-bold" style="min-width: 40px;">{{ incorrect_count }}/{{ max_incorrect }}</div>
