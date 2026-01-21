@@ -1,8 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import ClassGroupForm
 from .models import ClassGroup
-from django.shortcuts import get_object_or_404
 from accounts.models import UserProfile
 from quizzes.models import UserResult
 from django.contrib import messages
@@ -112,13 +111,16 @@ def delete_group(request, group_id):
 
 @login_required
 def student_detail(request, student_id):
+    # Obtenemos al estudiante
     student = get_object_or_404(UserProfile, id=student_id, role='student')
 
+    # Obtenemos el resultado del test VARK
     vark_result = UserResult.objects.filter(
         user=student,
         questionnaire__title="VARK"
     ).first()
 
+    # Buscamos el grupo al que pertenece el alumno dentro de los grupos de este profesor
     group = ClassGroup.objects.filter(students=student, teacher=request.user).first()
 
     return render(request, 'teachers/student_detail.html', {
