@@ -45,7 +45,7 @@
             {% for option in options %}
             <div class="card shadow-sm border-0 option-card animate-scale-in" id="card-{{option.student_id}}"
                 onclick="selectOption('{{option.student_id}}')"
-                style="cursor: pointer; animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+                style="cursor: pointer; animation-delay: {{ forloop.counter0|add:'2' }}00ms;">
 
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-3 border-bottom pb-3">
