@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {# Fixed target_name display #}
 {% block title %}¿Quién es quién? | RELACIONA{% endblock %}
 
@@ -31,7 +32,7 @@
         {% csrf_token %}
         <div class="row row-cols-2 g-4 justify-content-center">
             {% for student in options %}
-            <div class="col animate-scale-in" style="animation-delay: {{ forloop.counter0|add:2 }}00ms;">
+            <div class="col animate-scale-in" style="animation-delay: {{ forloop.counter0|add:'2' }}00ms;">
                 <div class="card h-100 border-0 shadow-sm option-card position-relative overflow-hidden">
                     <button type="submit" name="selected_id" value="{{student.id}}"
                         class="btn p-0 border-0 h-100 w-100 text-start bg-transparent">
