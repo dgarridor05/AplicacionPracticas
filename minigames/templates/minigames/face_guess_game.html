@@ -3,58 +3,74 @@
 
 {% block content %}
 <div class="container mt-4" style="max-width: 600px;">
-    <div class="card shadow-sm border-0" style="border-radius: var(--border-radius-xl);">
-        <div class="card-body p-4 text-center">
 
-            <h2 class="mb-4 fw-bold" style="color: var(--color-blue-dark);">
-                <i class="fas fa-question-circle me-2"></i>¿Quién es?
+    <div class="card card-glass shadow-lg border-0 animate-slide-up">
+        <div class="card-body p-5 text-center">
+
+            <!-- Header -->
+            <h2 class="mb-4 fw-bold font-heading" style="color: var(--color-primary);">
+                ¿Quién es?
             </h2>
 
-            <div class="d-inline-block mb-4 px-4 py-2 bg-light rounded-pill border">
-                <span class="text-muted small fw-bold text-uppercase">Puntuación:</span>
-                <span class="ms-2 fw-bold" style="color: var(--color-blue-dark);">{{ correct }} / {{ total }}</span>
+            <!-- Score Pill -->
+            <div class="d-inline-flex align-items-center mb-5 px-4 py-2 bg-light rounded-pill border">
+                <span class="text-muted small fw-bold text-uppercase me-2"
+                    style="letter-spacing: 1px;">Puntuación</span>
+                <span class="fw-bold text-primary">{{ correct }} / {{ total }}</span>
             </div>
 
-            <div class="position-relative d-inline-block mb-4">
-                {% if student.profile_picture %}
-                <img src="{{ student.profile_picture.url }}" class="rounded-circle shadow"
-                    style="width: 200px; height: 200px; object-fit: cover; border: 5px solid white; outline: 3px solid var(--color-green);"
-                    alt="Foto del alumno">
-                {% else %}
-                <div class="bg-light rounded-circle shadow-sm d-flex align-items-center justify-content-center mx-auto"
-                    style="width: 200px; height: 200px; border: 5px solid white; outline: 3px solid #dee2e6;">
-                    <i class="fas fa-user fa-5x text-muted"></i>
+            <!-- Profile Picture with Pulse Animation -->
+            <div class="position-relative d-inline-block mb-5 animate-float">
+                <div class="profile-image-container rounded-circle shadow-glow">
+                    {% if student.profile_picture %}
+                    <img src="{{ student.profile_picture.url }}" class="rounded-circle object-fit-cover"
+                        style="width: 180px; height: 180px; border: 6px solid white;" alt="Foto del alumno">
+                    {% else %}
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto"
+                        style="width: 180px; height: 180px; border: 6px solid white;">
+                        <i class="fas fa-user fa-4x text-muted opacity-50"></i>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
+                <!-- Decorative Elements -->
+                <div class="position-absolute top-0 start-100 translate-middle p-2 bg-accent rounded-circle animate-scale-in delay-200"
+                    style="width: 15px; height: 15px;"></div>
+                <div class="position-absolute bottom-0 start-0 translate-middle p-3 bg-success rounded-circle animate-scale-in delay-300 opacity-50"
+                    style="width: 25px; height: 25px; z-index: -1;"></div>
             </div>
 
-            <form method="POST" class="mt-2" autocomplete="off">
+            <!-- Game Form -->
+            <form method="POST" class="mt-2 animate-slide-up delay-100" autocomplete="off">
                 {% csrf_token %}
                 <input type="hidden" name="student_id" value="{{ student.id }}">
 
-                <div class="mb-4">
-                    <label for="answer" class="form-label fw-bold text-muted small text-uppercase">Escribe su nombre o
-                        apodo</label>
+                <div class="mb-4 position-relative">
+                    <label for="answer" class="form-label fw-bold text-muted small text-uppercase mb-3">Escribe su
+                        nombre o apodo</label>
                     <input type="text" name="answer" id="answer"
-                        class="form-control form-control-lg text-center rounded-pill" placeholder="Tu respuesta..."
-                        style="background-color: #f8f9fa; border: 2px solid #e9ecef;" required autofocus>
+                        class="form-control form-control-lg text-center rounded-pill shadow-sm border-2"
+                        placeholder="Tu respuesta..."
+                        style="height: 60px; font-size: 1.2rem; background-color: #f8fafc;" required autofocus>
+                    <div class="form-focus-effect"></div>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm">
-                        <i class="fas fa-paper-plane me-2"></i> Comprobar
+                <div class="d-grid gap-3">
+                    <button type="submit" class="btn btn-cta btn-lg shadow-lg">
+                        <span class="d-flex align-items-center justify-content-center gap-2">
+                            <i class="fas fa-paper-plane"></i> Comprobar
+                        </span>
                     </button>
 
-                    <div class="row g-2 mt-2">
+                    <div class="row g-3 mt-2">
                         <div class="col-6">
                             <a href="{% url 'face_guess_game' %}"
-                                class="btn btn-info btn-sm w-100 rounded-pill text-white">
-                                <i class="fas fa-redo me-1"></i> Saltar
+                                class="btn btn-light w-100 fw-medium text-muted hover-lift">
+                                <i class="fas fa-random me-1"></i> Saltar
                             </a>
                         </div>
                         <div class="col-6">
                             <a href="{% url 'teacher_home' %}"
-                                class="btn btn-outline-secondary btn-sm w-100 rounded-pill">
+                                class="btn btn-light w-100 fw-medium text-muted hover-lift">
                                 <i class="fas fa-home me-1"></i> Salir
                             </a>
                         </div>
@@ -65,17 +81,34 @@
         </div>
     </div>
 
-    <p class="text-center mt-4 text-muted small">
-        <i class="fas fa-info-circle me-1"></i> No importa si usas mayúsculas o tildes.
+    <p class="text-center mt-4 text-muted small animate-fade-in delay-300">
+        <i class="fas fa-info-circle me-1 text-info"></i> No importa si usas mayúsculas o tildes.
     </p>
 </div>
 
 <style>
-    /* Estilo específico para input focus usando variable */
+    .profile-image-container {
+        position: relative;
+        z-index: 1;
+    }
+
+    .shadow-glow {
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+    }
+
+    .bg-accent {
+        background-color: var(--color-accent);
+    }
+
     .form-control:focus {
-        border-color: var(--color-green) !important;
-        box-shadow: 0 0 0 0.25rem rgba(26, 142, 83, 0.25) !important;
-        background-color: #fff !important;
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        background-color: white;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        background-color: #f1f5f9;
     }
 </style>
 {% endblock %}

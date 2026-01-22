@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}RELACIONA{% endblock %}</title>
-    <!-- Viewport optimizado para Apps: evita zoom en inputs y mejora tactilidad -->
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 
@@ -14,11 +13,11 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Google Fonts: Montserrat (Deportivo/Títulos) & Open Sans (Psicológico/Lectura) -->
+    <!-- Google Fonts: Outfit (Headings) & Inter (Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <!-- Bootstrap JS -->
@@ -26,48 +25,82 @@
 
     <style>
         :root {
-            /* Paleta de Colores Revisada */
-            --color-red: #A6243C;
-            /* Alertas, acentos importantes */
-            --color-blue-dark: #226473;
-            /* Títulos, navegación principal */
-            --color-blue-light: #819FA6;
-            /* Fondos suaves, elementos secundarios */
-            --color-black: #161616;
-            /* Texto principal y legibilidad */
-            --color-green: #1A8E53;
-            /* Éxito, salud (Mantenido) */
-            --color-orange: #F7931E;
-            /* Call to Action (Mantenido) */
+            /* --- PROFESSIONAL COLOR PALETTE --- */
+            /* Primary Brand Colors */
+            --color-primary: #0F172A;
+            /* Slate 900 - Deep & Professional */
+            --color-secondary: #334155;
+            /* Slate 700 */
+            --color-accent: #3B82F6;
+            /* Blue 500 - Vibrant Accent */
 
-            --bg-body: #f4f6f8;
-            /* Fondo general neutro/claro */
-            --text-main: var(--color-black);
-            --text-muted: #6c757d;
+            /* Functional Colors */
+            --color-success: #10B981;
+            /* Emerald 500 */
+            --color-warning: #F59E0B;
+            /* Amber 500 */
+            --color-danger: #EF4444;
+            /* Red 500 */
+            --color-info: #0EA5E9;
+            /* Sky 500 */
 
-            --border-radius-xl: 20px;
-            --border-radius-lg: 15px;
+            /* Backgrounds */
+            --bg-body: #F8FAFC;
+            /* Slate 50 */
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(255, 255, 255, 0.85);
 
-            /* Glassmorphism Variables */
-            --glass-bg: rgba(255, 255, 255, 0.9);
-            /* Un poco más opaco para legibilidad */
-            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
-            --glass-blur: blur(12px);
-            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
-            --shadow-nav: 0 -5px 20px rgba(0, 0, 0, 0.06);
+            /* Text */
+            --text-main: #1E293B;
+            /* Slate 800 */
+            --text-muted: #64748B;
+            /* Slate 500 */
+            --text-light: #94A3B8;
+            /* Slate 400 */
+
+            /* UI Elements */
+            --border-radius-xl: 24px;
+            --border-radius-lg: 16px;
+            --border-radius-md: 12px;
+
+            /* Shadows & Effects */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+
+            --glass-blur: blur(16px);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+
+            /* Transitions */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* --- LEGACY VARIABLES (Backward Compatibility) --- */
+            /* Maps old variables to new palette to prevent breaking existing pages */
+            --color-blue-dark: var(--color-primary);
+            --color-blue-light: var(--color-info);
+            --color-green: var(--color-success);
+            --color-orange: var(--color-warning);
+            --color-red: var(--color-danger);
+            --color-black: var(--text-main);
+            /* Border radius mapping */
+            /* --border-radius-xl is already defined above */
+            /* --border-radius-lg is already defined above */
         }
 
-        /* --- GLOBAL STYLES --- */
+        /* --- GLOBAL RESET & TYPOGRAPHY --- */
         body {
             background-color: var(--bg-body);
-            font-family: 'Open Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            padding-bottom: 85px;
+            padding-bottom: 80px;
+            /* Space for mobile nav */
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
         }
 
         h1,
@@ -77,148 +110,197 @@
         h5,
         h6,
         .navbar-brand,
-        .nav-label {
-            font-family: 'Montserrat', sans-serif;
-            color: var(--color-blue-dark);
-            /* Títulos en Azul Oscuro */
+        .font-heading {
+            font-family: 'Outfit', sans-serif;
+            color: var(--color-primary);
+            letter-spacing: -0.02em;
         }
 
         a {
             text-decoration: none;
+            color: inherit;
         }
 
-        /* --- CONTENEDORES & TARJETAS --- */
-        .container {
-            max-width: 960px;
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.6s ease-out forwards;
+        }
+
+        .animate-scale-in {
+            animation: scaleIn 0.4s ease-out forwards;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Staggered delays for lists */
+        .delay-100 {
+            animation-delay: 100ms;
+        }
+
+        .delay-200 {
+            animation-delay: 200ms;
+        }
+
+        .delay-300 {
+            animation-delay: 300ms;
+        }
+
+        /* --- COMPONENTS --- */
+
+        /* Cards */
         .card,
         .game-card {
+            background: var(--bg-card);
             border: none;
             border-radius: var(--border-radius-xl);
-            background: white;
-            box-shadow: var(--shadow-soft);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-smooth);
             overflow: hidden;
         }
 
-        .card:active,
-        .btn:active,
-        .nav-item-mobile:active {
-            transform: scale(0.98);
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
         }
 
-        /* --- BOTONES APP-STYLE --- */
-        .btn {
-            border-radius: 50px;
-            padding: 0.6rem 1.5rem;
-            font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border: none;
-            transition: all 0.2s ease;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .btn-primary {
-            background-color: var(--color-blue-dark);
-            color: white;
-        }
-
-        /* Acción principal ahora es azul oscuro por defecto o naranja? Usuario dijo Naranja = CTA. Usaremos Naranja para cosas "Call to action" fuertes, pero primary de bootstrap quizás azul oscuro? */
-        /* Ajuste: Dejaremos Primary como Azul Oscuro para consistencia con Nav, y Warning como Naranja CTA */
-
-        .btn-cta {
-            background-color: var(--color-orange);
-            color: white;
-        }
-
-        /* Clase especial CTA */
-
-        .btn-success {
-            background-color: var(--color-green);
-            color: white;
-        }
-
-        .btn-info {
-            background-color: var(--color-blue-light);
-            color: white;
-        }
-
-        .btn-warning {
-            background-color: var(--color-orange);
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: var(--color-red);
-            color: white;
-        }
-
-        /* Sobreescribir primary de bootstrap si se desea */
-        .btn-primary {
-            background-color: var(--color-blue-dark);
-            border-color: var(--color-blue-dark);
-        }
-
-        .btn-outline-primary {
-            color: var(--color-blue-dark);
-            border-color: var(--color-blue-dark);
-        }
-
-        .btn-outline-primary:hover {
-            background-color: var(--color-blue-dark);
-            color: white;
-        }
-
-
-        /* --- NAVIGATION BARS --- */
-
-        /* TOP NAVBAR */
-        .navbar-desktop {
-            background: var(--glass-bg);
+        /* Glassmorphism Card Variant */
+        .card-glass {
+            background: var(--bg-glass);
             backdrop-filter: var(--glass-blur);
             -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: var(--glass-border);
+            border: var(--glass-border);
+        }
+
+        /* Buttons */
+        .btn {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            padding: 0.75rem 1.75rem;
+            border-radius: 100px;
+            border: none;
+            transition: var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #1e293b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .btn-cta {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-cta:hover {
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* Navbar */
+        .navbar-desktop {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.03);
-            padding: 1rem 0;
         }
 
         .navbar-brand {
             font-weight: 800;
-            font-size: 1.4rem;
-            letter-spacing: -0.5px;
-            color: var(--color-blue-dark) !important;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .nav-link {
-            color: var(--color-blue-dark);
-            font-weight: 600;
-        }
-
-        .nav-link:hover {
-            color: var(--color-orange);
-        }
-
-        /* BOTTOM NAVIGATION BAR */
+        /* Mobile Bottom Nav */
         .bottom-nav {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 75px;
-            background: var(--glass-bg);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-top: var(--glass-border);
-            box-shadow: var(--shadow-nav);
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-around;
             align-items: center;
             z-index: 1050;
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: 0 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .nav-item-mobile {
@@ -226,175 +308,92 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--color-blue-light);
-            /* Inactivo suave */
-            font-size: 0.75rem;
-            flex: 1;
-            height: 100%;
-            transition: color 0.3s ease;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 500;
+            transition: var(--transition-fast);
+            padding: 8px;
+            border-radius: 12px;
         }
 
         .nav-item-mobile i {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin-bottom: 4px;
+            transition: var(--transition-fast);
         }
 
         .nav-item-mobile.active {
-            color: var(--color-blue-dark);
-            /* Activo: Azul Oscuro */
+            color: var(--color-accent);
+            background: rgba(59, 130, 246, 0.1);
         }
 
         .nav-item-mobile.active i {
             transform: translateY(-2px);
         }
 
-        .nav-item-mobile.logout-btn.active {
-            color: var(--color-red);
-        }
-
-
-        /* --- ALERTAS --- */
-        .alert {
-            border: none;
-            border-radius: var(--border-radius-lg);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-        }
-
-        .alert-success {
-            background-color: #e8f5e9;
-            color: var(--color-green);
-            border-left: 5px solid var(--color-green);
-        }
-
-        .alert-error,
-        .alert-danger {
-            background-color: #fce4ec;
-            color: var(--color-red);
-            border-left: 5px solid var(--color-red);
-        }
-
-        .alert-warning {
-            background-color: #fff3e0;
-            color: var(--color-orange);
-            border-left: 5px solid var(--color-orange);
-        }
-
-
-        /* --- UTILITY CLASSES --- */
-        .rounded-pill-box {
+        /* Badges & Pills */
+        .badge-pill {
+            padding: 0.5em 1em;
             border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
         }
 
-        .text-green {
-            color: var(--color-green) !important;
-        }
-
-        .bg-green {
-            background-color: var(--color-green) !important;
-        }
-
-        .text-orange {
-            color: var(--color-orange);
-        }
-
-        .text-blue-dark {
-            color: var(--color-blue-dark);
-        }
-
-        .text-blue-light {
-            color: var(--color-blue-light);
-        }
-
-        .text-red {
-            color: var(--color-red);
-        }
-
-        /* --- RESPONSIVE ADJUSTMENTS --- */
+        /* --- RESPONSIVE --- */
         @media (min-width: 992px) {
             body {
                 padding-bottom: 0;
-                background-color: #f0f2f5;
             }
 
             .bottom-nav {
                 display: none;
             }
-
-            .navbar-desktop {
-                display: block;
-            }
-
-            .mobile-header {
-                display: none;
-            }
         }
 
-        @media (max-width: 991.98px) {
+        @media (max-width: 991px) {
             .navbar-desktop {
                 display: none;
-            }
-
-            .mobile-header {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 1rem;
-                background: transparent;
-            }
-
-            .mobile-header h4 {
-                color: var(--color-blue-dark) !important;
             }
         }
     </style>
-
     {% block extra_head %}{% endblock %}
 </head>
 
 <body>
 
-    <!-- MOBILE HEADER (Título simple en la parte superior) -->
-    <header class="mobile-header d-lg-none mt-2 mb-2">
-        <h4 class="m-0 fw-bold text-green"><i class="fas fa-handshake me-2"></i>RELACIONA</h4>
+    <!-- Mobile Header -->
+    <header class="d-lg-none py-3 text-center animate-fade-in">
+        <h4 class="m-0 fw-bold navbar-brand" style="font-size: 1.5rem;">
+            <i class="fas fa-layer-group me-2"></i>RELACIONA
+        </h4>
     </header>
 
-    <!-- DESKTOP NAVBAR -->
-    <nav class="navbar navbar-expand-lg navbar-desktop">
+    <!-- Desktop Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-desktop animate-slide-up">
         <div class="container">
-            {% if user.is_authenticated %}
-            {% if user.role == 'teacher' %}
-            <a class="navbar-brand" href="{% url 'teacher_home' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
-            {% else %}
-            <a class="navbar-brand" href="{% url 'student_home' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
-            {% endif %}
-            {% else %}
-            <a class="navbar-brand" href="{% url 'login' %}"><i class="fas fa-handshake me-2"></i>RELACIONA</a>
-            {% endif %}
+            <a class="navbar-brand" href="{% url 'teacher_home' %}">
+                <i class="fas fa-layer-group me-2"></i>RELACIONA
+            </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#desktopMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse justify-content-end" id="desktopMenu">
-                <ul class="navbar-nav gap-3 align-items-center">
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav gap-4 align-items-center">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <span class="navbar-text text-muted fw-semibold">Hola, {{ user.first_name }}</span>
+                        <span class="text-muted fw-medium">Hola, {{ user.first_name }}</span>
                     </li>
                     {% if user.role == 'student' %}
-                    <li class="nav-item"><a href="{% url 'student_home' %}" class="nav-link text-dark">Inicio</a></li>
-                    <li class="nav-item"><a href="{% url 'view_student_profile' %}" class="nav-link text-dark">Mi
+                    <li class="nav-item"><a href="{% url 'student_home' %}" class="nav-link fw-semibold">Inicio</a></li>
+                    <li class="nav-item"><a href="{% url 'view_student_profile' %}" class="nav-link fw-semibold">Mi
                             Perfil</a></li>
                     {% elif user.role == 'teacher' %}
-                    <li class="nav-item"><a href="{% url 'teacher_home' %}" class="nav-link text-dark">Panel</a></li>
+                    <li class="nav-item"><a href="{% url 'teacher_home' %}" class="nav-link fw-semibold">Panel</a></li>
                     {% endif %}
                     <li class="nav-item">
-                        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-4">Salir</a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm px-4">Salir</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a href="{% url 'login' %}" class="btn btn-primary rounded-pill px-4">Entrar</a>
+                        <a href="{% url 'login' %}" class="btn btn-primary px-5">Entrar</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -402,61 +401,48 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->
-    <main class="container py-3">
+    <!-- Main Content -->
+    <main class="container py-4 animate-fade-in delay-100">
         {% if messages %}
-        <div class="mb-4">
+        <div class="mb-4 animate-slide-up">
             {% for message in messages %}
-            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show d-flex align-items-center"
-                role="alert">
-                {% if message.tags == 'success' %}
-                <i class="fas fa-check-circle me-3 fs-4"></i>
-                {% elif message.tags == 'error' or message.tags == 'danger' %}
-                <i class="fas fa-exclamation-circle me-3 fs-4"></i>
-                {% else %}
-                <i class="fas fa-info-circle me-3 fs-4"></i>
-                {% endif %}
+            <div class="alert alert-{{ message.tags }} shadow-sm border-0 rounded-3 d-flex align-items-center p-3">
+                <i class="fas fa-info-circle me-3 fs-5"></i>
                 <div>{{ message }}</div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </main>
 
-
-    <!-- BOTTOM NAVIGATION BAR (MOBILE ONLY) -->
+    <!-- Mobile Bottom Nav -->
     {% if user.is_authenticated %}
-    <nav class="bottom-nav d-lg-none">
-        <!-- 1. INICIO -->
+    <nav class="bottom-nav d-lg-none animate-slide-up delay-200">
         <a href="{% if user.role == 'teacher' %}{% url 'teacher_home' %}{% else %}{% url 'student_home' %}{% endif %}"
             class="nav-item-mobile {% if request.resolver_match.url_name in 'student_home,teacher_home' %}active{% endif %}">
             <i class="fas fa-home"></i>
-            <span class="nav-label">Inicio</span>
+            <span>Inicio</span>
         </a>
 
-        <!-- 2. ACTIVIDADES / ALUMNOS (Dependiendo del rol) -->
         {% if user.role == 'student' %}
         <a href="{% url 'classmates_list' %}" class="nav-item-mobile {% if 'clase' in request.path %}active{% endif %}">
             <i class="fas fa-users"></i>
-            <span class="nav-label">Clase</span>
+            <span>Clase</span>
         </a>
         {% endif %}
 
-        <!-- 3. PERFIL -->
         <a href="{% url 'view_student_profile' %}"
             class="nav-item-mobile {% if 'perfil' in request.path %}active{% endif %}">
             <i class="fas fa-user-circle"></i>
-            <span class="nav-label">Perfil</span>
+            <span>Perfil</span>
         </a>
 
-        <!-- 4. SALIR -->
-        <a href="{% url 'logout' %}" class="nav-item-mobile logout-btn">
+        <a href="{% url 'logout' %}" class="nav-item-mobile">
             <i class="fas fa-sign-out-alt"></i>
-            <span class="nav-label">Salir</span>
+            <span>Salir</span>
         </a>
     </nav>
     {% endif %}
