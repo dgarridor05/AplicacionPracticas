@@ -79,20 +79,53 @@ def name_to_face_game(request):
 def student_interests_game(request):
     groups = ClassGroup.objects.filter(teacher=request.user)
     students = UserProfile.objects.filter(role='student', student_groups__in=groups).distinct()
-    if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
+    
+    if students.count() < 4:
+        return render(request, 'minigames/not_enough_students.html')
+
     if 'interests_correct' not in request.session: request.session['interests_correct'] = 0
     if 'interests_total' not in request.session: request.session['interests_total'] = 0
+
     if request.method == 'POST':
-        is_correct = str(request.POST.get('selected_id')) == str(request.session.get('interests_target_id'))
+        # 1. Recogemos 'selected_option' (que es el número 1, 2, 3 o 4)
+        selected_index = request.POST.get('selected_option') 
+        # 2. Recogemos la posición correcta que guardamos en la sesión
+        correct_index = request.session.get('interests_correct_pos')
+        
         request.session['interests_total'] += 1
-        if is_correct: request.session['interests_correct'] += 1
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest': return get_ajax_response(request, is_correct, "¡Correcto!" if is_correct else "Incorrecto", 'interests')
+        is_correct = str(selected_index) == str(correct_index)
+        
+        if is_correct:
+            request.session['interests_correct'] += 1
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return get_ajax_response(request, is_correct, "¡Correcto!" if is_correct else "¡No! Esa no era su descripción", 'interests')
         return redirect('student_interests_game')
+
+    # --- LÓGICA PARA GENERAR EL JUEGO ---
     target = random.choice(students)
-    request.session['interests_target_id'] = target.id
-    options = list(random.sample(list(students.exclude(id=target.id)), 3)) + [target]
+    
+    # Creamos una descripción amigable
+    def get_desc(s):
+        return f"Tiene {calculate_age(s.date_of_birth)} años. Su artista favorito es {s.favorite_artist or 'desconocido'} y le motiva: {s.motivation or 'aprender'}."
+
+    correct_desc = get_desc(target)
+    
+    # Creamos las opciones falsas
+    others = random.sample(list(students.exclude(id=target.id)), 3)
+    options = [get_desc(s) for s in others] + [correct_desc]
     random.shuffle(options)
-    return render(request, 'minigames/student_interests_game.html', {'target_student': target, 'options': options, 'correct': request.session['interests_correct'], 'total': request.session['interests_total']})
+
+    # Guardamos en qué número de botón (1-4) ha quedado la respuesta correcta
+    request.session['interests_correct_pos'] = options.index(correct_desc) + 1
+
+    return render(request, 'minigames/student_interests_game.html', {
+        'target_student': target,
+        'target_name': target.full_name or target.username, # Para que el HTML no falle
+        'options': options,
+        'correct': request.session['interests_correct'],
+        'total': request.session['interests_total']
+    })
 
 @login_required
 def quiz_results_game(request):
