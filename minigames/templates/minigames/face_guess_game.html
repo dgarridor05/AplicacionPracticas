@@ -3,24 +3,21 @@
 {% block title %}Adivina el Alumno | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 600px;">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<div class="container mt-4" style="max-width: 600px;">
     <div class="card card-glass shadow-lg border-0 animate-slide-up">
         <div class="card-body p-5 text-center">
 
-            <!-- Header -->
             <h2 class="mb-4 fw-bold font-heading" style="color: var(--color-primary);">
                 ¿Quién es?
             </h2>
 
-            <!-- Score Pill -->
             <div class="d-inline-flex align-items-center mb-5 px-4 py-2 bg-light rounded-pill border">
-                <span class="text-muted small fw-bold text-uppercase me-2"
-                    style="letter-spacing: 1px;">Puntuación</span>
-                <span class="fw-bold text-primary">{{ correct }} / {{ total }}</span>
+                <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 1px;">Puntuación</span>
+                <span id="score-display" class="fw-bold text-primary">{{ correct }} / {{ total }}</span>
             </div>
 
-            <!-- Profile Picture with Pulse Animation -->
             <div class="position-relative d-inline-block mb-5 animate-float">
                 <div class="profile-image-container rounded-circle shadow-glow">
                     {% if student.profile_picture %}
@@ -33,26 +30,18 @@
                     </div>
                     {% endif %}
                 </div>
-                <!-- Decorative Elements -->
-                <div class="position-absolute top-0 start-100 translate-middle p-2 bg-accent rounded-circle animate-scale-in delay-200"
-                    style="width: 15px; height: 15px;"></div>
-                <div class="position-absolute bottom-0 start-0 translate-middle p-3 bg-success rounded-circle animate-scale-in delay-300 opacity-50"
-                    style="width: 25px; height: 25px; z-index: -1;"></div>
             </div>
 
-            <!-- Game Form -->
-            <form method="POST" class="mt-2 animate-slide-up delay-100" autocomplete="off">
+            <form id="face-guess-form" method="POST" class="mt-2 animate-slide-up delay-100" autocomplete="off">
                 {% csrf_token %}
-                <input type="hidden" name="student_id" value="{{ student.id }}">
-
                 <div class="mb-4 position-relative">
-                    <label for="answer" class="form-label fw-bold text-muted small text-uppercase mb-3">Escribe su
-                        nombre o apodo</label>
+                    <label for="answer" class="form-label fw-bold text-muted small text-uppercase mb-3">
+                        Escribe su nombre o apodo
+                    </label>
                     <input type="text" name="answer" id="answer"
                         class="form-control form-control-lg text-center rounded-pill shadow-sm border-2"
                         placeholder="Tu respuesta..."
                         style="height: 60px; font-size: 1.2rem; background-color: #f8fafc;" required autofocus>
-                    <div class="form-focus-effect"></div>
                 </div>
 
                 <div class="d-grid gap-3">
@@ -64,21 +53,18 @@
 
                     <div class="row g-3 mt-2">
                         <div class="col-6">
-                            <a href="{% url 'face_guess_game' %}"
-                                class="btn btn-light w-100 fw-medium text-muted hover-lift">
+                            <a href="{% url 'face_guess_game' %}" class="btn btn-light w-100 fw-medium text-muted hover-lift">
                                 <i class="fas fa-random me-1"></i> Saltar
                             </a>
                         </div>
                         <div class="col-6">
-                            <a href="{% url 'teacher_home' %}"
-                                class="btn btn-light w-100 fw-medium text-muted hover-lift">
+                            <a href="{% url 'teacher_home' %}" class="btn btn-light w-100 fw-medium text-muted hover-lift">
                                 <i class="fas fa-home me-1"></i> Salir
                             </a>
                         </div>
                     </div>
                 </div>
             </form>
-
         </div>
     </div>
 
@@ -87,29 +73,60 @@
     </p>
 </div>
 
+<script>
+document.getElementById('face-guess-form').addEventListener('submit', function(e) {
+    e.preventDefault(); // Evita la recarga de página
+
+    const form = this;
+    const formData = new FormData(form);
+    const input = document.getElementById('answer');
+    
+    // Desactivamos el botón para evitar múltiples clics
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+
+    fetch("{% url 'face_guess_game' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Mostramos la alerta de éxito o error
+        Swal.fire({
+            title: data.success ? '¡Correcto!' : 'Incorrecto',
+            text: data.message,
+            icon: data.success ? 'success' : 'error',
+            timer: 1500,
+            showConfirmButton: false,
+            position: 'center',
+            backdrop: 'rgba(0,0,0,0.4)'
+        }).then(() => {
+            // Actualizamos la puntuación en la interfaz antes de recargar
+            document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+            // Recargamos para traer el siguiente alumno (parpadeo mínimo solo de contenido)
+            window.location.reload();
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        submitBtn.disabled = false;
+    });
+});
+</script>
+
 <style>
-    .profile-image-container {
-        position: relative;
-        z-index: 1;
-    }
-
-    .shadow-glow {
-        box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
-    }
-
-    .bg-accent {
-        background-color: var(--color-accent);
-    }
-
+    .profile-image-container { position: relative; z-index: 1; }
+    .shadow-glow { box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
+    .bg-accent { background-color: var(--color-accent); }
     .form-control:focus {
         border-color: var(--color-accent);
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         background-color: white;
     }
-
-    .hover-lift:hover {
-        transform: translateY(-2px);
-        background-color: #f1f5f9;
-    }
+    .hover-lift:hover { transform: translateY(-2px); background-color: #f1f5f9; }
 </style>
 {% endblock %}

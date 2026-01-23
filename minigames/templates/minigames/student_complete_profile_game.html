@@ -4,17 +4,17 @@
 {% block title %}Perfil Completo | RELACIONA{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4" style="max-width: 600px;">
 
-    <!-- Score -->
     <div class="text-center mb-4 animate-slide-up">
         <div class="d-inline-flex align-items-center px-4 py-2 bg-white rounded-pill shadow-sm border">
             <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 1px;">Puntuación</span>
-            <span class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
+            <span id="score-display" class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
         </div>
     </div>
 
-    <!-- Question Card -->
     <div class="card card-glass shadow-lg border-0 animate-slide-up delay-100 mb-5">
         <div class="card-body p-4 text-center">
             <h3 class="mb-3 fw-bold font-heading text-primary">
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <form method="post" id="gameForm" class="mt-4">
+    <form id="complete-profile-form" method="post" class="mt-4">
         {% csrf_token %}
         <div class="d-grid gap-4">
             {% for option in options %}
@@ -99,8 +99,7 @@
                         </div>
 
                         <div class="position-relative p-3 bg-light rounded-3 fst-italic text-muted small">
-                            <i
-                                class="fas fa-quote-left position-absolute top-0 start-0 ms-2 mt-2 text-primary opacity-25"></i>
+                            <i class="fas fa-quote-left position-absolute top-0 start-0 ms-2 mt-2 text-primary opacity-25"></i>
                             "{{option.motivation|truncatechars:80}}"
                         </div>
                     </div>
@@ -110,7 +109,7 @@
         </div>
 
         <div class="text-center mt-5 animate-slide-up delay-300">
-            <button type="submit" class="btn btn-cta btn-lg px-5 shadow-lg rounded-pill fw-bold hover-scale">
+            <button type="submit" id="submit-btn" class="btn btn-cta btn-lg px-5 shadow-lg rounded-pill fw-bold hover-scale">
                 <i class="fas fa-check-circle me-2"></i> Confirmar Elección
             </button>
         </div>
@@ -127,57 +126,68 @@
 </div>
 
 <style>
-    .bg-blue-50 {
-        background-color: #eff6ff;
-    }
-
+    .bg-blue-50 { background-color: #eff6ff; }
     .option-card {
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         background: white;
         border: 2px solid transparent !important;
     }
-
     .option-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.1) !important;
     }
-
     .option-card.selected {
         border-color: var(--color-success) !important;
         background-color: #f0fdf4 !important;
         box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
     }
-
-    .hover-scale:hover {
-        transform: scale(1.05);
-    }
+    .hover-scale:hover { transform: scale(1.05); }
 </style>
 
 <script>
     function selectOption(studentId) {
-        // 1. Remove selected class
-        document.querySelectorAll('.option-card').forEach(card => {
-            card.classList.remove('selected');
-        });
-
-        // 2. Add selected class
+        document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
         const selectedCard = document.getElementById('card-' + studentId);
-        if (selectedCard) {
-            selectedCard.classList.add('selected');
-        }
-
-        // 3. Check radio
+        if (selectedCard) selectedCard.classList.add('selected');
         const radio = document.getElementById('radio-' + studentId);
-        if (radio) {
-            radio.checked = true;
-        }
+        if (radio) radio.checked = true;
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('input[name="selected_student_id"]').forEach((radio) => {
-            radio.addEventListener('change', function () {
-                selectOption(this.value);
+    // Lógica AJAX para el envío
+    document.getElementById('complete-profile-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (!formData.get('selected_student_id')) {
+            Swal.fire('Atención', 'Por favor, selecciona un perfil antes de confirmar.', 'warning');
+            return;
+        }
+
+        submitBtn.disabled = true;
+
+        fetch("{% url 'student_complete_profile_game' %}", {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: data.success ? '¡Perfecto!' : 'No era ese...',
+                text: data.message,
+                icon: data.success ? 'success' : 'error',
+                timer: 1500,
+                showConfirmButton: false,
+                backdrop: 'rgba(0,0,0,0.4)'
+            }).then(() => {
+                document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+                window.location.reload();
             });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            submitBtn.disabled = false;
         });
     });
 </script>

@@ -4,12 +4,14 @@
 {% block title %}¿Quién es quién? | RELACIONA{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4" style="max-width: 600px;">
 
     <div class="text-center mb-5 animate-slide-up">
         <div class="d-inline-flex align-items-center px-4 py-2 bg-white rounded-pill shadow-sm border">
             <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 1px;">Puntuación</span>
-            <span class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
+            <span id="score-display" class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
         </div>
     </div>
 
@@ -34,7 +36,7 @@
             {% for student in options %}
             <div class="col animate-scale-in" style="animation-delay: {{ forloop.counter0|add:'2' }}00ms;">
                 <div class="card h-100 border-0 shadow-sm option-card position-relative overflow-hidden" 
-                     onclick="submitGame('{{student.id}}')" style="cursor: pointer;">
+                     onclick="submitGameAJAX('{{student.id}}')" style="cursor: pointer;">
                     
                     <div class="card-body p-3 d-flex flex-column align-items-center">
                         <div class="position-relative mb-3 w-100" style="padding-top: 100%;">
@@ -56,8 +58,6 @@
                             </span>
                         </div>
                     </div>
-                    
-                    <div class="hover-overlay position-absolute top-0 start-0 w-100 h-100 pointer-events-none"></div>
                 </div>
             </div>
             {% endfor %}
@@ -75,15 +75,48 @@
 </div>
 
 <script>
-    function submitGame(studentId) {
-        // Asignamos el ID al input oculto y enviamos el formulario
-        document.getElementById('selected-id-input').value = studentId;
-        
-        // Feedback visual inmediato
+    function submitGameAJAX(studentId) {
+        const formData = new FormData();
+        formData.append('selected_id', studentId);
+        formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+        // Bloqueo visual de opciones
         const cards = document.querySelectorAll('.option-card');
-        cards.forEach(c => c.style.opacity = "0.6");
-        
-        document.getElementById('game-form').submit();
+        cards.forEach(c => {
+            c.style.pointerEvents = "none";
+            c.style.opacity = "0.6";
+        });
+
+        fetch("{% url 'name_to_face_game' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.fire({
+                title: data.success ? '¡Correcto!' : 'Incorrecto',
+                text: data.message,
+                icon: data.success ? 'success' : 'error',
+                timer: 1500,
+                showConfirmButton: false,
+                backdrop: 'rgba(0,0,0,0.4)'
+            }).then(() => {
+                // Actualizamos marcador en pantalla
+                document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+                // Recarga suave para el siguiente reto
+                window.location.reload();
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            cards.forEach(c => {
+                c.style.pointerEvents = "auto";
+                c.style.opacity = "1";
+            });
+        });
     }
 </script>
 

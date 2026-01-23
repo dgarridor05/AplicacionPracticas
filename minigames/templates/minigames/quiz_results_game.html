@@ -4,27 +4,24 @@
 {% block title %}Resultados | RELACIONA{% endblock %}
 
 {% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4" style="max-width: 600px;">
 
-  <!-- Score -->
   <div class="text-center mb-4 animate-slide-up">
-    {% if total %}
     <div class="d-inline-flex align-items-center px-4 py-2 bg-white rounded-pill shadow-sm border">
       <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 1px;">Puntuación</span>
-      <span class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
+      <span id="score-display" class="fw-bold fs-5 text-primary">{{correct}} / {{total}}</span>
     </div>
-    {% endif %}
   </div>
 
   <div class="card card-glass shadow-lg border-0 animate-slide-up delay-100">
     <div class="card-body p-4 text-center">
 
-      <!-- Header -->
       <h3 class="mb-3 fw-bold font-heading text-primary">
         ¿Resultados de <span class="text-accent">{{target_name}}</span>?
       </h3>
 
-      <!-- Profile Picture -->
       <div class="mb-4 position-relative d-inline-block animate-float">
         <div class="rounded-circle shadow-glow p-1 bg-white">
           {% if target_student.profile_picture %}
@@ -39,7 +36,6 @@
         </div>
       </div>
 
-      <!-- Legend -->
       <div class="d-flex justify-content-center gap-3 animate-fade-in delay-200">
         <div class="badge bg-blue-50 text-primary border border-primary-subtle rounded-pill px-3 py-2">
           <i class="fas fa-brain me-1"></i> VARK
@@ -51,7 +47,7 @@
     </div>
   </div>
 
-  <form method="POST" class="mt-4">
+  <form id="quiz-results-form" method="POST" class="mt-4">
     {% csrf_token %}
     <input type="hidden" name="target_id" value="{{target_id}}">
     <input type="hidden" name="correct_option" value="{{correct_option}}">
@@ -89,8 +85,8 @@
             {% endwith %}
           </div>
 
-          <button type="submit" name="selected_option" value="{{forloop.counter}}"
-            class="btn btn-outline-primary w-100 rounded-pill fw-bold hover-lift py-2 border-2">
+          <button type="button" onclick="submitQuizGuess('{{forloop.counter}}')"
+            class="btn btn-outline-primary w-100 rounded-pill fw-bold hover-lift py-2 border-2 option-btn">
             Elegir esta Opción
           </button>
         </div>
@@ -107,33 +103,55 @@
 
 </div>
 
+<script>
+function submitQuizGuess(optionValue) {
+    const form = document.getElementById('quiz-results-form');
+    const formData = new FormData(form);
+    formData.append('selected_option', optionValue);
+
+    // Desactivar botones
+    document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+    fetch("{% url 'quiz_results_game' %}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        Swal.fire({
+            title: data.success ? '¡Correcto!' : 'Incorrecto',
+            text: data.message,
+            icon: data.success ? 'success' : 'error',
+            timer: 1500,
+            showConfirmButton: false,
+            backdrop: 'rgba(0,0,0,0.4)'
+        }).then(() => {
+            // Actualizar marcador
+            document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+            // Cargar siguiente
+            window.location.reload();
+        });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
+    });
+}
+</script>
+
 <style>
-  .bg-blue-50 {
-    background-color: #eff6ff;
-  }
-
-  .bg-green-50 {
-    background-color: #f0fdf4;
-  }
-
-  .tracking-wide {
-    letter-spacing: 0.05em;
-  }
-
-  .result-option-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: white;
-  }
-
+  .bg-blue-50 { background-color: #eff6ff; }
+  .bg-green-50 { background-color: #f0fdf4; }
+  .tracking-wide { letter-spacing: 0.05em; }
+  .result-option-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: white; }
   .result-option-card:hover {
     transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1) !important;
     border-color: var(--color-primary) !important;
   }
-
-  .hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-  }
+  .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); }
 </style>
 {% endblock %}
