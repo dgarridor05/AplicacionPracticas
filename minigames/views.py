@@ -86,6 +86,7 @@ def face_guess_game(request):
 
 @login_required
 def name_to_face_game(request):
+    # 1. Obtenemos los grupos del profesor y sus alumnos con foto
     groups = ClassGroup.objects.filter(teacher=request.user)
     students = UserProfile.objects.filter(
         role='student',
@@ -93,18 +94,20 @@ def name_to_face_game(request):
         profile_picture__isnull=False
     ).exclude(profile_picture='').distinct()
 
+    # 2. Verificamos si hay suficientes alumnos
     if students.count() < 4:
         messages.warning(request, "Se necesitan al menos 4 alumnos con foto para jugar.")
         return render(request, 'minigames/not_enough_students.html')
 
+    # 3. Inicializamos puntuación en sesión si no existe
     if 'name_to_face_correct' not in request.session:
         request.session['name_to_face_correct'] = 0
     if 'name_to_face_total' not in request.session:
         request.session['name_to_face_total'] = 0
 
+    # 4. Lógica de procesamiento (Cuando el usuario hace clic en una foto)
     if request.method == 'POST':
         selected_id = request.POST.get('selected_id')
-        # MEJORA: Obtenemos el ID correcto de la sesión (Seguridad)
         target_id = request.session.get('name_to_face_target_id')
 
         request.session['name_to_face_total'] += 1
@@ -120,26 +123,31 @@ def name_to_face_game(request):
             except:
                 messages.error(request, "Incorrecto. No era ese alumno.")
 
+        # Forzamos el guardado de la sesión antes de redirigir
+        request.session.modified = True
         return redirect('name_to_face_game')
 
-    # MEJORA: Sistema anti-repetición
+    # 5. Lógica de preparación (Nueva pregunta)
     last_id = request.session.get('name_to_face_last_id')
     available_students = students.exclude(id=last_id) if last_id and students.count() > 1 else students
     
     target = random.choice(available_students)
     
-    # Guardamos en sesión el objetivo para validar en el POST
+    # Guardamos el objetivo en la sesión para compararlo en el siguiente POST
     request.session['name_to_face_target_id'] = target.id
     request.session['name_to_face_last_id'] = target.id
 
-    # Seleccionamos 3 señuelos
-    decoys = students.exclude(id=target.id)
-    options = random.sample(list(decoys), 3)
+    # Seleccionamos 3 señuelos (alumnos que no son el objetivo)
+    decoys = list(students.exclude(id=target.id))
+    if len(decoys) >= 3:
+        options = random.sample(decoys, 3)
+    else:
+        options = decoys # Por si hay pocos
+        
     options.append(target)
     random.shuffle(options)
 
     return render(request, 'minigames/name_to_face_game.html', {
-        # MEJORA: Priorizamos nombre completo para un lenguaje más natural
         'target_name': target.full_name or target.nickname or target.username,
         'options': options,
         'correct': request.session['name_to_face_correct'],
