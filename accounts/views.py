@@ -38,16 +38,23 @@ def logout_view(request):
 
 @login_required
 def student_home(request):
+    # SEGURIDAD: Si un profesor intenta entrar aquí, lo mandamos a su panel
+    if request.user.role != 'student':
+        return redirect('teacher_home')
     return render(request, 'accounts/student_home.html')
 
 @login_required
 def teacher_home(request):
+    # SEGURIDAD: Si un alumno intenta entrar aquí, lo mandamos a su panel
+    if request.user.role != 'teacher':
+        return redirect('student_home')
     return render(request, 'accounts/teacher_home.html')
 
 @login_required
 def edit_student_profile(request):
+    # SEGURIDAD: Solo alumnos pueden editar su perfil de alumno
     if request.user.role != 'student':
-        return redirect('login')
+        return redirect('teacher_home')
 
     if request.method == 'POST':
         form = StudentProfileForm(request.POST, request.FILES, instance=request.user)
@@ -62,10 +69,10 @@ def edit_student_profile(request):
 
 @login_required
 def view_student_profile(request):
+    # SEGURIDAD: Si es profesor, lo redirigimos a su inicio (o puedes dejar que lo vea si quieres)
     if request.user.role != 'student':
-        return redirect('login')
+        return redirect('teacher_home')
 
-    # Enviamos 'student' para que la plantilla sea compatible con la del profesor
     return render(request, 'accounts/view_profile.html', {
         'user': request.user,
         'student': request.user
@@ -74,7 +81,7 @@ def view_student_profile(request):
 @login_required
 def public_classmates_list(request):
     if request.user.role != 'student':
-        return redirect('login')
+        return redirect('teacher_home')
 
     classmates = UserProfile.objects.filter(
         role='student',
@@ -87,7 +94,8 @@ def public_classmates_list(request):
 
 @login_required
 def public_student_profile(request, student_id):
-    # Lógica mejorada: Si es profesor, ve el perfil aunque share_with_class sea False
+    # Los profesores pueden ver cualquier perfil de alumno. 
+    # Los alumnos solo los que tengan share_with_class=True.
     if request.user.role == 'teacher':
         student = get_object_or_404(UserProfile, id=student_id, role='student')
     else:
@@ -99,5 +107,7 @@ def public_student_profile(request, student_id):
 
 @login_required
 def view_profile(request):
-    # Redirigimos a la vista detallada que ya tiene la lógica
+    # Si es profesor, al pinchar en "Ver perfil" lo mandamos a su home
+    if request.user.role == 'teacher':
+        return redirect('teacher_home')
     return redirect('view_student_profile')
