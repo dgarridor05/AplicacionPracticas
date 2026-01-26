@@ -48,8 +48,22 @@
 
           <li class="list-group-item"><strong>¿Cuál es tu artista favorito?:</strong> {{ user.favorite_artist|default:"No especificado" }}</li>
           <li class="list-group-item"><strong>¿Qué película verías una y otra vez?:</strong> {{ user.favorite_movie|default:"No especificada" }}</li>
-          <li class="list-group-item"><strong>¿Cuál es tu mayor motivación?:</strong> {{ user.motivation|default:"No especificada" }}</li>
           
+          <li class="list-group-item">
+            <strong>¿Cuál es tu lugar favorito?:</strong> 
+            {% if user.favorite_place %}
+              <a href="https://www.google.com/maps/search/?api=1&query={{ user.favorite_place|urlencode }}" 
+                 target="_blank" 
+                 class="btn btn-sm btn-outline-primary ms-2 py-0" 
+                 title="Ver en Google Maps">
+                <i class="fas fa-map-marker-alt"></i> {{ user.favorite_place }}
+              </a>
+            {% else %}
+              <span class="text-muted">No especificado</span>
+            {% endif %}
+          </li>
+
+          <li class="list-group-item"><strong>¿Cuál es tu mayor motivación?:</strong> {{ user.motivation|default:"No especificada" }}</li>
           <li class="list-group-item"><strong>¿Por qué estás más agradecido?:</strong> {{ user.gratitude|default:"Aún no has compartido esto" }}</li>
           <li class="list-group-item"><strong>Tu recuerdo más feliz:</strong> {{ user.happy_memory|default:"Aún no has compartido esto" }}</li>
           

@@ -42,6 +42,20 @@
 
             <li class="list-group-item px-0"><strong><i class="fas fa-microphone text-success me-2"></i>Artista favorito:</strong> {{ student.favorite_artist|default:"No especificado" }}</li>
             <li class="list-group-item px-0"><strong><i class="fas fa-film text-success me-2"></i>Película favorita:</strong> {{ student.favorite_movie|default:"No especificada" }}</li>
+
+            <li class="list-group-item px-0">
+                <strong><i class="fas fa-globe-americas text-success me-2"></i>Lugar favorito:</strong> 
+                {% if student.favorite_place %}
+                  <a href="https://www.google.com/maps/search/?api=1&query={{ student.favorite_place|urlencode }}" 
+                     target="_blank" 
+                     class="text-decoration-none fw-bold text-primary">
+                     {{ student.favorite_place }} <i class="fas fa-external-link-alt small ms-1"></i>
+                  </a>
+                {% else %}
+                  No especificado
+                {% endif %}
+            </li>
+
             <li class="list-group-item px-0"><strong><i class="fas fa-lightbulb text-success me-2"></i>Motivación:</strong> {{ student.motivation|default:"No especificada" }}</li>
             
             <li class="list-group-item px-0"><strong><i class="fas fa-heart text-danger me-2"></i>Agradecimiento:</strong> {{ student.gratitude|default:"No compartido aún" }}</li>

@@ -66,6 +66,20 @@
         </li>
         <li class="list-group-item"><strong>Artista favorito:</strong> {{ student.favorite_artist|default:"No especificado" }}</li>
         <li class="list-group-item"><strong>Película favorita:</strong> {{ student.favorite_movie|default:"No especificada" }}</li>
+        
+        <li class="list-group-item">
+            <strong>Lugar favorito:</strong> 
+            {% if student.favorite_place %}
+              <a href="https://www.google.com/maps/search/?api=1&query={{ student.favorite_place|urlencode }}" 
+                 target="_blank" 
+                 class="btn btn-sm btn-outline-primary ms-2 py-0">
+                <i class="fas fa-map-marked-alt me-1"></i> {{ student.favorite_place }}
+              </a>
+            {% else %}
+              <span class="text-muted">No especificado</span>
+            {% endif %}
+        </li>
+
         <li class="list-group-item"><strong>Motivación:</strong> {{ student.motivation|default:"No especificada" }}</li>
         <li class="list-group-item"><strong>¿Por qué está más agradecido?:</strong> {{ student.gratitude|default:"No compartido aún" }}</li>
         <li class="list-group-item"><strong>Recuerdo más feliz:</strong> {{ student.happy_memory|default:"No compartido aún" }}</li>

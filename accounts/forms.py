@@ -13,6 +13,7 @@ class StudentProfileForm(forms.ModelForm):
         fields = [
             'full_name', 'profile_picture', 'date_of_birth', 'gender', 'residence_area', 'celebrate_birthday',
             'nickname', 'favorite_song', 'spotify_link', 'favorite_artist', 'favorite_movie',
+            'favorite_place',  # <--- AÑADIDO
             'motivation', 'gratitude', 'happy_memory', 'share_with_class'
         ]
         labels = {
@@ -27,6 +28,7 @@ class StudentProfileForm(forms.ModelForm):
             'spotify_link': 'Enlace de la canción en Spotify',
             'favorite_artist': '¿Cuál es tu artista favorito?',
             'favorite_movie': '¿Qué película verías una y otra vez?',
+            'favorite_place': '¿Cuál es tu lugar favorito en el mundo?', # <--- AÑADIDO
             'motivation': '¿Cuál es tu mayor motivación?',
             'gratitude': '¿Por qué estás más agradecido en tu vida?',
             'happy_memory': '¿Cuál es tu recuerdo más feliz?',
@@ -59,6 +61,12 @@ class StudentProfileForm(forms.ModelForm):
             ),
             'favorite_artist': forms.TextInput(attrs={'class': 'form-control'}),
             'favorite_movie': forms.TextInput(attrs={'class': 'form-control'}),
+            'favorite_place': forms.TextInput(
+                attrs={
+                    'class': 'form-control', 
+                    'placeholder': 'Busca un país, ciudad o monumento...'
+                }
+            ), # <--- AÑADIDO
             'motivation': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'gratitude': forms.Textarea(
                 attrs={
