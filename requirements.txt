@@ -8,3 +8,4 @@ cloudinary==1.41.0
 crispy-bootstrap5==2024.2
 psycopg2-binary
 django-environ
+python-dotenv
