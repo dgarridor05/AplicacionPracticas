@@ -29,7 +29,7 @@ class UserProfile(AbstractUser):
     favorite_artist = models.CharField(max_length=100, blank=True, null=True)
     favorite_movie = models.CharField(max_length=100, blank=True, null=True)
     # Nuevo campo para el buscador de lugares
-    favorite_place = models.CharField(max_length=255, blank=True, null=True, verbose_name="Lugar favorito")
+    favorite_place = models.CharField(max_length=255, blank=True, null=True, verbose_name="Lugar favorito", db_column='favorite_place')
     
     motivation = models.TextField(blank=True, null=True)
 
