@@ -5,7 +5,14 @@ from .models import UserProfile
 class RegisterForm(UserCreationForm):
     class Meta:
         model = UserProfile
-        fields = ['username', 'email', 'password1', 'password2', 'role']
+        # Quitamos password1 y password2 de aquí porque UserCreationForm ya los incluye por defecto
+        fields = ['username', 'email', 'role']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Este bucle añade la clase de Bootstrap a todos los campos automáticamente
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:
@@ -35,51 +42,21 @@ class StudentProfileForm(forms.ModelForm):
             'share_with_class': '¿Quieres compartir esta información con la clase?',
         }
         widgets = {
-            'full_name': forms.TextInput(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Escribe tu nombre completo'
-                }
-            ),
-            'date_of_birth': forms.DateInput(
-                attrs={
-                    'type': 'date',
-                    'class': 'form-control',
-                    'placeholder': 'Selecciona tu fecha de nacimiento'
-                }
-            ),
+            'full_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Escribe tu nombre completo'}),
+            'date_of_birth': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'placeholder': 'Selecciona tu fecha de nacimiento'}),
             'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
             'gender': forms.Select(attrs={'class': 'form-control'}),
             'residence_area': forms.TextInput(attrs={'class': 'form-control'}),
             'nickname': forms.TextInput(attrs={'class': 'form-control'}),
             'favorite_song': forms.TextInput(attrs={'class': 'form-control'}),
-            'spotify_link': forms.URLInput(
-                attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Pega el enlace de Spotify aquí'
-                }
-            ),
+            'spotify_link': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'Pega el enlace de Spotify aquí'}),
             'favorite_artist': forms.TextInput(attrs={'class': 'form-control'}),
             'favorite_movie': forms.TextInput(attrs={'class': 'form-control'}),
-            'favorite_place': forms.TextInput(
-                attrs={
-                    'class': 'form-control', 
-                    'placeholder': 'Busca un país, ciudad o monumento...'
-                }
-            ), # <--- AÑADIDO
+            'favorite_place': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Busca un país, ciudad o monumento...'}), # <--- AÑADIDO
             'motivation': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'gratitude': forms.Textarea(
-                attrs={
-                    'class': 'form-control', 
-                    'rows': 3, 
-                    'placeholder': 'Describe brevemente qué agradeces hoy...'
-                }
-            ),
-            'happy_memory': forms.Textarea(
-                attrs={
-                    'class': 'form-control', 
-                    'rows': 3, 
-                    'placeholder': 'Cuéntanos un momento que te haga sonreír...'
-                }
-            ),
+            'gratitude': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Describe brevemente qué agradeces hoy...'}),
+            'happy_memory': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Cuéntanos un momento que te haga sonreír...'}),
+            # Estilo específico para los Checkbox de Bootstrap
+            'celebrate_birthday': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'share_with_class': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }

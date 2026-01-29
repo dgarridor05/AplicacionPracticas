@@ -2,26 +2,75 @@
 {% block title %}Panel del Profesor{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-lg p-4" style="width: 100%; max-width: 550px;">
-    <div class="text-center mb-3">
-      <h2 class="text-success">¡Bienvenido, {{ user.username }}!</h2>
-    </div>
+<div class="container py-4">
+    <div class="row justify-content-center g-4">
+        
+        <div class="col-md-7 col-lg-6">
+            <div class="card shadow-lg border-0 h-100" style="border-radius: 20px;">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4">
+                        <h2 class="text-success fw-bold">¡Hola, {{ user.username }}!</h2>
+                        <p class="text-muted small">Panel de Control del Profesor | RELACIONA</p>
+                    </div>
 
-    <div class="card-body">
-      <h5 class="card-title text-center">¿Qué deseas hacer?</h5>
-      <div class="d-grid gap-3 mt-4">
-        <a href="{% url 'view_groups' %}" class="btn btn-success">Ver mis grupos</a>
-        <a href="{% url 'create_group' %}" class="btn btn-outline-success">Crear nuevo grupo</a>
-        <a href="{% url 'face_guess_game' %}" class="btn btn-outline-success">Minijuego: Adivina el nombre</a>
-        <a href="{% url 'name_to_face_game' %}" class="btn btn-outline-success">Minijuego: Adivina la imagen</a>
-        <a href="{% url 'student_interests_game' %}" class="btn btn-outline-success">Minijuego de intereses</a>
-        <a href="{% url 'quiz_results_game' %}" class="btn btn-outline-success">Minijuego de resultados de test</a>
-        <a href="{% url 'student_complete_profile_game' %}" class="btn btn-outline-success">Minijuego: Perfil Completo</a>
-        <a href="{% url 'hangman_game' %}" class="btn btn-outline-success">🎯 Minijuego: Ahorcado</a>
-        <a href="{% url 'logout' %}" class="btn btn-outline-secondary">Cerrar sesión</a>
-      </div>
+                    <div class="d-grid gap-2">
+                        <h6 class="text-start text-uppercase small fw-bold text-muted mb-2">Gestión de Clase</h6>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <a href="{% url 'view_groups' %}" class="btn btn-success w-100 p-2 shadow-sm">
+                                    <i class="fas fa-users me-2"></i>Ver grupos
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="{% url 'create_group' %}" class="btn btn-outline-success w-100 p-2">
+                                    <i class="fas fa-plus me-2"></i>Nuevo grupo
+                                </a>
+                            </div>
+                        </div>
+
+                        <h6 class="text-start text-uppercase small fw-bold text-muted mb-2">Minijuegos de Memoria</h6>
+                        <div class="row g-2">
+                            <div class="col-6"><a href="{% url 'face_guess_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">Adivina Nombre</a></div>
+                            <div class="col-6"><a href="{% url 'name_to_face_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">Adivina Imagen</a></div>
+                            <div class="col-6"><a href="{% url 'student_interests_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">Intereses</a></div>
+                            <div class="col-6"><a href="{% url 'quiz_results_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">Resultados Test</a></div>
+                            <div class="col-6"><a href="{% url 'student_complete_profile_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">Perfil Completo</a></div>
+                            <div class="col-6"><a href="{% url 'hangman_game' %}" class="btn btn-outline-success btn-sm w-100 py-2">🎯 Ahorcado</a></div>
+                        </div>
+
+                        <hr class="my-4 opacity-10">
+                        <a href="{% url 'logout' %}" class="btn btn-outline-secondary btn-sm mx-auto w-50">Cerrar sesión</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-lg-4">
+            <div class="card shadow-lg border-0 h-100 text-center" style="border-radius: 20px; background-color: #f8f9fa;">
+                <div class="card-body p-4 d-flex flex-column justify-content-center">
+                    <h5 class="fw-bold text-dark mb-2">Registro de Alumnos</h5>
+                    <p class="small text-muted mb-4">Escanea para crear tu perfil</p>
+                    
+                    <div class="bg-white p-3 d-inline-block mx-auto rounded-4 shadow-sm mb-3 border">
+                        <img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=http://relaciona-env.eba-f4yp5tcr.eu-west-3.elasticbeanstalk.com/accounts/register/&choe=UTF-8" 
+                             alt="QR Registro Alumnos" 
+                             class="img-fluid"
+                             style="max-width: 220px;">
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="badge bg-white text-dark border p-2 px-3 rounded-pill fw-normal shadow-sm">
+                            <i class="fas fa-mobile-alt me-2 text-success"></i> Acceso Directo Clase
+                        </div>
+                    </div>
+                    
+                    <p class="mt-4 extra-small text-muted" style="font-size: 0.75rem;">
+                        Asegúrate de estar en la red Wi-Fi de la facultad.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
-  </div>
 </div>
 {% endblock %}

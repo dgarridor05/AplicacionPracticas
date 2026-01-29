@@ -3,34 +3,54 @@
 
 {% block content %}
 <div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-lg p-4" style="width: 100%; max-width: 600px;">
-    <h2 class="text-center mb-4 text-success">Crear cuenta de alumno</h2>
+  <div class="card shadow-lg p-4 animate-fade-in" style="width: 100%; max-width: 600px; border-radius: 20px; border: none;">
+    <h2 class="text-center mb-4 fw-bold" style="color: var(--color-primary);">Crear cuenta de alumno</h2>
 
-    <form method="post" enctype="multipart/form-data" novalidate>
+    <form method="post" enctype="multipart/form-data" id="register-form" novalidate>
       {% csrf_token %}
 
       {% for field in form %}
         <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          <label for="{{ field.id_for_label }}" class="form-label fw-semibold text-muted">{{ field.label }}</label>
           {{ field }}
           {% if field.help_text %}
             <div class="form-text">{{ field.help_text }}</div>
           {% endif %}
           {% for error in field.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="text-danger small"><i class="fas fa-exclamation-circle me-1"></i>{{ error }}</div>
           {% endfor %}
         </div>
       {% endfor %}
 
-      <div class="d-grid">
-        <button type="submit" class="btn btn-success">Registrarse</button>
+      <div class="d-grid mt-4">
+        <button type="submit" id="submit-btn" class="btn btn-primary shadow-sm" style="padding: 12px; border-radius: 12px;">
+          <i class="fas fa-user-plus me-2"></i>Registrarse
+        </button>
       </div>
     </form>
 
     <div class="text-center mt-4">
-      <p class="mb-0">¿Ya tienes una cuenta?</p>
-      <a href="{% url 'login' %}" class="text-decoration-none text-success fw-semibold">Inicia sesión</a>
+      <p class="mb-0 text-muted small">¿Ya tienes una cuenta?</p>
+      <a href="{% url 'login' %}" class="text-decoration-none fw-bold" style="color: var(--color-accent);">Inicia sesión</a>
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById('register-form').addEventListener('submit', function(e) {
+    const btn = document.getElementById('submit-btn');
+    
+    // Si el botón ya está desactivado, no hacemos nada
+    if (btn.disabled) {
+        e.preventDefault();
+        return false;
+    }
+
+    // Desactivamos el botón para evitar que pulsen varias veces
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando registro...';
+    
+    // El formulario se enviará normalmente tras este cambio
+});
+</script>
 {% endblock %}

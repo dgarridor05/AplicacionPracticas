@@ -116,22 +116,25 @@
         }
 
         .bottom-nav {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1050;
-        }
+    position: fixed;
+    bottom: 20px;
+    left: 0;       /* Empieza en el borde izquierdo */
+    right: 0;      /* Termina en el borde derecho */
+    margin-left: auto;  /* Centrado horizontal automático */
+    margin-right: auto; /* Centrado horizontal automático */
+    width: 90%;
+    max-width: 400px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1050;
+    /* Eliminamos el transform: translateX(-50%) que causaba el desplazamiento */
+}
 
         .nav-item-mobile {
             display: flex;
