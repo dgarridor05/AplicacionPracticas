@@ -23,7 +23,7 @@
                     {% if target_student.profile_picture %}
                     <img src="{{ target_student.profile_picture.url }}" class="rounded-circle shadow-sm"
                         style="width: 130px; height: 130px; object-fit: cover; border: 5px solid white;"
-                        alt="{{ target_name }}">
+                        alt="{{ target_student.full_name|default:target_student.username }}">
                     {% else %}
                     <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm"
                         style="width: 130px; height: 130px; border: 5px solid white;">
@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <h3 class="fw-bold text-dark mb-2">¿Cómo es {{ target_name }}?</h3>
+            <h3 class="fw-bold text-dark mb-2">¿Cómo es {{ target_student.full_name|default:target_student.username }}?</h3>
             <p class="text-muted px-md-5">
                 Hemos mezclado las descripciones. ¿Sabrías decir cuál es la que realmente define a este estudiante?
             </p>
@@ -67,7 +67,7 @@
     </form>
 
     <div class="text-center mt-5 mb-5 animate-fade-in delay-300">
-        <a href="{% url 'student_interests_game' %}" class="btn btn-link text-decoration-none text-muted me-3">
+        <a href="{% url 'student_interests_game' group.id %}" class="btn btn-link text-decoration-none text-muted me-3">
             <i class="fas fa-random me-1"></i> Otra persona
         </a>
         <a href="{% url 'teacher_home' %}" class="btn btn-light rounded-pill px-4 border">
@@ -141,14 +141,13 @@ function submitInterest(optionValue) {
     formData.append('selected_option', optionValue);
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-    // Bloqueo de UI
     const options = document.querySelectorAll('.interest-option');
     options.forEach(btn => {
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.6';
     });
 
-    fetch("{% url 'student_interests_game' %}", {
+    fetch("{% url 'student_interests_game' group.id %}", {
         method: 'POST',
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -163,7 +162,9 @@ function submitInterest(optionValue) {
             showConfirmButton: false,
             backdrop: 'rgba(13, 110, 253, 0.1)'
         }).then(() => {
-            document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+            if (data.correct !== undefined) {
+                document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+            }
             window.location.reload();
         });
     })

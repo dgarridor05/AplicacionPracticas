@@ -123,69 +123,80 @@ def hangman_game(request, group_id=None):
     
     if not students.exists(): return render(request, 'minigames/no_students.html')
     
+    # Inicializar contadores si no existen
     if 'hangman_correct' not in request.session: request.session['hangman_correct'] = 0
     if 'hangman_total' not in request.session: request.session['hangman_total'] = 0
     
-    if request.method == 'POST' and request.POST.get('action') == 'new_game' or 'hangman_target_id' not in request.session:
+    # Elegir nuevo alumno si no hay uno en curso o si se pide un juego nuevo
+    if 'hangman_target_id' not in request.session or (request.method == 'POST' and request.POST.get('action') == 'new_game'):
         student = random.choice(students)
         request.session['hangman_target_id'] = student.id
         request.session['hangman_target_name'] = normalize_text(student.full_name or student.username).upper()
         request.session['hangman_guessed_letters'] = []
         request.session['hangman_incorrect_count'] = 0
         request.session['hangman_game_over'] = False
+        request.session.modified = True
         if request.POST.get('action') == 'new_game': return redirect('hangman_game', group_id=group_id)
 
     target_name = request.session['hangman_target_name']
     
+    # Lógica de adivinar letra (AJAX)
     if request.method == 'POST' and request.POST.get('action') == 'guess_letter':
         letter = request.POST.get('letter', '').upper()
         if not request.session['hangman_game_over'] and letter not in request.session['hangman_guessed_letters']:
             request.session['hangman_guessed_letters'].append(letter)
             if letter not in target_name: request.session['hangman_incorrect_count'] += 1
-            displayed = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
-            won, lost = "_" not in displayed, request.session['hangman_incorrect_count'] >= 6
+            
+            displayed = "".join([c if c in request.session['hangman_guessed_letters'] or c == " " else "_" for c in target_name])
+            won = "_" not in displayed
+            lost = request.session['hangman_incorrect_count'] >= 6
+            
             if won or lost:
                 request.session['hangman_game_over'] = True
                 request.session['hangman_total'] += 1
                 if won: request.session['hangman_correct'] += 1
+            
             request.session.modified = True
-            return get_ajax_response(request, True, "", 'hangman', extra_data={'displayed_name': displayed, 'incorrect_count': request.session['hangman_incorrect_count'], 'game_over': request.session['hangman_game_over'], 'won': won, 'target_name': target_name})
+            return get_ajax_response(request, True, "", 'hangman', extra_data={
+                'displayed_name': displayed, 
+                'incorrect_count': request.session['hangman_incorrect_count'], 
+                'game_over': request.session['hangman_game_over'], 
+                'won': won, 
+                'target_name': target_name
+            })
 
+    # Preparar datos para el render
     student = UserProfile.objects.get(id=request.session['hangman_target_id'])
     displayed_name = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
     
     return render(request, 'minigames/hangman_game.html', {
-        'current_student': student, 
-        'group': group,
-        'displayed_name': displayed_name, 
-        'incorrect_count': request.session['hangman_incorrect_count'], 
-        'alphabet': "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", 
-        'used_letters': request.session['hangman_guessed_letters'], 
-        'game_over': request.session['hangman_game_over'], 
-        'correct': request.session['hangman_correct'], 
-        'total': request.session['hangman_total']
+        'current_student': student, 'group': group, 'displayed_name': displayed_name, 
+        'incorrect_count': request.session['hangman_incorrect_count'], 'alphabet': "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", 
+        'used_letters': request.session['hangman_guessed_letters'], 'game_over': request.session['hangman_game_over'], 
+        'correct': request.session['hangman_correct'], 'total': request.session['hangman_total']
     })
 
 @login_required
 def student_interests_game(request, group_id=None):
     if not group_id: return select_group_for_game(request, 'student_interests_game')
-    
     group = get_object_or_404(ClassGroup, id=group_id)
     students = group.students.all().distinct()
-    
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
 
     if 'interests_correct' not in request.session: request.session['interests_correct'] = 0
     if 'interests_total' not in request.session: request.session['interests_total'] = 0
 
-    if request.method == 'POST':
+    # Si recibimos respuesta (POST)
+    if request.method == 'POST' and 'selected_option' in request.POST:
         selected_index = request.POST.get('selected_option') 
         correct_index = request.session.get('interests_correct_pos')
         request.session['interests_total'] += 1
         is_correct = str(selected_index) == str(correct_index)
         if is_correct: request.session['interests_correct'] += 1
+        request.session.modified = True
         return get_ajax_response(request, is_correct, "¡Correcto!" if is_correct else "¡No! Esa no era su descripción", 'interests')
 
+    # Al cargar la página, elegimos alumno nuevo
     target = random.choice(students)
     def get_desc(s):
         return f"Tiene {calculate_age(s.date_of_birth)} años. Su artista favorito es {s.favorite_artist or 'desconocido'} y le motiva: {s.motivation or 'aprender'}."
@@ -197,11 +208,8 @@ def student_interests_game(request, group_id=None):
     request.session['interests_correct_pos'] = options.index(correct_desc) + 1
     
     return render(request, 'minigames/student_interests_game.html', {
-        'target_student': target, 
-        'group': group,
-        'options': options, 
-        'correct': request.session['interests_correct'], 
-        'total': request.session['interests_total']
+        'target_student': target, 'group': group, 'options': options, 
+        'correct': request.session['interests_correct'], 'total': request.session['interests_total']
     })
 
 @login_required
@@ -238,10 +246,7 @@ def quiz_results_game(request, group_id=None):
 @login_required
 def student_complete_profile_game(request, group_id=None):
     if not group_id: return select_group_for_game(request, 'student_complete_profile_game')
-    
     group = get_object_or_404(ClassGroup, id=group_id)
-    vark_q = Questionnaire.objects.filter(title="VARK").first()
-    chapman_q = Questionnaire.objects.filter(title="Chapman").first()
     students = group.students.filter(profile_picture__isnull=False).distinct()
     
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
@@ -249,14 +254,19 @@ def student_complete_profile_game(request, group_id=None):
     if 'complete_profile_correct' not in request.session: request.session['complete_profile_correct'] = 0
     if 'complete_profile_total' not in request.session: request.session['complete_profile_total'] = 0
     
-    if request.method == 'POST':
+    if request.method == 'POST' and 'selected_student_id' in request.POST:
         is_correct = str(request.POST.get('selected_student_id')) == str(request.session.get('complete_profile_target_id'))
         request.session['complete_profile_total'] += 1
         if is_correct: request.session['complete_profile_correct'] += 1
+        request.session.modified = True
         return get_ajax_response(request, is_correct, "¡Listo!", 'complete_profile')
     
+    # Al cargar, seleccionamos objetivo y opciones
+    vark_q = Questionnaire.objects.filter(title="VARK").first()
+    chapman_q = Questionnaire.objects.filter(title="Chapman").first()
     target = random.choice(students)
     request.session['complete_profile_target_id'] = target.id
+    
     raw_options = list(students.exclude(id=target.id).order_by('?')[:3]) + [target]
     random.shuffle(raw_options)
     
@@ -275,57 +285,6 @@ def student_complete_profile_game(request, group_id=None):
         })
         
     return render(request, 'minigames/student_complete_profile_game.html', {
-        'target_student': target, 
-        'options': options_data, 
-        'group': group,
-        'correct': request.session['complete_profile_correct'], 
-        'total': request.session['complete_profile_total']
-    })
-
-@login_required
-def spotify_guess_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'spotify_guess_game')
-    
-    group = get_object_or_404(ClassGroup, id=group_id)
-    # Filtramos alumnos que tengan el link de Spotify relleno
-    students = group.students.exclude(spotify_link__isnull=True).exclude(spotify_link='').distinct()
-    
-    if students.count() < 4:
-        return render(request, 'minigames/not_enough_students.html', {
-            'message': "Se necesitan al menos 4 alumnos con su canción de Spotify configurada."
-        })
-    
-    if 'spotify_correct' not in request.session: request.session['spotify_correct'] = 0
-    if 'spotify_total' not in request.session: request.session['spotify_total'] = 0
-    
-    if request.method == 'POST':
-        is_correct = str(request.POST.get('selected_id')) == str(request.session.get('spotify_target_id'))
-        request.session['spotify_total'] += 1
-        if is_correct: request.session['spotify_correct'] += 1
-        
-        target = UserProfile.objects.get(id=request.session.get('spotify_target_id'))
-        msg = f"¡Correcto! Es la canción de {target.full_name or target.username}" if is_correct else "¡Ups! No es de ese compañero."
-        
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return get_ajax_response(request, is_correct, msg, 'spotify')
-        return redirect('spotify_guess_game', group_id=group_id)
-
-    # Elegir un alumno objetivo que no sea el mismo de la última vez
-    last_id = request.session.get('spotify_last_id')
-    possible_targets = students.exclude(id=last_id) if students.count() > 1 else students
-    target = random.choice(possible_targets)
-    
-    request.session['spotify_target_id'] = target.id
-    request.session['spotify_last_id'] = target.id
-    
-    # Crear 4 opciones (el target + 3 aleatorios)
-    options = list(random.sample(list(students.exclude(id=target.id)), 3)) + [target]
-    random.shuffle(options)
-    
-    return render(request, 'minigames/spotify_guess_game.html', {
-        'target_embed': target.spotify_embed_url,
-        'options': options,
-        'group': group,
-        'correct': request.session['spotify_correct'],
-        'total': request.session['spotify_total']
+        'target_student': target, 'options': options_data, 'group': group,
+        'correct': request.session['complete_profile_correct'], 'total': request.session['complete_profile_total']
     })

@@ -12,7 +12,7 @@
         <div class="d-inline-flex align-items-center px-4 py-2 bg-white rounded-pill shadow-sm border">
             <span class="text-muted small fw-bold text-uppercase me-2" style="letter-spacing: 1px;">Progreso</span>
             <span id="score-display" class="fw-bold fs-5 text-primary">
-                <i class="fas fa-star text-warning me-1"></i> {{correct}} / {{total}}
+                <i class="fas fa-star text-warning me-1"></i> {{ correct }} / {{ total }}
             </span>
         </div>
     </div>
@@ -27,7 +27,7 @@
             <div class="position-relative d-inline-block animate-float">
                 <div class="rounded-circle shadow-glow p-1 bg-white border">
                     {% if target_student.profile_picture %}
-                        <img src="{{target_student.profile_picture.url}}" alt="Foto del estudiante"
+                        <img src="{{ target_student.profile_picture.url }}" alt="Foto del estudiante"
                              class="rounded-circle object-fit-cover shadow-sm"
                              style="width: 150px; height: 150px; border: 4px solid white;">
                     {% else %}
@@ -46,8 +46,8 @@
         <div class="d-grid gap-4">
             {% for option in options %}
             <div class="card shadow-sm border-0 option-card animate-scale-in" 
-                 id="card-{{option.student_id}}"
-                 onclick="selectOption('{{option.student_id}}')"
+                 id="card-{{ option.student_id }}"
+                 onclick="selectOption('{{ option.student_id }}')"
                  style="cursor: pointer; animation-delay: {{ forloop.counter0|add:'1' }}00ms;">
 
                 <div class="card-body p-4">
@@ -55,11 +55,11 @@
                         <div class="d-flex align-items-center">
                             <div class="form-check m-0">
                                 <input class="form-check-input" type="radio" name="selected_student_id"
-                                       value="{{option.student_id}}" id="radio-{{option.student_id}}"
+                                       value="{{ option.student_id }}" id="radio-{{ option.student_id }}"
                                        style="transform: scale(1.3); pointer-events: none;">
                             </div>
                             <span class="ms-3 badge bg-light text-primary border fw-bold px-3 py-2 rounded-pill">
-                                FICHA #{{forloop.counter}}
+                                FICHA #{{ forloop.counter }}
                             </span>
                         </div>
                     </div>
@@ -69,13 +69,13 @@
                             <div class="col-md-7">
                                 <p class="mb-1">
                                     <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Nombre Completo</small>
-                                    <span class="fs-5 fw-bold text-dark">{{option.full_name}}</span>
+                                    <span class="fs-5 fw-bold text-dark">{{ option.full_name }}</span>
                                 </p>
                             </div>
                             <div class="col-md-5 text-md-end">
                                 <p class="mb-0">
                                     <span class="badge bg-soft-info text-info rounded-pill px-3">
-                                        <i class="fas fa-birthday-cake me-1"></i> {{option.age}} años
+                                        <i class="fas fa-birthday-cake me-1"></i> {{ option.age }} años
                                     </span>
                                 </p>
                             </div>
@@ -86,30 +86,30 @@
                                 <div class="p-2 border rounded-3 bg-light-subtle">
                                     <small class="text-muted d-block" style="font-size: 0.7rem;">Música</small>
                                     <i class="fas fa-music text-primary me-1 small"></i> 
-                                    <span class="fw-medium small">{{option.favorite_artist|truncatechars:20}}</span>
+                                    <span class="fw-medium small">{{ option.favorite_artist|truncatechars:20 }}</span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="p-2 border rounded-3 bg-light-subtle">
                                     <small class="text-muted d-block" style="font-size: 0.7rem;">Cine</small>
                                     <i class="fas fa-film text-primary me-1 small"></i> 
-                                    <span class="fw-medium small">{{option.favorite_movie|truncatechars:20}}</span>
+                                    <span class="fw-medium small">{{ option.favorite_movie|truncatechars:20 }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="d-flex flex-wrap gap-2 mb-3">
                             <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-2">
-                                <i class="fas fa-heart me-1"></i> Chapman: {{option.chapman_result}}
+                                <i class="fas fa-heart me-1"></i> Chapman: {{ option.chapman_result }}
                             </span>
                             <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-2">
-                                <i class="fas fa-brain me-1"></i> VARK: {{option.vark_result}}
+                                <i class="fas fa-brain me-1"></i> VARK: {{ option.vark_result }}
                             </span>
                         </div>
 
                         <div class="position-relative p-3 bg-light rounded-3 fst-italic text-muted small border-start border-primary border-4">
                             <i class="fas fa-quote-left text-primary opacity-25 me-2"></i>
-                            "{{option.motivation|truncatechars:120}}"
+                            "{{ option.motivation|truncatechars:120 }}"
                         </div>
                     </div>
                 </div>
@@ -124,14 +124,14 @@
         </div>
 
         <div class="text-center mt-5 d-none d-md-block">
-            <button type="submit" id="submit-btn" class="btn btn-cta btn-lg px-5 shadow rounded-pill fw-bold hover-scale">
+            <button type="submit" id="submit-btn" class="btn btn-primary btn-lg px-5 shadow rounded-pill fw-bold hover-scale" style="background: linear-gradient(45deg, #0d6efd, #0043a8); border: none;">
                 <i class="fas fa-check-circle me-2"></i> Confirmar Selección
             </button>
         </div>
     </form>
 
     <div class="text-center mt-2 mb-5 animate-fade-in">
-        <a href="{% url 'student_complete_profile_game' %}" class="btn btn-link text-muted text-decoration-none mx-2">
+        <a href="{% url 'student_complete_profile_game' group.id %}" class="btn btn-link text-muted text-decoration-none mx-2">
             <i class="fas fa-sync me-1"></i> Saltar
         </a>
         <a href="{% url 'teacher_home' %}" class="btn btn-link text-muted text-decoration-none mx-2">
@@ -159,7 +159,6 @@
     .hover-scale:hover { transform: scale(1.05); }
     .shadow-glow { box-shadow: 0 0 20px rgba(13, 110, 253, 0.15); }
     
-    /* Para pantallas móviles, evitar que el botón tape contenido */
     @media (max-width: 768px) {
         form { padding-bottom: 80px; }
     }
@@ -167,19 +166,11 @@
 
 <script>
     function selectOption(studentId) {
-        // Remover clase de todos
         document.querySelectorAll('.option-card').forEach(card => card.classList.remove('selected'));
-        
-        // Añadir clase al seleccionado
         const selectedCard = document.getElementById('card-' + studentId);
         if (selectedCard) selectedCard.classList.add('selected');
-        
-        // Marcar radio
         const radio = document.getElementById('radio-' + studentId);
         if (radio) radio.checked = true;
-        
-        // Haptic feedback simple (vibración) si el dispositivo lo soporta
-        if (window.navigator.vibrate) window.navigator.vibrate(10);
     }
 
     document.getElementById('complete-profile-form').addEventListener('submit', function(e) {
@@ -199,7 +190,7 @@
 
         submitBtn.disabled = true;
 
-        fetch("{% url 'student_complete_profile_game' %}", {
+        fetch("{% url 'student_complete_profile_game' group.id %}", {
             method: 'POST',
             body: formData,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -214,6 +205,10 @@
                 showConfirmButton: false,
                 backdrop: `rgba(0,0,0,0.4)`
             }).then(() => {
+                // Actualizar marcador antes de recargar
+                if(data.correct !== undefined) {
+                    document.getElementById('score-display').innerHTML = `<i class="fas fa-star text-warning me-1"></i> ${data.correct} / ${data.total}`;
+                }
                 window.location.reload();
             });
         })
