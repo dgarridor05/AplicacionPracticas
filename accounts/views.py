@@ -69,7 +69,7 @@ def edit_student_profile(request):
 
 @login_required
 def view_student_profile(request):
-    # SEGURIDAD: Si es profesor, lo redirigimos a su inicio (o puedes dejar que lo vea si quieres)
+    # SEGURIDAD: Si es profesor, lo redirigimos a su inicio
     if request.user.role != 'student':
         return redirect('teacher_home')
 
@@ -80,13 +80,21 @@ def view_student_profile(request):
 
 @login_required
 def public_classmates_list(request):
+    """
+    Lista solo a los alumnos que pertenecen a los mismos grupos que el usuario actual.
+    """
     if request.user.role != 'student':
         return redirect('teacher_home')
 
+    # Obtenemos los IDs de los grupos del alumno logueado
+    mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
+
+    # Filtramos: mismo grupo, que quiera compartir y que sea estudiante
     classmates = UserProfile.objects.filter(
         role='student',
-        share_with_class=True
-    ).exclude(id=request.user.id)
+        share_with_class=True,
+        student_groups__id__in=mis_grupos_ids
+    ).exclude(id=request.user.id).distinct()
 
     return render(request, 'accounts/classmates_list.html', {
         'classmates': classmates
@@ -94,12 +102,23 @@ def public_classmates_list(request):
 
 @login_required
 def public_student_profile(request, student_id):
-    # Los profesores pueden ver cualquier perfil de alumno. 
-    # Los alumnos solo los que tengan share_with_class=True.
+    """
+    Muestra el perfil de un alumno. Si el que consulta es otro alumno, 
+    verifica que pertenezcan al mismo grupo.
+    """
     if request.user.role == 'teacher':
+        # Los profesores pueden ver cualquier perfil de alumno
         student = get_object_or_404(UserProfile, id=student_id, role='student')
     else:
-        student = get_object_or_404(UserProfile, id=student_id, role='student', share_with_class=True)
+        # Los alumnos solo pueden ver si comparten grupo y el otro marcó compartir
+        mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
+        student = get_object_or_404(
+            UserProfile, 
+            id=student_id, 
+            role='student', 
+            share_with_class=True,
+            student_groups__id__in=mis_grupos_ids
+        )
 
     return render(request, 'accounts/public_student_profile.html', {
         'student': student

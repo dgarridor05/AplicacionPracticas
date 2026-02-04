@@ -2,10 +2,31 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('adivina/', views.face_guess_game, name='face_guess_game'),#corregido!
-    path('adivina-imagen/', views.name_to_face_game, name='name_to_face_game'),#corregido!
-    path('adivina-gustos/', views.student_interests_game, name='student_interests_game'),#corregido!
+    # 1. Ahorcado (Hangman)
+    path('ahorcado/', views.hangman_game, name='hangman_game'),
+    path('ahorcado/<int:group_id>/', views.hangman_game, name='hangman_game'),
+
+    # 2. Adivina quién es (Face Guess - Foto a Nombre)
+    path('adivina/', views.face_guess_game, name='face_guess_game'),
+    path('adivina/<int:group_id>/', views.face_guess_game, name='face_guess_game'),
+
+    # 3. Adivina imagen (Name to Face - Nombre a Foto)
+    path('adivina-imagen/', views.name_to_face_game, name='name_to_face_game'),
+    path('adivina-imagen/<int:group_id>/', views.name_to_face_game, name='name_to_face_game'),
+
+    # 4. Adivina Gustos (Intereses personales)
+    path('adivina-gustos/', views.student_interests_game, name='student_interests_game'),
+    path('adivina-gustos/<int:group_id>/', views.student_interests_game, name='student_interests_game'),
+
+    # 5. Adivina Tests (Resultados de cuestionarios)
     path('adivina-tests/', views.quiz_results_game, name='quiz_results_game'),
-    path('perfil-completo/', views.student_complete_profile_game, name='student_complete_profile_game'),#corregido!
-    path('ahorcado/', views.hangman_game, name='hangman_game'),#corregido!
+    path('adivina-tests/<int:group_id>/', views.quiz_results_game, name='quiz_results_game'),
+
+    # 6. Perfil Completo (El desafío total)
+    path('perfil-completo/', views.student_complete_profile_game, name='student_complete_profile_game'),
+    path('perfil-completo/<int:group_id>/', views.student_complete_profile_game, name='student_complete_profile_game'),
+
+    # 7. NUEVO: Spotify Mystery (Adivina la canción)
+    path('spotify/', views.spotify_guess_game, name='spotify_guess_game'),
+    path('spotify/<int:group_id>/', views.spotify_guess_game, name='spotify_guess_game'),
 ]
