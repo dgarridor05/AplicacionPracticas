@@ -77,22 +77,27 @@ def public_classmates_list(request):
     if request.user.role != 'student':
         return redirect('teacher_home')
 
-    # Importación local para evitar errores de carga
     from teachers.models import ClassGroup
 
-    # Obtenemos los grupos donde está el alumno actual
+    # 1. Obtenemos los grupos a los que pertenece el alumno
     mis_grupos = ClassGroup.objects.filter(students=request.user)
 
     if not mis_grupos.exists():
-        return render(request, 'accounts/classmates_list.html', {'classmates': []})
+        # Si no tiene grupo, no ve a nadie
+        return render(request, 'accounts/classmates_list.html', {'classmates': [], 'no_group': True})
 
-    # Filtramos compañeros: mismo grupo, rol estudiante y que quieran compartir
+    # 2. Filtramos: 
+    # - Que sean estudiantes
+    # - Que hayan marcado "compartir perfil"
+    # - Que estén en MISMO grupo que yo
+    # - IMPORTANTE: .distinct() para que no salgan repetidos si comparten varios grupos
     classmates = UserProfile.objects.filter(
         role='student',
         share_with_class=True,
         student_groups__in=mis_grupos
     ).exclude(id=request.user.id).distinct()
 
+    # 3. Lógica de buscador (si existe)
     query = request.GET.get('q')
     if query:
         classmates = classmates.filter(
@@ -103,7 +108,8 @@ def public_classmates_list(request):
 
     return render(request, 'accounts/classmates_list.html', {
         'classmates': classmates,
-        'query': query
+        'query': query,
+        'mis_grupos': mis_grupos  # Para mostrar en qué grupos está
     })
 
 @login_required
