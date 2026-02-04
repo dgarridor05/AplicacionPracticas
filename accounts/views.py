@@ -74,28 +74,25 @@ def view_student_profile(request):
 
 @login_required
 def public_classmates_list(request):
-    """
-    Lista solo a los alumnos que comparten grupo con el usuario.
-    Incluye buscador por nickname o nombre.
-    """
     if request.user.role != 'student':
         return redirect('teacher_home')
 
-    # Obtenemos grupos del usuario actual
-    mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
+    # Importación local para evitar errores de carga
+    from teachers.models import ClassGroup
 
-    # Si el usuario no tiene grupo, no mostramos a nadie para evitar fugas de datos
-    if not mis_grupos_ids:
+    # Obtenemos los grupos donde está el alumno actual
+    mis_grupos = ClassGroup.objects.filter(students=request.user)
+
+    if not mis_grupos.exists():
         return render(request, 'accounts/classmates_list.html', {'classmates': []})
 
-    # Filtro base: mismo grupo, rol estudiante y que quieran compartir
+    # Filtramos compañeros: mismo grupo, rol estudiante y que quieran compartir
     classmates = UserProfile.objects.filter(
         role='student',
         share_with_class=True,
-        student_groups__id__in=mis_grupos_ids
+        student_groups__in=mis_grupos
     ).exclude(id=request.user.id).distinct()
 
-    # --- Lógica de Búsqueda Avanzada ---
     query = request.GET.get('q')
     if query:
         classmates = classmates.filter(
@@ -111,23 +108,26 @@ def public_classmates_list(request):
 
 @login_required
 def public_student_profile(request, student_id):
-    """
-    Muestra el perfil. Si es alumno, verifica que compartan grupo.
-    Usa get_object_or_404 para evitar Error 500 si el ID no existe.
-    """
+    from teachers.models import ClassGroup
+    
+    # 1. Obtenemos al estudiante (si existe y quiere compartir)
+    student = get_object_or_404(UserProfile, id=student_id, role='student', share_with_class=True)
+    
+    # 2. Verificación de seguridad
     if request.user.role == 'teacher':
-        student = get_object_or_404(UserProfile, id=student_id, role='student')
+        # El profesor puede verlo si es su alumno (puedes añadir más lógica aquí si quieres)
+        pass 
     else:
-        mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
+        # Si es alumno, verificamos que compartan al menos un grupo
+        comparten_grupo = ClassGroup.objects.filter(
+            students=request.user
+        ).filter(
+            students=student
+        ).exists()
         
-        # Filtro de seguridad: debe compartir grupo
-        student = get_object_or_404(
-            UserProfile, 
-            id=student_id, 
-            role='student', 
-            share_with_class=True,
-            student_groups__id__in=mis_grupos_ids
-        )
+        if not comparten_grupo:
+            messages.error(request, "No tienes permiso para ver este perfil.")
+            return redirect('classmates_list')
 
     return render(request, 'accounts/public_student_profile.html', {
         'student': student
