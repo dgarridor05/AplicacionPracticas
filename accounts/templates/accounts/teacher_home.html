@@ -28,6 +28,20 @@
               </div>
             </div>
 
+            <div class="bg-light p-3 rounded-4 mb-4 border border-opacity-10">
+              <h6 class="text-start text-uppercase extra-small fw-bold text-muted mb-2" style="font-size: 0.7rem;">Códigos de Invitación</h6>
+              <div class="d-flex flex-wrap gap-2 justify-content-center">
+                {% for group in user.teaching_groups.all %}
+                  <div class="bg-white border rounded p-2 text-center shadow-sm" style="min-width: 100px;">
+                    <div class="extra-small text-muted" style="font-size: 0.65rem; font-weight: bold;">{{ group.name|truncatechars:12 }}</div>
+                    <div class="text-success fw-bold" style="letter-spacing: 1px;">{{ group.invite_code }}</div>
+                  </div>
+                {% empty %}
+                  <span class="text-muted small italic">Crea un grupo para generar códigos</span>
+                {% endfor %}
+              </div>
+            </div>
+
             <h6 class="text-start text-uppercase small fw-bold text-muted mb-2">Minijuegos de Memoria</h6>
             <div class="row g-2">
               <div class="col-6"><a href="{% url 'face_guess_game' %}"
@@ -76,7 +90,7 @@
           </div>
 
           <p class="mt-4 extra-small text-muted" style="font-size: 0.75rem;">
-            Asegúrate de estar en la red Wi-Fi de la facultad.
+            Los alumnos deberán introducir el código de grupo tras registrarse.
           </p>
         </div>
       </div>

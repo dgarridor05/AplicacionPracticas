@@ -115,7 +115,7 @@ def public_student_profile(request, student_id):
     
     # 2. Verificación de seguridad
     if request.user.role == 'teacher':
-        # El profesor puede verlo si es su alumno (puedes añadir más lógica aquí si quieres)
+        # El profesor puede verlo si es su alumno
         pass 
     else:
         # Si es alumno, verificamos que compartan al menos un grupo
@@ -138,3 +138,31 @@ def view_profile(request):
     if request.user.role == 'teacher':
         return redirect('teacher_home')
     return redirect('view_student_profile')
+
+# --- NUEVA VISTA PARA UNIRSE POR CÓDIGO ---
+@login_required
+def join_group_by_code(request):
+    if request.user.role != 'student':
+        return redirect('teacher_home')
+
+    if request.method == 'POST':
+        code = request.POST.get('invite_code', '').strip().upper()
+        from teachers.models import ClassGroup
+        
+        try:
+            # Buscamos el grupo que tenga ese código único
+            group = ClassGroup.objects.get(invite_code=code)
+            
+            # Si el alumno ya está en el grupo, avisamos
+            if group.students.filter(id=request.user.id).exists():
+                messages.info(request, f"Ya eres miembro del grupo: {group.name}")
+            else:
+                group.students.add(request.user)
+                messages.success(request, f"Te has unido con éxito al grupo: {group.name}")
+            
+            return redirect('classmates_list')
+            
+        except ClassGroup.DoesNotExist:
+            messages.error(request, "El código introducido no es válido.")
+            
+    return render(request, 'accounts/join_group.html')

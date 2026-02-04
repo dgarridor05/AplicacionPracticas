@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow p-4">
+                <h2 class="mb-4">Unirse a una Clase</h2>
+                <p class="text-muted">Introduce el código de 6 caracteres que te ha dado tu profesor.</p>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <input type="text" 
+                               name="invite_code" 
+                               class="form-control form-control-lg text-center" 
+                               placeholder="EJ: AB1234" 
+                               style="text-transform: uppercase; font-weight: bold; letter-spacing: 3px;"
+                               maxlength="10" 
+                               required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Vincularme al Grupo</button>
+                </form>
+                
+                <div class="mt-4">
+                    <a href="{% url 'student_home' %}" class="btn btn-link text-secondary">Volver al inicio</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

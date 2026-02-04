@@ -12,4 +12,6 @@ urlpatterns = [
     path('alumno/clase/', views.public_classmates_list, name='classmates_list'),
     path('alumno/perfil-publico/<int:student_id>/', views.public_student_profile, name='public_student_profile'),
     path('perfil/', views.view_profile, name='view_profile'),
+    # NUEVA RUTA
+    path('alumno/unirse-clase/', views.join_group_by_code, name='join_group'),
 ]
