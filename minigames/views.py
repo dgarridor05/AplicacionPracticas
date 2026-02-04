@@ -288,3 +288,51 @@ def student_complete_profile_game(request, group_id=None):
         'target_student': target, 'options': options_data, 'group': group,
         'correct': request.session['complete_profile_correct'], 'total': request.session['complete_profile_total']
     })
+
+@login_required
+def spotify_guess_game(request, group_id=None):
+    if not group_id: return select_group_for_game(request, 'spotify_guess_game')
+    
+    group = get_object_or_404(ClassGroup, id=group_id)
+    # Filtramos alumnos que tengan el link de Spotify relleno
+    students = group.students.exclude(spotify_link__isnull=True).exclude(spotify_link='').distinct()
+    
+    if students.count() < 4:
+        return render(request, 'minigames/not_enough_students.html', {
+            'message': "Se necesitan al menos 4 alumnos con su canción de Spotify configurada."
+        })
+    
+    if 'spotify_correct' not in request.session: request.session['spotify_correct'] = 0
+    if 'spotify_total' not in request.session: request.session['spotify_total'] = 0
+    
+    if request.method == 'POST':
+        is_correct = str(request.POST.get('selected_id')) == str(request.session.get('spotify_target_id'))
+        request.session['spotify_total'] += 1
+        if is_correct: request.session['spotify_correct'] += 1
+        
+        target = UserProfile.objects.get(id=request.session.get('spotify_target_id'))
+        msg = f"¡Correcto! Es la canción de {target.full_name or target.username}" if is_correct else "¡Ups! No es de ese compañero."
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return get_ajax_response(request, is_correct, msg, 'spotify')
+        return redirect('spotify_guess_game', group_id=group_id)
+
+    # Elegir un alumno objetivo que no sea el mismo de la última vez
+    last_id = request.session.get('spotify_last_id')
+    possible_targets = students.exclude(id=last_id) if students.count() > 1 else students
+    target = random.choice(possible_targets)
+    
+    request.session['spotify_target_id'] = target.id
+    request.session['spotify_last_id'] = target.id
+    
+    # Crear 4 opciones (el target + 3 aleatorios)
+    options = list(random.sample(list(students.exclude(id=target.id)), 3)) + [target]
+    random.shuffle(options)
+    
+    return render(request, 'minigames/spotify_guess_game.html', {
+        'target_embed': target.spotify_embed_url,
+        'options': options,
+        'group': group,
+        'correct': request.session['spotify_correct'],
+        'total': request.session['spotify_total']
+    })
