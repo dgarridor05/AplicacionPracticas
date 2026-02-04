@@ -19,15 +19,14 @@ def register_view(request):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.role == 'student':
-                return redirect('student_home')
-            elif user.role == 'teacher':
+            if user.role == 'teacher':
                 return redirect('teacher_home')
+            return redirect('student_home')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
     return render(request, 'accounts/login.html')
@@ -38,21 +37,18 @@ def logout_view(request):
 
 @login_required
 def student_home(request):
-    # SEGURIDAD: Si un profesor intenta entrar aquí, lo mandamos a su panel
     if request.user.role != 'student':
         return redirect('teacher_home')
     return render(request, 'accounts/student_home.html')
 
 @login_required
 def teacher_home(request):
-    # SEGURIDAD: Si un alumno intenta entrar aquí, lo mandamos a su panel
     if request.user.role != 'teacher':
         return redirect('student_home')
     return render(request, 'accounts/teacher_home.html')
 
 @login_required
 def edit_student_profile(request):
-    # SEGURIDAD: Solo alumnos pueden editar su perfil de alumno
     if request.user.role != 'student':
         return redirect('teacher_home')
 
@@ -69,10 +65,8 @@ def edit_student_profile(request):
 
 @login_required
 def view_student_profile(request):
-    # SEGURIDAD: Si es profesor, lo redirigimos a su inicio
     if request.user.role != 'student':
         return redirect('teacher_home')
-
     return render(request, 'accounts/view_profile.html', {
         'user': request.user,
         'student': request.user
@@ -81,37 +75,52 @@ def view_student_profile(request):
 @login_required
 def public_classmates_list(request):
     """
-    Lista solo a los alumnos que pertenecen a los mismos grupos que el usuario actual.
+    Lista solo a los alumnos que comparten grupo con el usuario.
+    Incluye buscador por nickname o nombre.
     """
     if request.user.role != 'student':
         return redirect('teacher_home')
 
-    # Obtenemos los IDs de los grupos del alumno logueado
+    # Obtenemos grupos del usuario actual
     mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
 
-    # Filtramos: mismo grupo, que quiera compartir y que sea estudiante
+    # Si el usuario no tiene grupo, no mostramos a nadie para evitar fugas de datos
+    if not mis_grupos_ids:
+        return render(request, 'accounts/classmates_list.html', {'classmates': []})
+
+    # Filtro base: mismo grupo, rol estudiante y que quieran compartir
     classmates = UserProfile.objects.filter(
         role='student',
         share_with_class=True,
         student_groups__id__in=mis_grupos_ids
     ).exclude(id=request.user.id).distinct()
 
+    # --- Lógica de Búsqueda Avanzada ---
+    query = request.GET.get('q')
+    if query:
+        classmates = classmates.filter(
+            Q(nickname__icontains=query) | 
+            Q(full_name__icontains=query) |
+            Q(residence_area__icontains=query)
+        )
+
     return render(request, 'accounts/classmates_list.html', {
-        'classmates': classmates
+        'classmates': classmates,
+        'query': query
     })
 
 @login_required
 def public_student_profile(request, student_id):
     """
-    Muestra el perfil de un alumno. Si el que consulta es otro alumno, 
-    verifica que pertenezcan al mismo grupo.
+    Muestra el perfil. Si es alumno, verifica que compartan grupo.
+    Usa get_object_or_404 para evitar Error 500 si el ID no existe.
     """
     if request.user.role == 'teacher':
-        # Los profesores pueden ver cualquier perfil de alumno
         student = get_object_or_404(UserProfile, id=student_id, role='student')
     else:
-        # Los alumnos solo pueden ver si comparten grupo y el otro marcó compartir
         mis_grupos_ids = request.user.student_groups.values_list('id', flat=True)
+        
+        # Filtro de seguridad: debe compartir grupo
         student = get_object_or_404(
             UserProfile, 
             id=student_id, 
@@ -126,7 +135,6 @@ def public_student_profile(request, student_id):
 
 @login_required
 def view_profile(request):
-    # Si es profesor, al pinchar en "Ver perfil" lo mandamos a su home
     if request.user.role == 'teacher':
         return redirect('teacher_home')
     return redirect('view_student_profile')

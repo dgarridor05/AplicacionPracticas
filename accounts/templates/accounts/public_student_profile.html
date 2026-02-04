@@ -3,154 +3,186 @@
 
 {% block content %}
 <div class="container mt-4 pb-5 animate-fade-in" style="max-width: 900px;">
-    
-    <div class="mb-4">
-        <a href="{% url 'classmates_list' %}" class="text-decoration-none text-muted hover-green transition-all">
-            <i class="fas fa-arrow-left me-2"></i> Volver a la lista de compañeros
-        </a>
-    </div>
 
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm text-center p-4 sticky-top" style="border-radius: 20px; top: 20px;">
-                <div class="position-relative d-inline-block mx-auto mb-3">
-                    {% if student.profile_picture %}
-                        <img src="{{ student.profile_picture.url }}" alt="Foto de perfil" 
-                             class="rounded-circle shadow-sm border border-4 border-white" 
-                             style="width: 150px; height: 150px; object-fit: cover;">
-                    {% else %}
-                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-inner" 
-                             style="width: 150px; height: 150px; border: 2px dashed var(--color-green);">
-                            <i class="fas fa-user fa-4x text-muted opacity-50"></i>
-                        </div>
-                    {% endif %}
-                    <span class="position-absolute bottom-0 end-0 bg-success border border-white border-3 rounded-circle p-2" title="Perfil Activo"></span>
-                </div>
+  <div class="mb-4">
+    <a href="{% url 'classmates_list' %}" class="text-decoration-none text-muted hover-green transition-all">
+      <i class="fas fa-arrow-left me-2"></i> Volver a la lista de compañeros
+    </a>
+  </div>
 
-                <h3 class="fw-bold mb-1" style="color: var(--color-blue-dark);">{{ student.nickname|default:student.username }}</h3>
-                <p class="text-muted small mb-3">@{{ student.username }}</p>
-                
-                <div class="bg-light rounded-pill py-2 px-3 mb-3">
-                    <span class="text-success fw-bold small">
-                        <i class="fas fa-brain me-1"></i> {{ student.vark_result|default:"Estilo por definir" }}
-                    </span>
-                </div>
-
-                <hr class="my-4 opacity-50">
-
-                <div class="text-start">
-                    <p class="small mb-2 text-muted uppercase-tracking">📍 Residencia</p>
-                    <p class="fw-medium mb-3">{{ student.residence_area|default:"No especificado" }}</p>
-                    
-                    <p class="small mb-2 text-muted uppercase-tracking">🎯 Motivación</p>
-                    <p class="fst-italic small text-dark">"{{ student.motivation|default:"Sin frase definida todavía." }}"</p>
-                </div>
-            </div>
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm text-center p-4 sticky-top" style="border-radius: 20px; top: 20px;">
+        <div class="position-relative d-inline-block mx-auto mb-3">
+          {% if student.profile_picture %}
+          <img src="{{ student.profile_picture.url }}" alt="Foto de perfil"
+            class="rounded-circle shadow-sm border border-4 border-white"
+            style="width: 150px; height: 150px; object-fit: cover;">
+          {% else %}
+          <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-inner"
+            style="width: 150px; height: 150px; border: 2px dashed var(--color-green);">
+            <i class="fas fa-user fa-4x text-muted opacity-50"></i>
+          </div>
+          {% endif %}
+          <span class="position-absolute bottom-0 end-0 bg-success border border-white border-3 rounded-circle p-2"
+            title="Perfil Activo"></span>
         </div>
 
-        <div class="col-lg-8">
-            
-            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">
-                        <i class="fas fa-heart text-danger me-2"></i>Intereses y Favoritos
-                    </h5>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="p-3 rounded-4 border bg-white h-100 transition-all hover-card">
-                                <small class="text-muted d-block mb-1">Artista Favorito</small>
-                                <span class="fw-bold text-dark"><i class="fas fa-microphone-alt me-2 text-success"></i>{{ student.favorite_artist|default:"-" }}</span>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-3 rounded-4 border bg-white h-100 transition-all hover-card">
-                                <small class="text-muted d-block mb-1">Película Favorita</small>
-                                <span class="fw-bold text-dark"><i class="fas fa-film me-2 text-success"></i>{{ student.favorite_movie|default:"-" }}</span>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="p-3 rounded-4 border bg-white transition-all hover-card">
-                                <small class="text-muted d-block mb-1">Lugar Favorito</small>
-                                {% if student.favorite_place %}
-                                    <a href="https://www.google.com/maps/search/?api=1&query={{ student.favorite_place|urlencode }}" 
-                                       target="_blank" class="text-decoration-none fw-bold text-primary">
-                                        <i class="fas fa-map-marked-alt me-2"></i>{{ student.favorite_place }}
-                                        <i class="fas fa-external-link-alt small ms-1" style="font-size: 0.7rem;"></i>
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted fw-bold">-</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+        <h3 class="fw-bold mb-1" style="color: var(--color-blue-dark);">{{ student.nickname|default:student.username }}
+        </h3>
+        <p class="text-muted small mb-3">@{{ student.username }}</p>
 
+        <div class="bg-light rounded-pill py-2 px-3 mb-3">
+          <span class="text-success fw-bold small">
+            <i class="fas fa-brain me-1"></i> {{ student.vark_result|default:"Estilo por definir" }}
+          </span>
+        </div>
+
+        <hr class="my-4 opacity-50">
+
+        <div class="text-start">
+          <p class="small mb-2 text-muted uppercase-tracking">📍 Residencia</p>
+          <p class="fw-medium mb-3">{{ student.residence_area|default:"No especificado" }}</p>
+
+          <p class="small mb-2 text-muted uppercase-tracking">🎯 Motivación</p>
+          <p class="fst-italic small text-dark">"{{ student.motivation|default:"Sin frase definida todavía." }}"</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+
+      <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px;">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4 border-bottom pb-2">
+            <i class="fas fa-heart text-danger me-2"></i>Intereses y Favoritos
+          </h5>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 rounded-4 border bg-white h-100 transition-all hover-card">
+                <small class="text-muted d-block mb-1">Artista Favorito</small>
+                <span class="fw-bold text-dark"><i class="fas fa-microphone-alt me-2 text-success"></i>{{
+                  student.favorite_artist|default:"-" }}</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-3 rounded-4 border bg-white h-100 transition-all hover-card">
+                <small class="text-muted d-block mb-1">Película Favorita</small>
+                <span class="fw-bold text-dark"><i class="fas fa-film me-2 text-success"></i>{{
+                  student.favorite_movie|default:"-" }}</span>
+              </div>
+            </div>
+            <div class="col-12">
+              <div class="p-3 rounded-4 border bg-white transition-all hover-card">
+                <small class="text-muted d-block mb-1">Lugar Favorito</small>
+                {% if student.favorite_place %}
+                <a href="https://www.google.com/maps/search/?api=1&query={{ student.favorite_place|urlencode }}"
+                  target="_blank" class="text-decoration-none fw-bold text-primary">
+                  <i class="fas fa-map-marked-alt me-2"></i>{{ student.favorite_place }}
+                  <i class="fas fa-external-link-alt small ms-1" style="font-size: 0.7rem;"></i>
+                </a>
+                {% else %}
+                <span class="text-muted fw-bold">-</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!--POSIBLEMENTE SEA ERROR 500 porque si alguien no tiene cancion de spotify puede dar error en el html, 
+                    se podría cambiar por algo así: 
+                    
                     {% if student.spotify_embed_url %}
-                    <div class="mt-4">
-                        <small class="text-muted d-block mb-2">Su banda sonora actual</small>
-                        <iframe style="border-radius:12px" 
-                                src="{{ student.spotify_embed_url }}" 
-                                width="100%" height="152" 
-                                frameBorder="0" allowfullscreen="" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy">
-                        </iframe>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4 border-bottom pb-2">
-                        <i class="fas fa-comment-dots text-primary me-2"></i>Conociendo a {{ student.nickname|default:student.username }}
-                    </h5>
-                    
-                    <div class="mb-4">
-                        <label class="small text-muted mb-2 d-block"><i class="fas fa-star text-warning me-1"></i> Un recuerdo feliz:</label>
-                        <div class="p-3 bg-light rounded-4 border-start border-4 border-warning">
-                            {{ student.happy_memory|default:"No compartido aún." }}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="small text-muted mb-2 d-block"><i class="fas fa-hands-helping text-success me-1"></i> Algo que agradecer:</label>
-                        <div class="p-3 bg-light rounded-4 border-start border-4 border-success">
-                            {{ student.gratitude|default:"No compartido aún." }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                      <iframe src="{{ student.spotify_embed_url }}" ...></iframe>
+                    {% else %}
+                      <p>Este alumno no ha compartido su canción favorita.</p>
+                    {% endif %}-->
+          {% if student.spotify_embed_url %}
+          <div class="mt-4">
+            <small class="text-muted d-block mb-2">Su banda sonora actual</small>
+            <iframe style="border-radius:12px" src="{{ student.spotify_embed_url }}" width="100%" height="152"
+              frameBorder="0" allowfullscreen=""
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+            </iframe>
+          </div>
+          {% endif %}
         </div>
+      </div>
+
+      <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-4 border-bottom pb-2">
+            <i class="fas fa-comment-dots text-primary me-2"></i>Conociendo a {{
+            student.nickname|default:student.username }}
+          </h5>
+
+          <div class="mb-4">
+            <label class="small text-muted mb-2 d-block"><i class="fas fa-star text-warning me-1"></i> Un recuerdo
+              feliz:</label>
+            <div class="p-3 bg-light rounded-4 border-start border-4 border-warning">
+              {{ student.happy_memory|default:"No compartido aún." }}
+            </div>
+          </div>
+
+          <div>
+            <label class="small text-muted mb-2 d-block"><i class="fas fa-hands-helping text-success me-1"></i> Algo que
+              agradecer:</label>
+            <div class="p-3 bg-light rounded-4 border-start border-4 border-success">
+              {{ student.gratitude|default:"No compartido aún." }}
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+  </div>
 </div>
 
 <style>
-    :root {
-        --color-blue-dark: #2c3e50;
-        --color-green: #198754;
-    }
-    .uppercase-tracking {
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        font-size: 0.7rem;
-        font-weight: 700;
-    }
-    .hover-green:hover { color: var(--color-green) !important; }
-    .transition-all { transition: all 0.3s ease; }
-    .shadow-inner { box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-    
-    .hover-card:hover {
-        border-color: var(--color-green) !important;
-        background-color: #f8fff9 !important;
-        transform: translateY(-2px);
+  :root {
+    --color-blue-dark: #2c3e50;
+    --color-green: #198754;
+  }
+
+  .uppercase-tracking {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .hover-green:hover {
+    color: var(--color-green) !important;
+  }
+
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+
+  .shadow-inner {
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .hover-card:hover {
+    border-color: var(--color-green) !important;
+    background-color: #f8fff9 !important;
+    transform: translateY(-2px);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
 </style>
 {% endblock %}
