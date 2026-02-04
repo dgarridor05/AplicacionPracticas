@@ -65,7 +65,7 @@
     </form>
 
     <div class="d-grid gap-3 mt-5 animate-slide-up delay-300">
-        <a href="{% url 'name_to_face_game' %}" class="btn btn-light text-muted fw-medium rounded-pill py-3 hover-lift">
+        <a href="{% url 'name_to_face_game' group.id %}" class="btn btn-light text-muted fw-medium rounded-pill py-3 hover-lift">
             <i class="fas fa-random me-2"></i>Saltar este alumno
         </a>
         <a href="{% url 'teacher_home' %}" class="btn btn-link text-muted text-decoration-none small text-center">
@@ -80,14 +80,14 @@
         formData.append('selected_id', studentId);
         formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-        // Bloqueo visual de opciones
         const cards = document.querySelectorAll('.option-card');
         cards.forEach(c => {
             c.style.pointerEvents = "none";
             c.style.opacity = "0.6";
         });
 
-        fetch("{% url 'name_to_face_game' %}", {
+        // CORREGIDO: Se añade group.id a la URL del fetch
+        fetch("{% url 'name_to_face_game' group.id %}", {
             method: 'POST',
             body: formData,
             headers: {
@@ -104,9 +104,7 @@
                 showConfirmButton: false,
                 backdrop: 'rgba(0,0,0,0.4)'
             }).then(() => {
-                // Actualizamos marcador en pantalla
                 document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
-                // Recarga suave para el siguiente reto
                 window.location.reload();
             });
         })

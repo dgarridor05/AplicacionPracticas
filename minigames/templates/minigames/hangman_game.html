@@ -95,7 +95,7 @@
                 {{ won|yesno:"¡Ganaste!,¡Perdiste!" }}
              </h4>
              <p>Era: <strong>{{ target_name }}</strong></p>
-             <button onclick="window.location.reload()" class="btn btn-success rounded-pill px-4">Siguiente</button>
+             <a href="{% url 'hangman_game' group.id %}" class="btn btn-success rounded-pill px-4">Siguiente</a>
           </div>
           {% endif %}
       </div>
@@ -104,8 +104,8 @@
   </div>
 
   <div class="text-center mt-4 mb-5 animate-fade-in delay-300">
-    <a href="{% url 'teacher_home' %}" class="btn btn-link text-muted text-decoration-none">
-      <i class="fas fa-home me-2"></i> Volver al panel
+    <a href="{% url 'group_detail' group.id %}" class="btn btn-link text-muted text-decoration-none">
+      <i class="fas fa-arrow-left me-2"></i> Volver a la clase
     </a>
   </div>
 </div>
@@ -117,24 +117,22 @@ function submitLetter(letter) {
     formData.append('letter', letter);
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-    // Desactivar tecla pulsada
     const btn = document.getElementById('btn-' + letter);
     if(btn) {
         btn.disabled = true;
         btn.classList.add('disabled-letter');
     }
 
-    fetch("{% url 'hangman_game' %}", {
+    // CORREGIDO: URL con group.id para mantener el contexto en AJAX
+    fetch("{% url 'hangman_game' group.id %}", {
         method: 'POST',
         body: formData,
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
-        // 1. Actualizar palabra
         document.getElementById('word-display').innerText = data.displayed_name;
         
-        // 2. Actualizar intentos y progreso
         document.getElementById('attempts-text').innerText = `${data.incorrect_count}/${data.max_incorrect}`;
         const progress = (data.incorrect_count / data.max_incorrect) * 100;
         const progressBar = document.getElementById('hangman-progress-bar');
@@ -145,13 +143,11 @@ function submitLetter(letter) {
             progressBar.classList.add('bg-danger');
         }
 
-        // 3. Actualizar Emoji
         const emojiDiv = document.getElementById('status-emoji');
         if (data.incorrect_count >= data.max_incorrect) emojiDiv.innerText = '😵';
         else if (data.incorrect_count >= 1) emojiDiv.innerText = '😰';
         else emojiDiv.innerText = '😊';
 
-        // 4. Verificar fin de juego
         if (data.game_over) {
             setTimeout(() => {
                 Swal.fire({
@@ -162,7 +158,8 @@ function submitLetter(letter) {
                     confirmButtonColor: '#3085d6',
                     allowOutsideClick: false
                 }).then(() => {
-                    window.location.reload();
+                    // CORREGIDO: Recarga a la URL del grupo
+                    window.location.href = "{% url 'hangman_game' group.id %}";
                 });
             }, 300);
         }

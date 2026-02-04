@@ -53,7 +53,7 @@
 
                     <div class="row g-3 mt-2">
                         <div class="col-6">
-                            <a href="{% url 'face_guess_game' %}" class="btn btn-light w-100 fw-medium text-muted hover-lift">
+                            <a href="{% url 'face_guess_game' group.id %}" class="btn btn-light w-100 fw-medium text-muted hover-lift">
                                 <i class="fas fa-random me-1"></i> Saltar
                             </a>
                         </div>
@@ -75,17 +75,17 @@
 
 <script>
 document.getElementById('face-guess-form').addEventListener('submit', function(e) {
-    e.preventDefault(); // Evita la recarga de página
+    e.preventDefault(); 
 
     const form = this;
     const formData = new FormData(form);
     const input = document.getElementById('answer');
     
-    // Desactivamos el botón para evitar múltiples clics
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
 
-    fetch("{% url 'face_guess_game' %}", {
+    // CORREGIDO: Se añade group.id a la URL del fetch
+    fetch("{% url 'face_guess_game' group.id %}", {
         method: 'POST',
         body: formData,
         headers: {
@@ -95,7 +95,6 @@ document.getElementById('face-guess-form').addEventListener('submit', function(e
     })
     .then(response => response.json())
     .then(data => {
-        // Mostramos la alerta de éxito o error
         Swal.fire({
             title: data.success ? '¡Correcto!' : 'Incorrecto',
             text: data.message,
@@ -105,9 +104,7 @@ document.getElementById('face-guess-form').addEventListener('submit', function(e
             position: 'center',
             backdrop: 'rgba(0,0,0,0.4)'
         }).then(() => {
-            // Actualizamos la puntuación en la interfaz antes de recargar
             document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
-            // Recargamos para traer el siguiente alumno (parpadeo mínimo solo de contenido)
             window.location.reload();
         });
     })

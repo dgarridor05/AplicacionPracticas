@@ -4,69 +4,136 @@
 {% block content %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<div class="container mt-4" style="max-width: 600px;">
+<div class="container mt-4" style="max-width: 650px;">
 
-    <div class="text-center mb-4">
-        <div class="d-inline-block px-4 py-2 bg-light rounded-pill border shadow-sm">
-            <i class="fas fa-star text-warning me-2"></i>
-            <span class="text-muted small fw-bold text-uppercase">Puntuación:</span>
-            <span id="score-display" class="ms-2 fw-bold" style="color: var(--color-blue-dark);">{{ correct }} / {{ total }}</span>
+    <div class="text-center mb-4 animate-slide-up">
+        <div class="d-inline-flex align-items-center px-4 py-2 bg-white rounded-pill border shadow-sm">
+            <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px;">
+                <i class="fas fa-star text-white small"></i>
+            </div>
+            <span class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px;">Puntuación:</span>
+            <span id="score-display" class="ms-2 fw-bold text-primary">{{ correct }} / {{ total }}</span>
         </div>
     </div>
 
-    <div class="card shadow-soft border-0 mb-4" style="border-radius: var(--border-radius-xl);">
+    <div class="card shadow-lg border-0 mb-4 animate-slide-up delay-100" style="border-radius: 20px; overflow: hidden;">
         <div class="card-body p-4 text-center">
-            <div class="mb-3 position-relative d-inline-block">
-                {% if target_student.profile_picture %}
-                <img src="{{ target_student.profile_picture.url }}" class="rounded-circle shadow"
-                    style="width: 140px; height: 140px; object-fit: cover; border: 4px solid white; outline: 3px solid var(--color-green);"
-                    alt="Foto de {{ target_name }}">
-                {% else %}
-                <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm"
-                    style="width: 140px; height: 140px; border: 4px solid white; outline: 3px solid #dee2e6;">
-                    <i class="fas fa-user fa-4x"></i>
+            <div class="mb-4 position-relative d-inline-block">
+                <div class="avatar-container">
+                    {% if target_student.profile_picture %}
+                    <img src="{{ target_student.profile_picture.url }}" class="rounded-circle shadow-sm"
+                        style="width: 130px; height: 130px; object-fit: cover; border: 5px solid white;"
+                        alt="{{ target_name }}">
+                    {% else %}
+                    <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm"
+                        style="width: 130px; height: 130px; border: 5px solid white;">
+                        <i class="fas fa-user fa-4x opacity-25"></i>
+                    </div>
+                    {% endif %}
+                    <div class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white" style="width: 20px; height: 20px;"></div>
                 </div>
-                {% endif %}
             </div>
 
-            <h3 class="fw-bold mb-2" style="color: var(--color-blue-dark);">¿Quién es {{ target_name }}?</h3>
-            <p class="text-muted small mb-0">
-                Selecciona la descripción que encaja 100% con sus gustos.
+            <h3 class="fw-bold text-dark mb-2">¿Cómo es {{ target_name }}?</h3>
+            <p class="text-muted px-md-5">
+                Hemos mezclado las descripciones. ¿Sabrías decir cuál es la que realmente define a este estudiante?
             </p>
         </div>
     </div>
 
-    <form id="interests-form" method="POST">
+    <form id="interests-form" method="POST" class="animate-slide-up delay-200">
         {% csrf_token %}
         <div class="d-grid gap-3">
             {% for description in options %}
             <button type="button" onclick="submitInterest('{{ forloop.counter }}')"
-                class="btn btn-white text-start p-3 shadow-sm border-0 position-relative interest-option"
-                style="border-radius: var(--border-radius-lg); background: white; transition: all 0.2s ease;">
-
-                <div class="d-flex align-items-center">
-                    <span class="badge rounded-circle bg-light text-dark me-3 d-flex align-items-center justify-content-center border"
-                        style="width: 32px; height: 32px; min-width: 32px;">
-                        {{ forloop.counter }}
-                    </span>
-                    <span class="text-secondary lh-sm" style="font-size: 0.95rem;">
-                        {{ description }}
-                    </span>
+                class="btn btn-white text-start p-4 shadow-sm border-0 interest-option position-relative">
+                
+                <div class="d-flex">
+                    <div class="me-3">
+                        <span class="option-number">{{ forloop.counter }}</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <p class="mb-0 text-secondary lh-base" style="font-size: 1rem;">
+                            {{ description }}
+                        </p>
+                    </div>
+                    <div class="ms-2 align-self-center opacity-25 icon-arrow">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
                 </div>
             </button>
             {% endfor %}
         </div>
     </form>
 
-    <div class="text-center mt-5 mb-4">
-        <a href="{% url 'student_interests_game' %}" class="btn btn-link text-decoration-none text-muted small me-3">
-            <i class="fas fa-redo me-1"></i> Saltar
+    <div class="text-center mt-5 mb-5 animate-fade-in delay-300">
+        <a href="{% url 'student_interests_game' %}" class="btn btn-link text-decoration-none text-muted me-3">
+            <i class="fas fa-random me-1"></i> Otra persona
         </a>
-        <a href="{% url 'teacher_home' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-            <i class="fas fa-home me-1"></i> Volver
+        <a href="{% url 'teacher_home' %}" class="btn btn-light rounded-pill px-4 border">
+            <i class="fas fa-arrow-left me-1"></i> Panel Principal
         </a>
     </div>
 </div>
+
+<style>
+    :root {
+        --btn-bg: #ffffff;
+        --btn-hover-bg: #f0f7ff;
+        --accent-color: #0d6efd;
+    }
+
+    .interest-option {
+        background: var(--btn-bg);
+        border-radius: 16px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .interest-option:hover {
+        background-color: var(--btn-hover-bg) !important;
+        transform: translateX(8px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    }
+
+    .interest-option:hover .option-number {
+        background-color: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+    }
+
+    .interest-option:hover .icon-arrow {
+        opacity: 1 !important;
+        color: var(--accent-color);
+        transform: translateX(4px);
+    }
+
+    .option-number {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-weight: bold;
+        color: #64748b;
+        transition: all 0.2s;
+    }
+
+    .avatar-container {
+        position: relative;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .icon-arrow { transition: all 0.3s; }
+</style>
 
 <script>
 function submitInterest(optionValue) {
@@ -74,25 +141,27 @@ function submitInterest(optionValue) {
     formData.append('selected_option', optionValue);
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-    // Desactivar botones para evitar doble clic
-    document.querySelectorAll('.interest-option').forEach(btn => btn.style.pointerEvents = 'none');
+    // Bloqueo de UI
+    const options = document.querySelectorAll('.interest-option');
+    options.forEach(btn => {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+    });
 
     fetch("{% url 'student_interests_game' %}", {
         method: 'POST',
         body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
         Swal.fire({
-            title: data.success ? '¡Genial!' : 'Casi...',
+            title: data.success ? '¡Lo conoces bien!' : '¡Casi lo tienes!',
             text: data.message,
-            icon: data.success ? 'success' : 'error',
-            timer: 1800,
+            icon: data.success ? 'success' : 'info',
+            timer: 2000,
             showConfirmButton: false,
-            backdrop: 'rgba(0,0,0,0.3)'
+            backdrop: 'rgba(13, 110, 253, 0.1)'
         }).then(() => {
             document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
             window.location.reload();
@@ -100,18 +169,11 @@ function submitInterest(optionValue) {
     })
     .catch(error => {
         console.error('Error:', error);
-        document.querySelectorAll('.interest-option').forEach(btn => btn.style.pointerEvents = 'auto');
+        options.forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+            btn.style.opacity = '1';
+        });
     });
 }
 </script>
-
-<style>
-    .interest-option:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08) !important;
-        background-color: #f8fff9 !important;
-    }
-    .interest-option:active { transform: scale(0.98); }
-    .shadow-soft { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-</style>
 {% endblock %}
