@@ -56,7 +56,7 @@
                     <div class="card h-100 border-0 shadow-sm bg-danger text-white overflow-hidden position-relative">
                         <div class="card-body z-1 position-relative">
                             <h5 class="fw-bold">¿Quién es quién?</h5>
-                            <p class="small opacity-75">Identifica a tu compañero por su foto.</p>
+                            <p class="small opacity-75">Identifica a tu compañer@ por su foto.</p>
                             <a href="{% url 'face_guess_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
                         </div>
                         <i class="fas fa-user-secret position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
@@ -77,16 +77,20 @@
                 <div class="col-md-6">
                     <div class="card h-100 border-0 shadow-sm bg-primary text-white overflow-hidden position-relative" style="background: linear-gradient(45deg, #4e73df, #224abe) !important;">
                         <div class="card-body z-1 position-relative">
-                            <h5 class="fw-bold">Ponle Cara</h5>
-                            <p class="small opacity-75">Te damos el nombre, ¿sabes qué foto es?</p>
+                            <h5 class="fw-bold">Ponle Nombre</h5>
+                            <p class="small opacity-75">Te damos el nombre, ¿sabes quién es?</p>
                             <a href="{% url 'name_to_face_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
                         </div>
                         <i class="fas fa-id-badge position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
                     </div>
                 </div>
 
-                <div class="col-12 text-center mt-2">
-                    <p class="text-muted small">Tienes más retos como <span class="badge bg-light text-dark">Adivina Gustos</span> y <span class="badge bg-light text-dark">Perfil Completo</span> en el menú lateral.</p>
+                <div class="col-12 text-center mt-3">
+                    <p class="text-muted small">Tienes más minjuegos como 
+                        <a href="{% url 'student_interests_game' %}" class="badge bg-light text-dark text-decoration-none border hover-link">Adivina Gustos</a> 
+                        y 
+                        <a href="{% url 'student_complete_profile_game' %}" class="badge bg-light text-dark text-decoration-none border hover-link">Perfil Completo</a>
+                    </p>
                 </div>
             </div>
         </div>
@@ -96,5 +100,6 @@
 <style>
     .card { transition: transform 0.2s ease-in-out; }
     .card:hover { transform: translateY(-5px); }
+    .hover-link:hover { background-color: #e9ecef !important; color: #0d6efd !important; border-color: #0d6efd !important; }
 </style>
 {% endblock %}
