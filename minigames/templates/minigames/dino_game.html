@@ -3,12 +3,12 @@
 
 {% block content %}
 <div class="container-fluid py-2 py-md-3 text-center game-main-container">
-    <div class="d-flex justify-content-between align-items-center mb-2 px-2 mx-auto" style="max-width: 600px; width: 100%;">
+    <div class="d-flex justify-content-between align-items-center mb-2 px-2 mx-auto header-controls">
         <a href="{% url 'student_home' %}" class="btn btn-sm btn-outline-secondary border-0">
-            <i class="fas fa-chevron-left"></i>
+            <i class="fas fa-chevron-left"></i> <span class="d-none d-md-inline">Salir</span>
         </a>
         <div class="game-stats d-flex gap-3">
-            <div class="stat-item"><small>HI</small> <span id="highScore">00000</span></div>
+            <div class="stat-item"><small>HI-SCORE</small> <span id="highScore">00000</span></div>
             <div class="stat-item text-primary"><small>SCORE</small> <span id="currentScore">00000</span></div>
         </div>
     </div>
@@ -26,7 +26,7 @@
                     {% endif %}
                 </div>
                 <h2 class="fw-bold mb-1 fs-4">STUDENT RUN</h2>
-                <p class="text-muted small mb-3">TOCA PARA SALTAR</p>
+                <p class="text-muted small mb-3">MANTÉN PARA SALTAR MÁS ALTO</p>
                 <button id="startBtn" class="btn btn-dark rounded-pill px-4">JUGAR</button>
             </div>
             
@@ -43,56 +43,41 @@
 
 <style>
     :root { --game-bg: #f8f9fa; }
-    
-    body { 
-        overflow: hidden; 
-        position: fixed; 
-        width: 100%; 
-        background-color: #f0f2f5;
-    }
+    body { overflow: hidden; position: fixed; width: 100%; background-color: #f0f2f5; font-family: sans-serif; }
 
-    .game-main-container {
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
+    .header-controls { max-width: 800px; width: 100%; }
 
     .game-wrapper {
         position: relative;
-        width: 95%;
-        max-width: 500px; /* Ancho más controlado para móviles */
-        aspect-ratio: 9 / 13; /* Proporción ideal para ver todo y tener zona de toque */
         margin: 0 auto;
         background: var(--game-bg);
-        border-radius: 24px;
+        border-radius: 20px;
         overflow: hidden;
-        border: 6px solid white;
+        border: 5px solid white;
         touch-action: none; 
-        -webkit-user-select: none;
         user-select: none;
     }
 
-    #gameCanvas {
-        width: 100% !important;
-        height: 100% !important;
-        display: block;
-        background: linear-gradient(to bottom, #a1c4fd 0%, #c2e9fb 100%); /* Cielo inicial */
+    /* FORMATO MÓVIL (Por defecto) */
+    @media (max-width: 767px) {
+        .game-wrapper { width: 92%; aspect-ratio: 9 / 14; max-width: 400px; }
     }
+
+    /* FORMATO ORDENADOR */
+    @media (min-width: 768px) {
+        .game-wrapper { width: 100%; max-width: 850px; aspect-ratio: 2 / 1; }
+    }
+
+    #gameCanvas { width: 100% !important; height: 100% !important; display: block; }
 
     .game-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; align-items: center; justify-content: center;
-        background: rgba(255,255,255,0.8); transition: 0.3s;
-        z-index: 10;
+        background: rgba(255,255,255,0.85); z-index: 10;
     }
 
-    .avatar-preview img {
-        width: 70px; height: 70px; border-radius: 50%;
-        border: 4px solid #4834d4; object-fit: cover;
-    }
-
-    .stat-item { font-family: 'monospace'; font-weight: bold; font-size: 1rem; }
+    .avatar-preview img { width: 70px; height: 70px; border-radius: 50%; border: 4px solid #4834d4; object-fit: cover; }
+    .stat-item { font-family: monospace; font-weight: bold; }
     .stat-item small { font-size: 0.6rem; color: #636e72; display: block; }
 </style>
 
@@ -104,27 +89,17 @@ class Game {
         this.img = document.getElementById('playerImg');
         this.wrapper = document.getElementById('gameWrapper');
         
-        // Resolución interna fija para consistencia
-        this.canvas.width = 450;
-        this.canvas.height = 650;
-        
+        this.isMobile = window.innerWidth < 768;
+        this.setResolution();
+
         this.baseSpeed = 6;
         this.speed = this.baseSpeed;
-        this.gravity = 0.8;
-        this.jumpForce = 15;
-        
-        // El suelo está más arriba (30% del canvas desde abajo libre para el dedo)
-        this.groundY = this.canvas.height - 180;
+        this.gravity = 0.7;
+        this.jumpForce = -15;
+        this.minJumpForce = -6; // Para cuando sueltas rápido
 
-        this.player = {
-            x: 50, y: 0, w: 50, h: 50,
-            dy: 0, grounded: false
-        };
-
-        // Para el fondo infinito (Pasillo)
+        this.player = { x: 60, y: 0, w: 55, h: 55, dy: 0, grounded: false, jumping: false };
         this.bgX = 0;
-        this.bgSpeed = 2;
-
         this.obstacles = [];
         this.score = 0;
         this.highScore = 0;
@@ -133,19 +108,48 @@ class Game {
         this.init();
     }
 
+    setResolution() {
+        if (this.isMobile) {
+            this.canvas.width = 450;
+            this.canvas.height = 700;
+            this.groundY = this.canvas.height - 180; // Mucho espacio abajo
+        } else {
+            this.canvas.width = 900;
+            this.canvas.height = 450;
+            this.groundY = this.canvas.height - 80; // Espacio normal
+        }
+    }
+
     init() {
-        const jump = (e) => {
+        const startJump = (e) => {
             if (!this.active) return;
             if (this.player.grounded) {
-                this.player.dy = -this.jumpForce;
+                this.player.dy = this.jumpForce;
                 this.player.grounded = false;
+                this.player.jumping = true;
             }
-            if(e) e.preventDefault();
+            if(e.cancelable) e.preventDefault();
         };
 
-        this.wrapper.addEventListener('touchstart', jump, { passive: false });
-        this.wrapper.addEventListener('mousedown', jump);
-        window.addEventListener('keydown', (e) => { if(e.code === 'Space') jump(); });
+        const endJump = () => {
+            // Si soltamos y aún estamos subiendo rápido, cortamos el impulso
+            if (this.player.jumping && this.player.dy < this.minJumpForce) {
+                this.player.dy = this.minJumpForce;
+                this.player.jumping = false;
+            }
+        };
+
+        this.wrapper.addEventListener('touchstart', startJump, { passive: false });
+        this.wrapper.addEventListener('touchend', endJump);
+        this.wrapper.addEventListener('mousedown', startJump);
+        window.addEventListener('mouseup', endJump);
+        
+        window.addEventListener('keydown', (e) => { 
+            if(e.code === 'Space') { startJump(e); }
+        });
+        window.addEventListener('keyup', (e) => {
+            if(e.code === 'Space') endJump();
+        });
 
         document.getElementById('startBtn').onclick = () => this.start();
         document.getElementById('restartBtn').onclick = () => this.start();
@@ -158,43 +162,39 @@ class Game {
         this.obstacles = [];
         this.player.y = this.groundY - this.player.h;
         this.player.dy = 0;
-        
-        document.getElementById('overlay').style.opacity = '0';
-        setTimeout(() => {
-            if(this.active) document.getElementById('overlay').style.visibility = 'hidden';
-        }, 300);
+        document.getElementById('overlay').style.display = 'none';
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-over-screen').style.display = 'none';
         this.loop();
     }
 
     drawBackground() {
-        // Dibujamos "ventanas" o "puertas" que se mueven
-        this.bgX -= this.speed * 0.5; // Se mueve más lento que los obstáculos
-        if (this.bgX <= -200) this.bgX = 0;
+        this.bgX -= this.speed * 0.4;
+        if (this.bgX <= -300) this.bgX = 0;
 
-        this.ctx.fillStyle = '#e1e8ed'; // Pared del pasillo
+        // Pared
+        this.ctx.fillStyle = '#f1f2f6';
         this.ctx.fillRect(0, 0, this.canvas.width, this.groundY);
 
-        for (let i = 0; i < 5; i++) {
-            // Ventanas
-            this.ctx.fillStyle = '#ffffff';
-            this.ctx.fillRect(this.bgX + (i * 200), 100, 80, 120);
-            // Detalles de la ventana
-            this.ctx.strokeStyle = '#b2bec3';
-            this.ctx.strokeRect(this.bgX + (i * 200), 100, 80, 120);
+        // Decoración de pasillo (Puertas)
+        for (let i = 0; i < 6; i++) {
+            let xPos = this.bgX + (i * 300);
+            this.ctx.fillStyle = '#dfe4ea';
+            this.ctx.fillRect(xPos, this.groundY - 180, 70, 180); // Puerta
+            this.ctx.fillStyle = '#ced6e0';
+            this.ctx.fillRect(xPos + 55, this.groundY - 100, 8, 8); // Pomo
         }
 
-        // Suelo (Pasillo)
-        this.ctx.fillStyle = '#dfe6e9';
+        // Suelo
+        this.ctx.fillStyle = '#747d8c'; // Color cemento/clase
         this.ctx.fillRect(0, this.groundY, this.canvas.width, this.canvas.height - this.groundY);
-        this.ctx.fillStyle = '#b2bec3';
+        this.ctx.fillStyle = '#2f3542';
         this.ctx.fillRect(0, this.groundY, this.canvas.width, 4);
     }
 
     update() {
         this.score += 0.1;
-        this.speed = this.baseSpeed + (this.score / 50); 
+        this.speed = this.baseSpeed + (this.score / 60); 
         document.getElementById('currentScore').innerText = Math.floor(this.score).toString().padStart(5, '0');
 
         this.player.dy += this.gravity;
@@ -204,55 +204,54 @@ class Game {
             this.player.y = this.groundY - this.player.h;
             this.player.dy = 0;
             this.player.grounded = true;
+            this.player.jumping = false;
         }
 
-        // Generar obstáculos
-        if (this.obstacles.length === 0 || (this.canvas.width - this.obstacles[this.obstacles.length-1].x) > 300) {
-            if (Math.random() < 0.05) {
+        // Obstáculos
+        let spawnRate = this.isMobile ? 0.04 : 0.03;
+        let gap = this.isMobile ? 350 : 450;
+
+        if (this.obstacles.length === 0 || (this.canvas.width - this.obstacles[this.obstacles.length-1].x) > gap) {
+            if (Math.random() < spawnRate) {
                 this.obstacles.push({
                     x: this.canvas.width,
                     y: this.groundY - 45,
                     w: 40, h: 40,
-                    icon: ['📚', '🎒', '🧪', '📐'][Math.floor(Math.random()*4)]
+                    icon: ['📚', '🎒', '📝', '🎓'][Math.floor(Math.random()*4)]
                 });
             }
         }
 
         this.obstacles.forEach((obs, i) => {
             obs.x -= this.speed;
-            
-            // Colisión ajustada
-            if (this.player.x < obs.x + obs.w - 10 &&
-                this.player.x + this.player.w - 10 > obs.x &&
-                this.player.y < obs.y + obs.h - 10 &&
-                this.player.y + this.player.h - 10 > obs.y) {
-                this.gameOver();
-            }
-            
+            // Colisión circular básica
+            let dx = (this.player.x + 27) - (obs.x + 20);
+            let dy = (this.player.y + 27) - (obs.y + 20);
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 35) this.gameOver();
             if (obs.x < -50) this.obstacles.splice(i, 1);
         });
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
         this.drawBackground();
 
-        // Jugador
+        // Personaje
         this.ctx.save();
         this.ctx.beginPath();
-        this.ctx.arc(this.player.x + 25, this.player.y + 25, 25, 0, Math.PI*2);
+        this.ctx.arc(this.player.x + 27, this.player.y + 27, 27, 0, Math.PI*2);
         this.ctx.clip();
         if (this.img && this.img.complete) {
-            this.ctx.drawImage(this.img, this.player.x, this.player.y, 50, 50);
+            this.ctx.drawImage(this.img, this.player.x, this.player.y, 55, 55);
         }
         this.ctx.restore();
         this.ctx.strokeStyle = '#4834d4';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
 
-        // Obstáculos
-        this.ctx.font = '30px Arial';
+        // Iconos
+        this.ctx.font = '32px Arial';
         this.obstacles.forEach(obs => {
             this.ctx.fillText(obs.icon, obs.x, obs.y + 32);
         });
@@ -263,10 +262,7 @@ class Game {
         if (this.score > this.highScore) this.highScore = this.score;
         document.getElementById('highScore').innerText = Math.floor(this.highScore).toString().padStart(5, '0');
         document.getElementById('finalScoreText').innerText = `PUNTUACIÓN: ${Math.floor(this.score)}`;
-        
-        const overlay = document.getElementById('overlay');
-        overlay.style.visibility = 'visible';
-        overlay.style.opacity = '1';
+        document.getElementById('overlay').style.display = 'flex';
         document.getElementById('game-over-screen').style.display = 'block';
     }
 
@@ -278,6 +274,7 @@ class Game {
     }
 }
 
-const game = new Game();
+// Iniciar
+window.onload = () => { new Game(); };
 </script>
 {% endblock %}
