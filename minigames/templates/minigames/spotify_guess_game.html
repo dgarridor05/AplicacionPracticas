@@ -40,10 +40,22 @@
             <div class="row row-cols-1 row-cols-md-2 g-3" id="options-container">
                 {% for student in options %}
                 <div class="col">
-                    <button class="btn btn-outline-success w-100 py-3 rounded-pill option-btn shadow-sm hover-lift" 
+                    <button class="btn btn-outline-success w-100 p-2 rounded-pill option-btn shadow-sm hover-lift d-flex align-items-center" 
                             onclick="checkAnswer('{{ student.id }}', this)">
-                        <i class="fas fa-user-circle me-2 opacity-50"></i>
-                        {{ student.full_name|default:student.username }}
+                        
+                        <div class="flex-shrink-0">
+                            {% if student.profile_picture %}
+                                <img src="{{ student.profile_picture.url }}" class="game-avatar" alt="{{ student.username }}">
+                            {% else %}
+                                <div class="game-avatar-placeholder">
+                                    <i class="fas fa-user text-white-50"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <span class="ms-3 text-start fw-bold flex-grow-1">
+                            {{ student.full_name|default:student.username }}
+                        </span>
                     </button>
                 </div>
                 {% endfor %}
@@ -61,17 +73,41 @@
 </div>
 
 <style>
+    /* Estilos del juego */
     .spotify-wrapper { 
         max-width: 500px; 
         margin: 0 auto; 
         transition: transform 0.3s; 
     }
     .spotify-wrapper:hover { transform: scale(1.01); }
+    
     .option-btn { 
-        font-weight: 600; 
         border-width: 2px;
         transition: all 0.2s;
+        background-color: white;
+        min-height: 65px;
     }
+
+    /* Estilo para las fotos redondas */
+    .game-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #198754;
+    }
+
+    .game-avatar-placeholder {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #198754;
+    }
+
     .hover-lift:hover {
         transform: translateY(-3px);
         box-shadow: 0 10px 20px rgba(25, 135, 84, 0.1) !important;
@@ -81,10 +117,7 @@
 
 <script>
 function checkAnswer(selectedId, button) {
-    const feedback = document.getElementById('feedback');
     const buttons = document.querySelectorAll('.option-btn');
-
-    // Desactivar botones para evitar spam
     buttons.forEach(btn => btn.disabled = true);
 
     const formData = new FormData();
@@ -100,15 +133,12 @@ function checkAnswer(selectedId, button) {
     })
     .then(response => response.json())
     .then(data => {
-        // Estilo visual inmediato
         button.classList.remove('btn-outline-success');
         button.classList.add(data.success ? 'btn-success' : 'btn-danger');
 
-        // Actualizar contadores
         document.getElementById('correct-count').innerText = data.correct;
         document.getElementById('total-count').innerText = data.total;
 
-        // SweetAlert para una transición elegante
         setTimeout(() => {
             Swal.fire({
                 title: data.success ? '¡Excelente gusto!' : '¡Casi!',
@@ -119,7 +149,6 @@ function checkAnswer(selectedId, button) {
                 allowOutsideClick: false,
                 backdrop: `rgba(0,0,0,0.6)`
             }).then(() => {
-                // Recarga la página para la siguiente canción
                 window.location.reload();
             });
         }, 600);
