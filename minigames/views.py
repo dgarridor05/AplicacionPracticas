@@ -10,10 +10,12 @@ from datetime import date
 
 # --- UTILIDADES ---
 def normalize_text(text):
+    """Elimina tildes y convierte a mayúsculas."""
     if not text: return ""
-    text = unicodedata.normalize('NFD', text)
-    text = "".join([c for c in text if unicodedata.category(c) != 'Mn'])
-    return text.lower().strip()
+    return ''.join(
+        c for c in unicodedata.normalize('NFD', text)
+        if unicodedata.category(c) != 'Mn'
+    ).upper()
 
 def calculate_age(birth_date):
     if not birth_date: return "desconocida"
@@ -116,39 +118,62 @@ def name_to_face_game(request, group_id=None):
 
 @login_required
 def hangman_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'hangman_game')
+    # 1. SI NO HAY GRUPO, USAR EL SELECTOR QUE YA CREASTE
+    if not group_id:
+        return select_group_for_game(request, 'hangman_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
     students = group.students.filter(profile_picture__isnull=False).distinct()
     
-    if not students.exists(): return render(request, 'minigames/no_students.html')
+    if not students.exists():
+        return render(request, 'minigames/no_students.html')
     
-    # Inicializar contadores si no existen
-    if 'hangman_correct' not in request.session: request.session['hangman_correct'] = 0
-    if 'hangman_total' not in request.session: request.session['hangman_total'] = 0
-    
-    # Elegir nuevo alumno si no hay uno en curso o si se pide un juego nuevo
-    if 'hangman_target_id' not in request.session or (request.method == 'POST' and request.POST.get('action') == 'new_game'):
-        student = random.choice(students)
+    # 2. LIMPIEZA SI EL JUEGO ANTERIOR TERMINÓ
+    if request.session.get('hangman_game_over', False) and request.method == 'GET':
+        keys_to_reset = [
+            'hangman_target_id', 'hangman_target_name', 
+            'hangman_guessed_letters', 'hangman_incorrect_count', 
+            'hangman_game_over'
+        ]
+        for key in keys_to_reset:
+            request.session.pop(key, None)
+        request.session.modified = True
+
+    # 3. INICIALIZACIÓN (Elegir alumno y normalizar nombre)
+    if 'hangman_target_id' not in request.session:
+        # Intentar no repetir el último alumno
+        last_id = request.session.get('hangman_last_id')
+        possible_students = students.exclude(id=last_id) if students.count() > 1 else students
+        student = random.choice(possible_students)
+        
         request.session['hangman_target_id'] = student.id
-        request.session['hangman_target_name'] = normalize_text(student.full_name or student.username).upper()
+        request.session['hangman_last_id'] = student.id # Guardamos para la próxima vez
+        raw_name = student.full_name or student.username
+        request.session['hangman_target_name'] = normalize_text(raw_name)
         request.session['hangman_guessed_letters'] = []
         request.session['hangman_incorrect_count'] = 0
         request.session['hangman_game_over'] = False
         request.session.modified = True
-        if request.POST.get('action') == 'new_game': return redirect('hangman_game', group_id=group_id)
+
+    # Asegurar contadores globales
+    if 'hangman_correct' not in request.session: request.session['hangman_correct'] = 0
+    if 'hangman_total' not in request.session: request.session['hangman_total'] = 0
 
     target_name = request.session['hangman_target_name']
-    
-    # Lógica de adivinar letra (AJAX)
+
+    # 4. LÓGICA POST (AJAX)
     if request.method == 'POST' and request.POST.get('action') == 'guess_letter':
         letter = request.POST.get('letter', '').upper()
+        
         if not request.session['hangman_game_over'] and letter not in request.session['hangman_guessed_letters']:
             request.session['hangman_guessed_letters'].append(letter)
-            if letter not in target_name: request.session['hangman_incorrect_count'] += 1
             
-            displayed = "".join([c if c in request.session['hangman_guessed_letters'] or c == " " else "_" for c in target_name])
-            won = "_" not in displayed
+            if letter not in target_name:
+                request.session['hangman_incorrect_count'] += 1
+            
+            # Estado del juego
+            displayed = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
+            won = all(c in request.session['hangman_guessed_letters'] or not c.isalpha() for c in target_name)
             lost = request.session['hangman_incorrect_count'] >= 6
             
             if won or lost:
@@ -157,24 +182,37 @@ def hangman_game(request, group_id=None):
                 if won: request.session['hangman_correct'] += 1
             
             request.session.modified = True
-            return get_ajax_response(request, True, "", 'hangman', extra_data={
-                'displayed_name': displayed, 
-                'incorrect_count': request.session['hangman_incorrect_count'], 
-                'game_over': request.session['hangman_game_over'], 
-                'won': won, 
-                'target_name': target_name
+            
+            return JsonResponse({
+                'success': True,
+                'displayed_name': displayed,
+                'incorrect_count': request.session['hangman_incorrect_count'],
+                'max_incorrect': 6,
+                'game_over': request.session['hangman_game_over'],
+                'won': won,
+                'target_name': target_name,
+                'correct': request.session['hangman_correct'],
+                'total': request.session['hangman_total']
             })
 
-    # Preparar datos para el render
-    student = UserProfile.objects.get(id=request.session['hangman_target_id'])
+    # 5. RENDERIZADO
+    current_student = get_object_or_404(UserProfile, id=request.session['hangman_target_id'])
     displayed_name = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
     
-    return render(request, 'minigames/hangman_game.html', {
-        'current_student': student, 'group': group, 'displayed_name': displayed_name, 
-        'incorrect_count': request.session['hangman_incorrect_count'], 'alphabet': "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ", 
-        'used_letters': request.session['hangman_guessed_letters'], 'game_over': request.session['hangman_game_over'], 
-        'correct': request.session['hangman_correct'], 'total': request.session['hangman_total']
-    })
+    context = {
+        'current_student': current_student,
+        'group': group,
+        'displayed_name': displayed_name,
+        'incorrect_count': request.session['hangman_incorrect_count'],
+        'max_incorrect': 6,
+        'alphabet': "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+        'used_letters': request.session['hangman_guessed_letters'],
+        'game_over': request.session['hangman_game_over'],
+        'correct': request.session['hangman_correct'],
+        'total': request.session['hangman_total'],
+        'target_name': target_name,
+    }
+    return render(request, 'minigames/hangman_game.html', context)
 
 @login_required
 def student_interests_game(request, group_id=None):
