@@ -1,53 +1,72 @@
-# Relaciona - Aplicación Django
+🎮 Gamificación Escolar: Suite de Minijuegos con Django
+Este módulo es una extensión interactiva para plataformas educativas basada en Django, diseñada para fomentar el reconocimiento y la cohesión entre alumnos y profesores mediante juegos dinámicos que utilizan los perfiles de los estudiantes.
 
-Este proyecto ha sido configurado y optimizado para ejecutarse localmente y desplegarse tanto en **Render** como en **Vercel**.
+🚀 Características Principales
+Lógica basada en Sesiones: Seguimiento de puntuación y estado de juego (victoria/derrota) persistente por sesión de usuario.
 
-## 📝 Cambios Realizados
+Normalización de Texto: Algoritmos para ignorar tildes y mayúsculas, garantizando una experiencia de juego fluida.
 
-A continuación se detallan las modificaciones técnicas implementadas para asegurar el funcionamiento del proyecto:
+Selección Dinámica de Grupos: Flujo de trabajo inteligente que redirige al usuario para seleccionar un grupo si no se especifica uno.
 
-### 1. Configuración de Despliegue
-*   **Render**:
-    *   Creado archivo `render.yaml` para definición de servicio.
-    *   Creado script `build.sh` para automatizar la instalación de dependencias, recolección de estáticos y migraciones.
-*   **Vercel**:
-    *   Creado `vercel.json` con configuración de runtime (Python 3.12).
-    *   Ajustado `relaciona/wsgi.py` exponiendo la variable `app` para el entorno serverless.
-    *   **Solución Base de Datos**: Se implementó una lógica en `settings.py` que detecta el entorno Vercel y copia la base de datos `db.sqlite3` a `/tmp/` (directorio temporal escribible) para evitar errores de "Read-only database".
-*   **Dockerización**: Se incluyó un `Dockerfile` optimizado para despliegue en contenedores (Northflank, Railway, etc.).
+Protección contra Repeticiones: Sistema que evita mostrar el mismo perfil de alumno de forma consecutiva.
 
-### 2. Base de Datos
-*   **Persistencia**: Se incluyó el archivo `db.sqlite3` en el control de versiones (Git) para garantizar que el despliegue tenga una estructura de datos inicial.
-*   **Correcciones**: Se generaron y aplicaron migraciones faltantes para la tabla de perfiles de usuario (`accounts_userprofile`), solucionando errores 500 en el registro.
+Interfaz AJAX: Respuestas rápidas en juegos de respuesta única sin necesidad de recargar la página completa.
 
-### 3. Limpieza y Mantenimiento
-*   Eliminación de logs de error (`install_log.txt`) y archivos temporales (`__pycache__`).
-*   Configuración depurada de `.gitignore`.
-*   Restauración de dependencias críticas en `requirements.txt` (`psycopg2-binary`, `pillow`).
+🕹️ Juegos Incluidos
+Ahorcado (Hangman): Adivina el nombre del compañero letra a letra.
 
-## 🚀 Cómo Ejecutar Localmente
+Adivina Quién es: Identifica al alumno a partir de su foto de perfil.
 
-Requisitos: Python 3.10+ instalado.
+Adivina la Imagen: Se da un nombre y hay que elegir la foto correcta.
 
-1.  **Instalar dependencias**:
-    ```bash
-    pip install -r requirements.txt
-    ```
+Adivina Gustos: Basado en los intereses personales registrados en los perfiles.
 
-2.  **Aplicar migraciones** (si es necesario):
-    ```bash
-    python manage.py migrate
-    ```
+Adivina Tests: Preguntas basadas en resultados de cuestionarios previos.
 
-3.  **Iniciar servidor**:
-    ```bash
-    python manage.py runserver
-    ```
-    Acceder en: `http://127.0.0.1:8000/`
+Spotify Mystery: El desafío musical para adivinar las canciones favoritas de los alumnos.
 
-## ⚠️ Notas Importantes sobre Vercel
+Perfil Completo: El desafío final que combina múltiples datos del estudiante.
 
-Vercel es una plataforma *serverless* y su sistema de archivos es efímero (se reinicia) y de solo lectura.
+🛠️ Tecnologías Utilizadas
+Backend: Python 3.x, Django Framework.
 
-*   **Persistencia de Datos**: Con la configuración actual (SQLite), **los datos nuevos (usuarios registrados, resultados) SE PERDERÁN** cada vez que Vercel reinicie el servidor o se haga un nuevo despliegue. La base de datos siempre volverá al estado inicial subido a Git.
-*   **Recomendación**: Para un entorno de producción real donde se guarden los datos permanentemente, se debe conectar una base de datos externa (como PostgreSQL en Neon, Supabase o Render) usando la variable de entorno `DATABASE_URL`.
+Base de Datos: PostgreSQL / SQLite (compatible).
+
+Frontend: JavaScript (AJAX/Fetch API), HTML5, CSS3 (Tailwind CSS recomendado).
+
+Procesamiento de Datos: Unidecode para normalización de caracteres.
+
+📂 Estructura de URLs
+El sistema utiliza un enrutamiento dual para máxima flexibilidad:
+
+Python
+# Acceso directo (requiere selección de grupo)
+path('ahorcado/', views.hangman_game, name='hangman_game'),
+
+# Acceso directo a grupo específico
+path('ahorcado/<int:group_id>/', views.hangman_game, name='hangman_game_with_group'),
+⚙️ Instalación y Configuración
+Clonar el repositorio:
+
+Bash
+git clone https://github.com/tu-usuario/nombre-del-repo.git
+Instalar dependencias:
+
+Bash
+pip install -r requirements.txt
+Migraciones de base de datos:
+
+Bash
+python manage.py migrate
+Ejecutar el servidor:
+
+Bash
+python manage.py runserver
+📋 Requisitos del Modelo de Datos
+Para que los juegos funcionen correctamente, el modelo UserProfile debe contar con:
+
+profile_picture: ImageField (obligatorio para la mayoría de juegos).
+
+full_name o username: String.
+
+interests / quiz_results: Campos de texto o relaciones ManyToMany.
