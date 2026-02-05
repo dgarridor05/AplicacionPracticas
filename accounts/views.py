@@ -80,20 +80,18 @@ def public_classmates_list(request):
     from teachers.models import ClassGroup
     from django.db.models import Q
 
-    # 1. Buscamos los grupos donde está el usuario actual
+    # 1. Obtenemos los grupos donde está el alumno actual
+    # Usamos .all() para asegurar que traemos la relación
     mis_grupos = ClassGroup.objects.filter(students=request.user)
 
     if not mis_grupos.exists():
         return render(request, 'accounts/classmates_list.html', {'classmates': [], 'no_group': True})
 
-    # 2. Obtenemos los IDs de los alumnos directamente de MIS grupos
-    # Esto crea una lista limpia de IDs de las personas que comparten clase contigo
-    ids_compañeros = mis_grupos.values_list('students__id', flat=True)
+    # 2. Obtenemos los IDs de los perfiles que están en mis grupos
+    # Cambiamos 'students__id' por 'students' para que nos de el ID directo del UserProfile
+    ids_compañeros = mis_grupos.values_list('students', flat=True)
 
-    # 3. Filtramos los perfiles:
-    # - Que su ID esté en la lista de mis grupos
-    # - Que tengan perfil compartido
-    # - Que NO sea yo mismo
+    # 3. Filtramos los perfiles
     classmates = UserProfile.objects.filter(
         id__in=ids_compañeros,
         share_with_class=True
