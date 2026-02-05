@@ -78,25 +78,28 @@ def public_classmates_list(request):
         return redirect('teacher_home')
 
     from teachers.models import ClassGroup
+    from django.db.models import Q
 
-    # 1. Obtenemos SOLO los IDs de los grupos donde está el alumno actual
-    mis_grupos_ids = ClassGroup.objects.filter(students=request.user).values_list('id', flat=True)
+    # 1. Buscamos los grupos donde está el usuario actual
+    mis_grupos = ClassGroup.objects.filter(students=request.user)
 
-    if not mis_grupos_ids:
-        # Si el alumno no tiene grupo, la lista es vacía sí o sí
+    if not mis_grupos.exists():
         return render(request, 'accounts/classmates_list.html', {'classmates': [], 'no_group': True})
 
-    # 2. Filtramos con lógica estricta:
-    # - Que el rol sea estudiante
-    # - Que quiera compartir
-    # - Que pertenezca a alguno de los IDs de mis grupos
-    # - EXCLUIRME a mí mismo
+    # 2. Obtenemos los IDs de los alumnos directamente de MIS grupos
+    # Esto crea una lista limpia de IDs de las personas que comparten clase contigo
+    ids_compañeros = mis_grupos.values_list('students__id', flat=True)
+
+    # 3. Filtramos los perfiles:
+    # - Que su ID esté en la lista de mis grupos
+    # - Que tengan perfil compartido
+    # - Que NO sea yo mismo
     classmates = UserProfile.objects.filter(
-        role='student',
-        share_with_class=True,
-        student_groups__id__in=mis_grupos_ids 
+        id__in=ids_compañeros,
+        share_with_class=True
     ).exclude(id=request.user.id).distinct()
 
+    # Lógica de buscador
     query = request.GET.get('q')
     if query:
         classmates = classmates.filter(
