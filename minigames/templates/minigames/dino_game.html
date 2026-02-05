@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dino Run Pro{% endblock %}
+{% block title %}Dino Student Run{% endblock %}
 
 {% block content %}
 <div class="container py-4 text-center">
@@ -18,69 +18,49 @@
         
         <div id="game-overlay" class="overlay">
             <div id="start-screen">
-                <div class="dino-icon mb-3">🦖</div>
-                <h4 class="fw-bold text-dark">DINO RUN</h4>
+                <div class="mb-3">
+                    <img src="{{ request.user.studentprofile.avatar.url|default:'https://cdn-icons-png.flaticon.com/512/194/194931.png' }}" 
+                         id="playerSprite" class="rounded-circle border border-primary" style="width: 60px; height: 60px; object-fit: cover;">
+                </div>
+                <h4 class="fw-bold text-dark">¡ESQUIVA LOS LIBROS!</h4>
                 <p class="text-muted small">Pulsa [Espacio] o Toca para saltar</p>
             </div>
             <div id="game-over-screen" style="display: none;">
-                <h4 class="fw-bold text-danger mb-2">GAME OVER</h4>
-                <button onclick="game.reset()" class="btn btn-outline-dark btn-sm px-4 rounded-pill">
-                    <i class="fas fa-redo me-2"></i>REINTENTAR
-                </button>
+                <h4 class="fw-bold text-danger mb-2">¡FIN DEL RECREO!</h4>
+                <button onclick="game.reset()" class="btn btn-dark btn-sm px-4 rounded-pill">REINTENTAR</button>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    .game-wrapper {
-        position: relative;
-        display: inline-block;
-        background-color: #f7f7f7;
-        border: 2px solid #eee;
-        line-height: 0;
-    }
-    canvas {
-        max-width: 100%;
-        height: auto;
-    }
-    .overlay {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        display: flex; align-items: center; justify-content: center;
-        background: rgba(255,255,255,0.1);
-        pointer-events: none;
-    }
+    .game-wrapper { position: relative; display: inline-block; background-color: #f7f7f7; border: 2px solid #eee; overflow: hidden; }
+    canvas { max-width: 100%; height: auto; }
+    .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; pointer-events: none; }
     #game-over-screen, #start-screen { pointer-events: auto; }
-    .dino-icon { font-size: 3rem; animation: bounce 1s infinite; }
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
+    #playerSprite { animation: bounce 1.5s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 </style>
 
 <script>
-/**
- * LÓGICA PROFESIONAL DEL JUEGO
- */
 class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.scoreElement = document.getElementById('currentScore');
         this.highScoreElement = document.getElementById('highScore');
+        this.img = document.getElementById('playerSprite');
         
-        this.dino = {
-            x: 50, y: 150, w: 44, h: 48,
-            dy: 0, jumpForce: 12, gravity: 0.6,
-            grounded: false, emoji: '🦖'
+        this.player = {
+            x: 50, y: 140, w: 45, h: 45,
+            dy: 0, jumpForce: 13, gravity: 0.7,
+            grounded: false
         };
 
         this.obstacles = [];
-        this.clouds = [];
         this.score = 0;
         this.highScore = 0;
-        this.speed = 7;
+        this.speed = 6;
         this.active = false;
         this.lastTime = 0;
         
@@ -88,127 +68,111 @@ class Game {
     }
 
     init() {
-        window.addEventListener('keydown', e => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') this.handleInput();
-        });
-        this.canvas.addEventListener('touchstart', () => this.handleInput());
-        this.canvas.addEventListener('mousedown', () => this.handleInput());
+        const handler = (e) => {
+            if (e.code === 'Space' || e.type === 'touchstart' || e.type === 'mousedown') {
+                this.handleInput();
+                if(e.code === 'Space') e.preventDefault();
+            }
+        };
+        window.addEventListener('keydown', handler);
+        this.canvas.addEventListener('mousedown', handler);
+        this.canvas.addEventListener('touchstart', handler);
     }
 
     handleInput() {
-        if (!this.active) {
-            this.start();
-        } else if (this.dino.grounded) {
-            this.dino.dy = -this.dino.jumpForce;
-            this.dino.grounded = false;
+        if (!this.active) this.start();
+        else if (this.player.grounded) {
+            this.player.dy = -this.player.jumpForce;
+            this.player.grounded = false;
         }
     }
 
     start() {
         this.active = true;
         this.score = 0;
-        this.speed = 7;
+        this.speed = 6;
         this.obstacles = [];
-        this.clouds = [];
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-over-screen').style.display = 'none';
         requestAnimationFrame((t) => this.loop(t));
     }
 
-    reset() { this.start(); }
-
     spawnObstacle() {
-        const type = Math.random() > 0.5 ? '🌵' : '🧱';
-        this.obstacles.push({ x: this.canvas.width, y: 155, w: 30, h: 30, emoji: type });
-    }
-
-    spawnCloud() {
-        this.clouds.push({ 
-            x: this.canvas.width, 
-            y: Math.random() * 80 + 20, 
-            speed: Math.random() * 1 + 0.5 
-        });
+        const icons = ['📚', '📖', '🎒', '📝'];
+        const icon = icons[Math.floor(Math.random() * icons.length)];
+        this.obstacles.push({ x: this.canvas.width, y: 155, w: 35, h: 35, icon: icon });
     }
 
     loop(timestamp) {
         if (!this.active) return;
-        
-        const deltaTime = timestamp - this.lastTime;
-        this.lastTime = timestamp;
-
         this.update();
         this.draw();
         requestAnimationFrame((t) => this.loop(t));
     }
 
     update() {
-        // Puntos y velocidad
-        this.score += 0.15;
-        this.scoreElement.innerText = Math.floor(this.score).toString().padStart(5, '0');
-        this.speed += 0.001;
+        this.score += 0.2;
+        let currentScoreInt = Math.floor(this.score);
+        this.scoreElement.innerText = currentScoreInt.toString().padStart(5, '0');
 
-        // Dino Física
-        this.dino.y += this.dino.dy;
-        if (this.dino.y + this.dino.h < 190) {
-            this.dino.dy += this.dino.gravity;
-            this.dino.grounded = false;
+        // LÓGICA DE DIFICULTAD: Aumenta velocidad cada 100 puntos
+        this.speed = 6 + Math.floor(currentScoreInt / 100) * 0.8;
+
+        // Física Jugador
+        this.player.y += this.player.dy;
+        if (this.player.y + this.player.h < 190) {
+            this.player.dy += this.player.gravity;
+            this.player.grounded = false;
         } else {
-            this.dino.y = 190 - this.dino.h;
-            this.dino.dy = 0;
-            this.dino.grounded = true;
+            this.player.y = 190 - this.player.h;
+            this.player.dy = 0;
+            this.player.grounded = true;
         }
 
         // Obstáculos
-        if (this.obstacles.length === 0 || this.obstacles[this.obstacles.length-1].x < this.canvas.width - 300) {
-            if (Math.random() < 0.02) this.spawnObstacle();
+        if (this.obstacles.length === 0 || this.obstacles[this.obstacles.length-1].x < this.canvas.width - (350 - (this.speed * 5))) {
+            if (Math.random() < 0.03) this.spawnObstacle();
         }
 
         this.obstacles.forEach((obs, i) => {
             obs.x -= this.speed;
             if (obs.x + obs.w < 0) this.obstacles.splice(i, 1);
             
-            // Colisión precisa
-            if (this.dino.x < obs.x + obs.w - 10 &&
-                this.dino.x + this.dino.w - 10 > obs.x &&
-                this.dino.y < obs.y + obs.h - 5 &&
-                this.dino.y + this.dino.h > obs.y + 5) {
+            // Colisión con el avatar circular
+            if (this.player.x < obs.x + obs.w - 15 &&
+                this.player.x + this.player.w - 15 > obs.x &&
+                this.player.y < obs.y + obs.h - 10 &&
+                this.player.y + this.player.h > obs.y + 10) {
                 this.gameOver();
             }
-        });
-
-        // Nubes (Decorativo)
-        if (Math.random() < 0.005) this.spawnCloud();
-        this.clouds.forEach((c, i) => {
-            c.x -= c.speed;
-            if (c.x < -50) this.clouds.splice(i, 1);
         });
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Línea de suelo
-        this.ctx.strokeStyle = '#535353';
-        this.ctx.lineWidth = 2;
+        // Suelo
+        this.ctx.strokeStyle = '#bbb';
         this.ctx.beginPath();
         this.ctx.moveTo(0, 190);
         this.ctx.lineTo(this.canvas.width, 190);
         this.ctx.stroke();
 
-        // Nubes
-        this.ctx.fillStyle = '#d3d3d3';
-        this.clouds.forEach(c => {
-            this.ctx.font = '24px serif';
-            this.ctx.fillText('☁️', c.x, c.y);
-        });
-
-        // Dino
-        this.ctx.font = '40px serif';
-        this.ctx.fillText(this.dino.emoji, this.dino.x, this.dino.y + 35);
+        // Dibujar Avatar del Alumno
+        this.ctx.save();
+        this.ctx.beginPath();
+        this.ctx.arc(this.player.x + this.player.w/2, this.player.y + this.player.h/2, this.player.w/2, 0, Math.PI * 2);
+        this.ctx.clip();
+        this.ctx.drawImage(this.img, this.player.x, this.player.y, this.player.w, this.player.h);
+        this.ctx.restore();
+        // Borde del avatar
+        this.ctx.strokeStyle = '#007bff';
+        this.ctx.stroke();
 
         // Obstáculos
+        this.ctx.font = '30px serif';
         this.obstacles.forEach(obs => {
-            this.ctx.fillText(obs.emoji, obs.x, obs.y + 25);
+            this.ctx.fillText(obs.icon, obs.x, obs.y + 25);
         });
     }
 
@@ -220,6 +184,8 @@ class Game {
         }
         document.getElementById('game-over-screen').style.display = 'block';
     }
+
+    reset() { this.start(); }
 }
 
 const game = new Game();
