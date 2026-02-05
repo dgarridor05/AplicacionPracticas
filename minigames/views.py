@@ -51,10 +51,17 @@ def select_group_for_game(request, game_name):
 
 @login_required
 def face_guess_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'face_guess_game')
+    # Mejora: Detección automática para alumnos
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'face_guess_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.filter(profile_picture__isnull=False).exclude(profile_picture='').distinct()
+    # Mejora: Excluir al propio usuario si es alumno
+    students = group.students.filter(profile_picture__isnull=False).exclude(id=request.user.id).distinct()
     
     if not students.exists(): return render(request, 'minigames/no_students.html')
     
@@ -85,10 +92,16 @@ def face_guess_game(request, group_id=None):
 
 @login_required
 def name_to_face_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'name_to_face_game')
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'name_to_face_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.filter(profile_picture__isnull=False).exclude(profile_picture='').distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.filter(profile_picture__isnull=False).exclude(id=request.user.id).distinct()
     
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
     
@@ -118,17 +131,20 @@ def name_to_face_game(request, group_id=None):
 
 @login_required
 def hangman_game(request, group_id=None):
-    # 1. SI NO HAY GRUPO, USAR EL SELECTOR QUE YA CREASTE
-    if not group_id:
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id:
         return select_group_for_game(request, 'hangman_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.filter(profile_picture__isnull=False).distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.filter(profile_picture__isnull=False).exclude(id=request.user.id).distinct()
     
     if not students.exists():
         return render(request, 'minigames/no_students.html')
     
-    # 2. LIMPIEZA SI EL JUEGO ANTERIOR TERMINÓ
     if request.session.get('hangman_game_over', False) and request.method == 'GET':
         keys_to_reset = [
             'hangman_target_id', 'hangman_target_name', 
@@ -139,15 +155,13 @@ def hangman_game(request, group_id=None):
             request.session.pop(key, None)
         request.session.modified = True
 
-    # 3. INICIALIZACIÓN (Elegir alumno y normalizar nombre)
     if 'hangman_target_id' not in request.session:
-        # Intentar no repetir el último alumno
         last_id = request.session.get('hangman_last_id')
         possible_students = students.exclude(id=last_id) if students.count() > 1 else students
         student = random.choice(possible_students)
         
         request.session['hangman_target_id'] = student.id
-        request.session['hangman_last_id'] = student.id # Guardamos para la próxima vez
+        request.session['hangman_last_id'] = student.id
         raw_name = student.full_name or student.username
         request.session['hangman_target_name'] = normalize_text(raw_name)
         request.session['hangman_guessed_letters'] = []
@@ -155,13 +169,11 @@ def hangman_game(request, group_id=None):
         request.session['hangman_game_over'] = False
         request.session.modified = True
 
-    # Asegurar contadores globales
     if 'hangman_correct' not in request.session: request.session['hangman_correct'] = 0
     if 'hangman_total' not in request.session: request.session['hangman_total'] = 0
 
     target_name = request.session['hangman_target_name']
 
-    # 4. LÓGICA POST (AJAX)
     if request.method == 'POST' and request.POST.get('action') == 'guess_letter':
         letter = request.POST.get('letter', '').upper()
         
@@ -171,7 +183,6 @@ def hangman_game(request, group_id=None):
             if letter not in target_name:
                 request.session['hangman_incorrect_count'] += 1
             
-            # Estado del juego
             displayed = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
             won = all(c in request.session['hangman_guessed_letters'] or not c.isalpha() for c in target_name)
             lost = request.session['hangman_incorrect_count'] >= 6
@@ -195,7 +206,6 @@ def hangman_game(request, group_id=None):
                 'total': request.session['hangman_total']
             })
 
-    # 5. RENDERIZADO
     current_student = get_object_or_404(UserProfile, id=request.session['hangman_target_id'])
     displayed_name = "".join([c if c in request.session['hangman_guessed_letters'] or not c.isalpha() else "_" for c in target_name])
     
@@ -216,15 +226,22 @@ def hangman_game(request, group_id=None):
 
 @login_required
 def student_interests_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'student_interests_game')
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'student_interests_game')
+    
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.all().distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.all().exclude(id=request.user.id).distinct()
+    
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
 
     if 'interests_correct' not in request.session: request.session['interests_correct'] = 0
     if 'interests_total' not in request.session: request.session['interests_total'] = 0
 
-    # Si recibimos respuesta (POST)
     if request.method == 'POST' and 'selected_option' in request.POST:
         selected_index = request.POST.get('selected_option') 
         correct_index = request.session.get('interests_correct_pos')
@@ -234,7 +251,6 @@ def student_interests_game(request, group_id=None):
         request.session.modified = True
         return get_ajax_response(request, is_correct, "¡Correcto!" if is_correct else "¡No! Esa no era su descripción", 'interests')
 
-    # Al cargar la página, elegimos alumno nuevo
     target = random.choice(students)
     def get_desc(s):
         return f"Tiene {calculate_age(s.date_of_birth)} años. Su artista favorito es {s.favorite_artist or 'desconocido'} y le motiva: {s.motivation or 'aprender'}."
@@ -252,10 +268,16 @@ def student_interests_game(request, group_id=None):
 
 @login_required
 def quiz_results_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'quiz_results_game')
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'quiz_results_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.all().distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.all().exclude(id=request.user.id).distinct()
     
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
     
@@ -283,9 +305,16 @@ def quiz_results_game(request, group_id=None):
 
 @login_required
 def student_complete_profile_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'student_complete_profile_game')
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'student_complete_profile_game')
+        
     group = get_object_or_404(ClassGroup, id=group_id)
-    students = group.students.filter(profile_picture__isnull=False).distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.filter(profile_picture__isnull=False).exclude(id=request.user.id).distinct()
     
     if students.count() < 4: return render(request, 'minigames/not_enough_students.html')
     
@@ -299,7 +328,6 @@ def student_complete_profile_game(request, group_id=None):
         request.session.modified = True
         return get_ajax_response(request, is_correct, "¡Listo!", 'complete_profile')
     
-    # Al cargar, seleccionamos objetivo y opciones
     vark_q = Questionnaire.objects.filter(title="VARK").first()
     chapman_q = Questionnaire.objects.filter(title="Chapman").first()
     target = random.choice(students)
@@ -329,15 +357,20 @@ def student_complete_profile_game(request, group_id=None):
 
 @login_required
 def spotify_guess_game(request, group_id=None):
-    if not group_id: return select_group_for_game(request, 'spotify_guess_game')
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group: return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id: 
+        return select_group_for_game(request, 'spotify_guess_game')
     
     group = get_object_or_404(ClassGroup, id=group_id)
-    # Filtramos alumnos que tengan el link de Spotify relleno
-    students = group.students.exclude(spotify_link__isnull=True).exclude(spotify_link='').distinct()
+    # Mejora: Excluir al propio usuario
+    students = group.students.exclude(spotify_link__isnull=True).exclude(spotify_link='').exclude(id=request.user.id).distinct()
     
     if students.count() < 4:
         return render(request, 'minigames/not_enough_students.html', {
-            'message': "Se necesitan al menos 4 alumnos con su canción de Spotify configurada."
+            'message': "Se necesitan al menos 4 compañeros con su canción de Spotify configurada."
         })
     
     if 'spotify_correct' not in request.session: request.session['spotify_correct'] = 0
@@ -355,7 +388,6 @@ def spotify_guess_game(request, group_id=None):
             return get_ajax_response(request, is_correct, msg, 'spotify')
         return redirect('spotify_guess_game', group_id=group_id)
 
-    # Elegir un alumno objetivo que no sea el mismo de la última vez
     last_id = request.session.get('spotify_last_id')
     possible_targets = students.exclude(id=last_id) if students.count() > 1 else students
     target = random.choice(possible_targets)
@@ -363,7 +395,6 @@ def spotify_guess_game(request, group_id=None):
     request.session['spotify_target_id'] = target.id
     request.session['spotify_last_id'] = target.id
     
-    # Crear 4 opciones (el target + 3 aleatorios)
     options = list(random.sample(list(students.exclude(id=target.id)), 3)) + [target]
     random.shuffle(options)
     

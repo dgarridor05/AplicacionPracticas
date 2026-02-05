@@ -8,11 +8,11 @@
 
 <div class="container mt-4" style="max-width: 800px;">
     <div class="card card-glass shadow-lg border-0 animate-slide-up">
-        <div class="card-header bg-success text-white text-center py-3 border-0">
-            <h3 class="mb-0 font-heading">
+        <div class="card-header bg-dark text-white text-center py-3 border-0" style="background: linear-gradient(90deg, #198754 0%, #1db954 100%);">
+            <h3 class="mb-0 fw-bold">
                 <i class="fab fa-spotify me-2"></i> Spotify Mystery
             </h3>
-            <small class="opacity-75">{{ group.name }}</small>
+            <small class="opacity-75 text-uppercase fw-bold" style="letter-spacing: 1px;">{{ group.name }}</small>
         </div>
 
         <div class="card-body p-4 text-center">
@@ -34,7 +34,8 @@
                         frameBorder="0" 
                         allowfullscreen="" 
                         allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                        loading="lazy"></iframe>
+                        loading="lazy"
+                        style="border-radius: 12px;"></iframe>
             </div>
 
             <div class="row row-cols-1 row-cols-md-2 g-3" id="options-container">
@@ -53,7 +54,7 @@
                             {% endif %}
                         </div>
 
-                        <span class="ms-3 text-start fw-bold flex-grow-1">
+                        <span class="ms-3 text-start fw-bold flex-grow-1 text-truncate">
                             {{ student.full_name|default:student.username }}
                         </span>
                     </button>
@@ -63,9 +64,12 @@
 
             <div id="feedback" class="mt-4 alert d-none animate-scale-in"></div>
 
-            <div class="mt-5 pt-3 border-top">
+            <div class="mt-5 pt-3 border-top d-flex justify-content-between align-items-center">
                 <a href="{% url 'group_detail' group.id %}" class="btn btn-link text-muted text-decoration-none">
                     <i class="fas fa-arrow-left me-2"></i> Volver a la clase
+                </a>
+                <a href="{% url 'spotify_guess_game' group.id %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="fas fa-step-forward me-1"></i> Saltar canción
                 </a>
             </div>
         </div>
@@ -73,52 +77,77 @@
 </div>
 
 <style>
-    /* Estilos del juego */
+    /* Estilos del reproductor y efectos */
     .spotify-wrapper { 
         max-width: 500px; 
         margin: 0 auto; 
-        transition: transform 0.3s; 
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     }
-    .spotify-wrapper:hover { transform: scale(1.01); }
+    .spotify-wrapper:hover { transform: scale(1.02); }
     
     .option-btn { 
         border-width: 2px;
-        transition: all 0.2s;
+        transition: all 0.2s ease;
         background-color: white;
         min-height: 65px;
+        border-color: #1db954;
+        color: #198754;
     }
 
-    /* Estilo para las fotos redondas */
+    .option-btn:hover {
+        background-color: #1db954 !important;
+        border-color: #1db954 !important;
+        color: white !important;
+    }
+
+    /* Avatares circulares */
     .game-avatar {
-        width: 48px;
-        height: 48px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
         object-fit: cover;
-        border: 2px solid #198754;
+        border: 2px solid #1db954;
     }
 
     .game-avatar-placeholder {
-        width: 48px;
-        height: 48px;
+        width: 45px;
+        height: 45px;
         border-radius: 50%;
-        background-color: #6c757d;
+        background-color: #212529;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 2px solid #198754;
+        border: 2px solid #1db954;
     }
 
     .hover-lift:hover {
         transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(25, 135, 84, 0.1) !important;
+        box-shadow: 0 8px 15px rgba(29, 185, 84, 0.2) !important;
     }
-    .bg-black { background-color: #000; }
+
+    .bg-black { background-color: #000 !important; }
+
+    /* Animación flotante para el reproductor */
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
 </style>
 
 <script>
 function checkAnswer(selectedId, button) {
     const buttons = document.querySelectorAll('.option-btn');
-    buttons.forEach(btn => btn.disabled = true);
+    
+    // Bloquear interacción inmediata
+    buttons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = "0.7";
+    });
 
     const formData = new FormData();
     formData.append('selected_id', selectedId);
@@ -127,27 +156,33 @@ function checkAnswer(selectedId, button) {
     fetch("{% url 'spotify_guess_game' group.id %}", {
         method: 'POST',
         body: formData,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(response => response.json())
     .then(data => {
-        button.classList.remove('btn-outline-success');
-        button.classList.add(data.success ? 'btn-success' : 'btn-danger');
+        // Estilo de respuesta
+        if(data.success) {
+            button.style.backgroundColor = "#1db954";
+            button.style.color = "white";
+        } else {
+            button.style.backgroundColor = "#dc3545";
+            button.style.color = "white";
+            button.style.borderColor = "#dc3545";
+        }
 
+        // Actualizar UI del marcador
         document.getElementById('correct-count').innerText = data.correct;
         document.getElementById('total-count').innerText = data.total;
 
         setTimeout(() => {
             Swal.fire({
-                title: data.success ? '¡Excelente gusto!' : '¡Casi!',
+                title: data.success ? '¡Oído absoluto! 🎧' : '¡Casi lo tienes!',
                 text: data.message,
                 icon: data.success ? 'success' : 'error',
                 confirmButtonText: 'Siguiente Canción',
-                confirmButtonColor: '#198754',
+                confirmButtonColor: '#1db954',
                 allowOutsideClick: false,
-                backdrop: `rgba(0,0,0,0.6)`
+                backdrop: `rgba(0,0,0,0.7)`
             }).then(() => {
                 window.location.reload();
             });

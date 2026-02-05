@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="d-grid gap-3">
-                    <button type="submit" class="btn btn-cta btn-lg shadow-lg">
+                    <button type="submit" id="submit-btn" class="btn btn-cta btn-lg shadow-lg">
                         <span class="d-flex align-items-center justify-content-center gap-2">
                             <i class="fas fa-paper-plane"></i> Comprobar
                         </span>
@@ -79,12 +79,10 @@ document.getElementById('face-guess-form').addEventListener('submit', function(e
 
     const form = this;
     const formData = new FormData(form);
-    const input = document.getElementById('answer');
+    const submitBtn = document.getElementById('submit-btn');
     
-    const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
 
-    // CORREGIDO: Se añade group.id a la URL del fetch
     fetch("{% url 'face_guess_game' group.id %}", {
         method: 'POST',
         body: formData,
@@ -95,16 +93,18 @@ document.getElementById('face-guess-form').addEventListener('submit', function(e
     })
     .then(response => response.json())
     .then(data => {
+        // Actualizar marcador antes de la alerta
+        document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+
         Swal.fire({
             title: data.success ? '¡Correcto!' : 'Incorrecto',
             text: data.message,
             icon: data.success ? 'success' : 'error',
             timer: 1500,
             showConfirmButton: false,
-            position: 'center',
-            backdrop: 'rgba(0,0,0,0.4)'
+            position: 'center'
         }).then(() => {
-            document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
+            // Recargamos para traer un nuevo alumno
             window.location.reload();
         });
     })
@@ -118,7 +118,6 @@ document.getElementById('face-guess-form').addEventListener('submit', function(e
 <style>
     .profile-image-container { position: relative; z-index: 1; }
     .shadow-glow { box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
-    .bg-accent { background-color: var(--color-accent); }
     .form-control:focus {
         border-color: var(--color-accent);
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);

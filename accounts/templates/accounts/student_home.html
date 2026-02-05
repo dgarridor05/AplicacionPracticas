@@ -2,32 +2,100 @@
 {% block title %}Panel del Alumno{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-lg p-4" style="width: 100%; max-width: 500px;">
-    <div class="text-center mb-3">
-      <h2 class="text-success">¡Bienvenido, {{ user.username }}!</h2>
+<div class="container py-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-success">¡Hola de nuevo, {{ user.username }}! 👋</h1>
+        <p class="lead text-muted">¿Qué quieres hacer hoy en tu grupo?</p>
     </div>
 
-    <div class="card-body">
-      <h5 class="card-title text-center">Acciones disponibles</h5>
-      <div class="d-grid gap-3 mt-4">
-        
-        <a href="{% url 'join_group' %}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus-circle"></i> Unirse a una clase (Código)
-        </a>
-        <a href="{% url 'classmates_list' %}" class="btn btn-success">
-            <i class="fas fa-users"></i> Ver mis compañeros
-        </a>
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow border-0 h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-center text-primary"><i class="fas fa-user-cog me-2"></i>Mi Cuenta</h5>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    <a href="{% url 'view_profile' %}" class="btn btn-outline-primary"><i class="fas fa-id-card me-2"></i>Mi Perfil</a>
+                    <a href="{% url 'classmates_list' %}" class="btn btn-outline-success"><i class="fas fa-users me-2"></i>Mis Compañeros</a>
+                    <a href="{% url 'join_group' %}" class="btn btn-primary"><i class="fas fa-plus-circle me-2"></i>Unirse a una Clase</a>
+                    
+                    <hr class="my-3">
+                    
+                    <p class="small text-muted mb-2 fw-bold text-center text-uppercase">Tests de Personalidad</p>
+                    <a href="{% url 'take_vark_quiz' %}" class="btn btn-sm btn-outline-info">VARK: Hacer Test</a>
+                    <a href="{% url 'vark_result' %}" class="btn btn-sm btn-light border">VARK: Resultados</a>
+                    <a href="{% url 'take_chapman_quiz' %}" class="btn btn-sm btn-outline-info mt-1">Chapman: Hacer Test</a>
+                    <a href="{% url 'chapman_result' %}" class="btn btn-sm btn-light border">Chapman: Resultados</a>
+                    
+                    <a href="{% url 'logout' %}" class="btn btn-link text-danger mt-3 btn-sm text-decoration-none">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
 
-        <hr> <a href="{% url 'view_profile' %}" class="btn btn-outline-success">Ver mi perfil</a>
-        <a href="{% url 'take_vark_quiz' %}" class="btn btn-outline-success">Realizar o repetir el test VARK</a>
-        <a href="{% url 'take_chapman_quiz' %}" class="btn btn-outline-success">Realizar o repetir el test de Chapman</a>
-        <a href="{% url 'vark_result' %}" class="btn btn-outline-success">Ver mi resultado VARK</a>
-        <a href="{% url 'chapman_result' %}" class="btn btn-outline-success">Ver mi resultado del test de Chapman</a>
-        
-        <a href="{% url 'logout' %}" class="btn btn-outline-secondary mt-2">Cerrar sesión</a>
-      </div>
+        <div class="col-lg-8">
+            <div class="row g-3">
+                <div class="col-12">
+                    <h3 class="fw-bold mb-3 d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-2">NUEVO!</span> 
+                        🕹️ Minijuegos de Compañeros
+                    </h3>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm bg-info text-white overflow-hidden position-relative" style="min-height: 140px;">
+                        <div class="card-body z-1 position-relative">
+                            <h5 class="fw-bold">El Ahorcado</h5>
+                            <p class="small opacity-75">¿Puedes adivinar el nombre letra a letra?</p>
+                            <a href="{% url 'hangman_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+                        </div>
+                        <i class="fas fa-spell-check position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm bg-danger text-white overflow-hidden position-relative">
+                        <div class="card-body z-1 position-relative">
+                            <h5 class="fw-bold">¿Quién es quién?</h5>
+                            <p class="small opacity-75">Identifica a tu compañero por su foto.</p>
+                            <a href="{% url 'face_guess_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+                        </div>
+                        <i class="fas fa-user-secret position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm bg-success text-white overflow-hidden position-relative">
+                        <div class="card-body z-1 position-relative">
+                            <h5 class="fw-bold">Melómanos</h5>
+                            <p class="small opacity-75">¿De quién es esta canción favorita?</p>
+                            <a href="{% url 'spotify_guess_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+                        </div>
+                        <i class="fab fa-spotify position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm bg-dark text-white overflow-hidden position-relative">
+                        <div class="card-body z-1 position-relative">
+                            <h5 class="fw-bold">Mentes Expertas</h5>
+                            <p class="small opacity-75">Adivina quién sacó este resultado en los tests.</p>
+                            <a href="{% url 'quiz_results_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+                        </div>
+                        <i class="fas fa-brain position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-2">
+                    <p class="text-muted small">Tienes más retos como <span class="badge bg-light text-dark">Adivina Gustos</span> y <span class="badge bg-light text-dark">Perfil Completo</span> en el menú lateral.</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
+
+<style>
+    /* Efecto hover suave para las cards de juegos */
+    .card { transition: transform 0.2s ease-in-out; }
+    .card:hover { transform: translateY(-5px); }
+</style>
 {% endblock %}

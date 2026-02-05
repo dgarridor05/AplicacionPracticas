@@ -23,20 +23,22 @@
                     {% if target_student.profile_picture %}
                     <img src="{{ target_student.profile_picture.url }}" class="rounded-circle shadow-sm"
                         style="width: 130px; height: 130px; object-fit: cover; border: 5px solid white;"
-                        alt="{{ target_student.full_name|default:target_student.username }}">
+                        alt="{{ target_student.full_name }}">
                     {% else %}
                     <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm"
                         style="width: 130px; height: 130px; border: 5px solid white;">
                         <i class="fas fa-user fa-4x opacity-25"></i>
                     </div>
                     {% endif %}
-                    <div class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white" style="width: 20px; height: 20px;"></div>
+                    <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle border border-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="fas fa-question text-white small"></i>
+                    </div>
                 </div>
             </div>
 
             <h3 class="fw-bold text-dark mb-2">¿Cómo es {{ target_student.full_name|default:target_student.username }}?</h3>
-            <p class="text-muted px-md-5">
-                Hemos mezclado las descripciones. ¿Sabrías decir cuál es la que realmente define a este estudiante?
+            <p class="text-muted px-md-4">
+                Analiza las siguientes descripciones. Una de ellas es la verdadera motivación y gustos de este estudiante.
             </p>
         </div>
     </div>
@@ -46,20 +48,20 @@
         <div class="d-grid gap-3">
             {% for description in options %}
             <button type="button" onclick="submitInterest('{{ forloop.counter }}')"
-                class="btn btn-white text-start p-4 shadow-sm border-0 interest-option position-relative">
+                class="btn btn-white text-start p-4 shadow-sm border-0 interest-option position-relative d-flex align-items-center">
                 
-                <div class="d-flex">
-                    <div class="me-3">
-                        <span class="option-number">{{ forloop.counter }}</span>
-                    </div>
-                    <div class="flex-grow-1">
-                        <p class="mb-0 text-secondary lh-base" style="font-size: 1rem;">
-                            {{ description }}
-                        </p>
-                    </div>
-                    <div class="ms-2 align-self-center opacity-25 icon-arrow">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
+                <div class="me-3">
+                    <span class="option-number">{{ forloop.counter }}</span>
+                </div>
+                
+                <div class="flex-grow-1">
+                    <p class="mb-0 text-secondary lh-base" style="font-size: 0.95rem;">
+                        {{ description }}
+                    </p>
+                </div>
+                
+                <div class="ms-2 opacity-25 icon-arrow">
+                    <i class="fas fa-chevron-right text-primary"></i>
                 </div>
             </button>
             {% endfor %}
@@ -68,10 +70,10 @@
 
     <div class="text-center mt-5 mb-5 animate-fade-in delay-300">
         <a href="{% url 'student_interests_game' group.id %}" class="btn btn-link text-decoration-none text-muted me-3">
-            <i class="fas fa-random me-1"></i> Otra persona
+            <i class="fas fa-random me-1"></i> Saltar a otra persona
         </a>
-        <a href="{% url 'teacher_home' %}" class="btn btn-light rounded-pill px-4 border">
-            <i class="fas fa-arrow-left me-1"></i> Panel Principal
+        <a href="{% url 'teacher_home' %}" class="btn btn-light rounded-pill px-4 border shadow-sm">
+            <i class="fas fa-door-open me-1"></i> Salir al Panel
         </a>
     </div>
 </div>
@@ -79,20 +81,22 @@
 <style>
     :root {
         --btn-bg: #ffffff;
-        --btn-hover-bg: #f0f7ff;
+        --btn-hover-bg: #f8fbff;
         --accent-color: #0d6efd;
     }
 
     .interest-option {
         background: var(--btn-bg);
         border-radius: 16px;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid transparent !important;
     }
 
     .interest-option:hover {
         background-color: var(--btn-hover-bg) !important;
-        transform: translateX(8px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+        transform: scale(1.02) translateX(5px);
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.08) !important;
+        border-color: rgba(13, 110, 253, 0.2) !important;
     }
 
     .interest-option:hover .option-number {
@@ -103,8 +107,7 @@
 
     .interest-option:hover .icon-arrow {
         opacity: 1 !important;
-        color: var(--accent-color);
-        transform: translateX(4px);
+        transform: translateX(3px);
     }
 
     .option-number {
@@ -113,7 +116,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f8fafc;
+        background: #f1f5f9;
         border: 2px solid #e2e8f0;
         border-radius: 10px;
         font-weight: bold;
@@ -123,14 +126,37 @@
 
     .avatar-container {
         position: relative;
-        animation: float 3s ease-in-out infinite;
+        display: inline-block;
     }
 
-    @keyframes float {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
+    .avatar-container::after {
+        content: '';
+        position: absolute;
+        top: -5px; bottom: -5px; left: -5px; right: -5px;
+        border-radius: 50%;
+        border: 2px dashed #0d6efd;
+        opacity: 0.3;
+        animation: rotate 10s linear infinite;
     }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
 
     .icon-arrow { transition: all 0.3s; }
 </style>
@@ -142,10 +168,8 @@ function submitInterest(optionValue) {
     formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
     const options = document.querySelectorAll('.interest-option');
-    options.forEach(btn => {
-        btn.style.pointerEvents = 'none';
-        btn.style.opacity = '0.6';
-    });
+    // Bloquear clics múltiples
+    options.forEach(btn => btn.style.pointerEvents = 'none');
 
     fetch("{% url 'student_interests_game' group.id %}", {
         method: 'POST',
@@ -155,25 +179,19 @@ function submitInterest(optionValue) {
     .then(response => response.json())
     .then(data => {
         Swal.fire({
-            title: data.success ? '¡Lo conoces bien!' : '¡Casi lo tienes!',
+            title: data.success ? '¡Excelente! ✨' : '¡Casi! 🤔',
             text: data.message,
-            icon: data.success ? 'success' : 'info',
+            icon: data.success ? 'success' : 'error',
             timer: 2000,
             showConfirmButton: false,
             backdrop: 'rgba(13, 110, 253, 0.1)'
         }).then(() => {
-            if (data.correct !== undefined) {
-                document.getElementById('score-display').innerText = `${data.correct} / ${data.total}`;
-            }
             window.location.reload();
         });
     })
     .catch(error => {
         console.error('Error:', error);
-        options.forEach(btn => {
-            btn.style.pointerEvents = 'auto';
-            btn.style.opacity = '1';
-        });
+        options.forEach(btn => btn.style.pointerEvents = 'auto');
     });
 }
 </script>
