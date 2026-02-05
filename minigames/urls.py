@@ -29,4 +29,7 @@ urlpatterns = [
     # 7. NUEVO: Spotify Mystery (Adivina la canción)
     path('spotify/', views.spotify_guess_game, name='spotify_guess_game'),
     path('spotify/<int:group_id>/', views.spotify_guess_game, name='spotify_guess_game'),
+
+    # 8. Dino-Reto (Juego de habilidad)
+    path('dino-reto/', views.dino_game, name='dino_game'),
 ]

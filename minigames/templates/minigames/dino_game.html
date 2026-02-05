@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Dino Run - Recreo{% endblock %}
+
+{% block content %}
+<div class="container py-4 text-center">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'student_home' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver al Panel
+        </a>
+        <h2 class="fw-bold text-primary mb-0">🦖 Dino Run Escolar</h2>
+        <div class="fw-bold fs-4 text-success" id="score">Puntos: 0</div>
+    </div>
+
+    <div id="gameCanvas" class="position-relative mx-auto shadow-lg rounded overflow-hidden bg-light border" 
+         style="width: 100%; max-width: 800px; height: 200px; cursor: pointer;">
+        
+        <div id="dino" class="position-absolute text-dark" style="bottom: 0; left: 50px; font-size: 40px; transition: none;">
+            <i class="fas fa-dragon"></i>
+        </div>
+
+        <div class="position-absolute w-100 border-bottom border-secondary" style="bottom: 0;"></div>
+        
+        <div id="message" class="position-absolute top-50 start-50 translate-middle text-center w-100">
+            <h3 class="fw-bold">¡Pulsa ESPACIO o haz CLIC para saltar!</h3>
+            <p class="text-muted">Esquiva los libros para no perder el recreo.</p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <p class="text-muted small italic">Tip: El juego se vuelve más rápido cada 100 puntos.</p>
+    </div>
+</div>
+
+<style>
+    #gameCanvas {
+        background-image: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+    }
+    .obstacle {
+        position: absolute;
+        bottom: 0;
+        font-size: 30px;
+        color: #dc3545;
+    }
+    .jump-animation {
+        animation: jump 0.5s cubic-bezier(0.21, 0.61, 0.35, 1);
+    }
+    @keyframes jump {
+        0% { bottom: 0; }
+        50% { bottom: 120px; }
+        100% { bottom: 0; }
+    }
+</style>
+
+<script>
+    const dino = document.getElementById("dino");
+    const canvas = document.getElementById("gameCanvas");
+    const scoreElement = document.getElementById("score");
+    const message = document.getElementById("message");
+
+    let score = 0;
+    let isJumping = false;
+    let isGameOver = true;
+    let gameSpeed = 5;
+
+    function handleInput() {
+        if (isGameOver) {
+            startGame();
+        } else if (!isJumping) {
+            jump();
+        }
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") handleInput();
+    });
+    canvas.addEventListener("mousedown", handleInput);
+
+    function jump() {
+        isJumping = true;
+        dino.classList.add("jump-animation");
+        setTimeout(() => {
+            dino.classList.remove("jump-animation");
+            isJumping = false;
+        }, 500);
+    }
+
+    function createObstacle() {
+        if (isGameOver) return;
+
+        const obstacle = document.createElement("div");
+        obstacle.classList.add("obstacle");
+        // Alternar entre iconos de libros y mochilas
+        const icons = ['fa-book', 'fa-book-open', 'fa-school'];
+        const randomIcon = icons[Math.floor(Math.random() * icons.length)];
+        obstacle.innerHTML = `<i class="fas ${randomIcon}"></i>`;
+        
+        canvas.appendChild(obstacle);
+
+        let obstaclePos = canvas.offsetWidth;
+        obstacle.style.left = obstaclePos + "px";
+
+        let obstacleTimer = setInterval(() => {
+            if (isGameOver) {
+                clearInterval(obstacleTimer);
+                obstacle.remove();
+                return;
+            }
+
+            obstaclePos -= gameSpeed;
+            obstacle.style.left = obstaclePos + "px";
+
+            // Detección de colisión simple
+            let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+            
+            if (obstaclePos > 50 && obstaclePos < 90 && dinoBottom < 30) {
+                gameOver();
+            }
+
+            if (obstaclePos < -50) {
+                clearInterval(obstacleTimer);
+                obstacle.remove();
+                score += 10;
+                scoreElement.innerHTML = `Puntos: ${score}`;
+                if (score % 100 === 0) gameSpeed += 0.5; // Aumentar dificultad
+            }
+        }, 20);
+
+        // Generar siguiente obstáculo de forma aleatoria
+        let nextSpawn = Math.random() * (2000 - 700) + 700;
+        setTimeout(createObstacle, nextSpawn / (gameSpeed / 5));
+    }
+
+    function startGame() {
+        isGameOver = false;
+        score = 0;
+        gameSpeed = 5;
+        scoreElement.innerHTML = "Puntos: 0";
+        message.style.display = "none";
+        createObstacle();
+    }
+
+    function gameOver() {
+        isGameOver = true;
+        message.style.display = "block";
+        message.innerHTML = `<h3 class="text-danger fw-bold">¡FIN DEL JUEGO!</h3>
+                             <p>Puntuación: ${score}</p>
+                             <button class="btn btn-primary btn-sm">Reintentar</button>`;
+    }
+</script>
+{% endblock %}

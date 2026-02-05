@@ -25,7 +25,7 @@
                     <a href="{% url 'take_vark_quiz' %}" class="btn btn-sm btn-outline-info">VARK: Hacer Test</a>
                     <a href="{% url 'vark_result' %}" class="btn btn-sm btn-light border">VARK: Resultados</a>
                     <a href="{% url 'take_chapman_quiz' %}" class="btn btn-sm btn-outline-info mt-1">Chapman: Hacer Test</a>
-                    <a href="{% url 'chapman_result' %}" class="btn btn-sm btn-light border">Chapman: Resultados</a>
+                    <a href="{% url 'vark_result' %}" class="btn btn-sm btn-light border">Chapman: Resultados</a>
                     
                     <a href="{% url 'logout' %}" class="btn btn-link text-danger mt-3 btn-sm text-decoration-none">Cerrar sesión</a>
                 </div>
@@ -49,6 +49,17 @@
                             <a href="{% url 'hangman_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
                         </div>
                         <i class="fas fa-spell-check position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative" style="background: linear-gradient(45deg, #f39c12, #d35400) !important;">
+                        <div class="card-body z-1 position-relative">
+                            <h5 class="fw-bold">Dino Run 🌵</h5>
+                            <p class="small opacity-75">¡Esquiva los libros y rompe el récord!</p>
+                            <a href="{% url 'dino_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Saltar</a>
+                        </div>
+                        <i class="fas fa-dragon position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
                     </div>
                 </div>
 
@@ -86,7 +97,7 @@
                 </div>
 
                 <div class="col-12 text-center mt-3">
-                    <p class="text-muted small">Tienes más minjuegos como 
+                    <p class="text-muted small">Tienes más minijuegos como 
                         <a href="{% url 'student_interests_game' %}" class="badge bg-light text-dark text-decoration-none border hover-link">Adivina Gustos</a> 
                         y 
                         <a href="{% url 'student_complete_profile_game' %}" class="badge bg-light text-dark text-decoration-none border hover-link">Perfil Completo</a>

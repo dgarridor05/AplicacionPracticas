@@ -405,3 +405,24 @@ def spotify_guess_game(request, group_id=None):
         'correct': request.session['spotify_correct'],
         'total': request.session['spotify_total']
     })
+
+@login_required
+def dino_game(request):
+    """
+    Lógica para el juego del Dino. 
+    Mantiene la coherencia con el resto de vistas del proyecto.
+    """
+    # En tus otras vistas usas request.user.student_groups.first() 
+    # Vamos a usar lo mismo para evitar errores de atributo.
+    group = None
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+    
+    # Si quieres que el juego también tenga un contador de "Sesión" 
+    # como tus otros juegos, podemos inicializarlo aquí:
+    if 'dino_total' not in request.session:
+        request.session['dino_total'] = 0
+
+    return render(request, 'minigames/dino_game.html', {
+        'group': group,
+    })
