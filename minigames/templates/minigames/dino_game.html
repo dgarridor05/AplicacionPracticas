@@ -27,13 +27,13 @@
                 </div>
                 <h2 class="fw-bold mb-1 fs-4 fs-md-2">STUDENT RUN</h2>
                 <p class="text-muted small mb-3">TOCA O PULSA [ESPACIO] PARA SALTAR</p>
-                <button onclick="game.start()" class="btn btn-dark rounded-pill px-4 shadow-sm">JUGAR</button>
+                <button id="startBtn" class="btn btn-dark rounded-pill px-4 shadow-sm">JUGAR</button>
             </div>
             
             <div id="game-over-screen" style="display: none;" class="px-3">
                 <h1 class="text-danger fw-black mb-0 fs-3 fs-md-1">¡SUSPENSO!</h1>
                 <p id="finalScoreText" class="mb-3 text-muted small"></p>
-                <button onclick="game.start()" class="btn btn-primary rounded-pill px-5 shadow">
+                <button id="restartBtn" class="btn btn-primary rounded-pill px-5 shadow">
                     REINTENTAR <i class="fas fa-redo ms-2"></i>
                 </button>
             </div>
@@ -44,7 +44,7 @@
 <style>
     :root { --game-bg: #ffffff; }
     
-    /* Contenedor responsivo */
+    /* Contenedor responsivo con bloqueo de gestos nativos */
     .game-wrapper {
         position: relative;
         display: block;
@@ -55,10 +55,14 @@
         border-radius: 20px;
         overflow: hidden;
         border: 4px solid #f0f0f0;
-        touch-action: none; /* Evita el scroll accidental al tocar el juego */
+        
+        /* IMPORTANTE PARA MÓVIL: Evita que el navegador mueva la página al tocar */
+        touch-action: none; 
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
-    /* Canvas flexible */
     #gameCanvas {
         width: 100% !important;
         height: auto !important;
@@ -83,7 +87,6 @@
 
     .stat-item { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 1rem; }
     @media (min-width: 768px) { .stat-item { font-size: 1.2rem; } }
-    
     .stat-item small { font-size: 0.6rem; color: #636e72; display: block; line-height: 1; }
 </style>
 
@@ -93,6 +96,7 @@ class Game {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.img = document.getElementById('playerImg');
+        this.wrapper = document.getElementById('gameWrapper');
         
         this.baseSpeed = 6.5;
         this.speed = this.baseSpeed;
@@ -115,36 +119,64 @@ class Game {
 
     init() {
         const handleStartJump = (e) => {
-            if (e.type === 'touchstart') e.preventDefault(); // Evita zoom y scroll
+            // Si el juego no está activo, no saltamos (evita conflictos con botones)
+            if (!this.active) return;
             
-            if (this.active && this.player.grounded) {
-                this.player.dy = -this.jumpForce;
-                this.player.grounded = false;
-                this.player.isJumping = true;
-            } else if (!this.active && document.getElementById('game-over-screen').style.display === 'block') {
-                // Permitir reiniciar tocando la pantalla en game over
-                // this.start(); // Opcional
+            // En móvil prevenimos comportamiento por defecto para evitar lag/scroll
+            if (e.type === 'touchstart' || e.type === 'mousedown') {
+                if (this.player.grounded) {
+                    this.player.dy = -this.jumpForce;
+                    this.player.grounded = false;
+                    this.player.isJumping = true;
+                }
             }
         };
 
-        const handleEndJump = (e) => {
+        const handleEndJump = () => {
             if (this.player.isJumping && this.player.dy < -3) {
                 this.player.dy *= this.jumpCutoff;
                 this.player.isJumping = false;
             }
         };
 
-        // Eventos de Teclado
-        window.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); handleStartJump(e); }});
-        window.addEventListener('keyup', (e) => { if(e.code === 'Space') handleEndJump(e); });
+        // EVENTOS DE TECLADO
+        window.addEventListener('keydown', (e) => { 
+            if(e.code === 'Space') { 
+                e.preventDefault(); 
+                handleStartJump(e); 
+            }
+        });
+        window.addEventListener('keyup', (e) => { if(e.code === 'Space') handleEndJump(); });
 
-        // Eventos de Mouse
-        this.canvas.addEventListener('mousedown', handleStartJump);
+        // EVENTOS TÁCTILES Y RATÓN EN EL CONTENEDOR (Área más grande)
+        this.wrapper.addEventListener('touchstart', (e) => {
+            if (this.active) {
+                e.preventDefault(); // Bloquea el scroll del móvil
+                handleStartJump(e);
+            }
+        }, { passive: false });
+
+        this.wrapper.addEventListener('touchend', (e) => {
+            if (this.active) {
+                e.preventDefault();
+                handleEndJump();
+            }
+        }, { passive: false });
+
+        this.wrapper.addEventListener('mousedown', (e) => {
+            handleStartJump(e);
+        });
         window.addEventListener('mouseup', handleEndJump);
 
-        // Eventos de Toque (Móvil)
-        this.canvas.addEventListener('touchstart', handleStartJump, {passive: false});
-        this.canvas.addEventListener('touchend', handleEndJump, {passive: false});
+        // BOTONES DE INTERFAZ
+        document.getElementById('startBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.start();
+        });
+        document.getElementById('restartBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.start();
+        });
     }
 
     start() {
@@ -154,6 +186,7 @@ class Game {
         this.obstacles = [];
         this.player.y = this.canvas.height - 110;
         this.player.dy = 0;
+        this.player.grounded = false;
         
         document.getElementById('overlay').style.background = 'transparent';
         document.getElementById('start-screen').style.display = 'none';
@@ -246,6 +279,7 @@ class Game {
     }
 }
 
+// Iniciar instancia
 const game = new Game();
 </script>
 {% endblock %}
