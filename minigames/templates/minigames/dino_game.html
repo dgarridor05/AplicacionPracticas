@@ -2,37 +2,37 @@
 {% block title %}Student Runner Pro{% endblock %}
 
 {% block content %}
-<div class="container py-4 text-center">
-    <div class="d-flex justify-content-between align-items-center mb-4" style="max-width: 800px; margin: 0 auto;">
+<div class="container py-2 py-md-4 text-center">
+    <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2" style="max-width: 800px; margin: 0 auto;">
         <a href="{% url 'student_home' %}" class="btn btn-sm btn-outline-secondary border-0 shadow-sm">
-            <i class="fas fa-chevron-left"></i> Salir
+            <i class="fas fa-chevron-left"></i> <span class="d-none d-sm-inline">Salir</span>
         </a>
-        <div class="game-stats d-flex gap-4">
+        <div class="game-stats d-flex gap-3 gap-md-4">
             <div class="stat-item"><small>HI-SCORE</small> <span id="highScore">00000</span></div>
             <div class="stat-item text-primary"><small>SCORE</small> <span id="currentScore">00000</span></div>
         </div>
     </div>
 
-    <div class="game-container shadow-lg" id="gameWrapper">
+    <div class="game-wrapper shadow-lg" id="gameWrapper">
         <canvas id="gameCanvas" width="800" height="250"></canvas>
         
         <div id="overlay" class="game-overlay">
-            <div id="start-screen">
-                <div class="avatar-preview mb-3">
+            <div id="start-screen" class="px-3">
+                <div class="avatar-preview mb-2 mb-md-3">
                     {% if user.profile_picture %}
                         <img src="{{ user.profile_picture.url }}" id="playerImg" crossorigin="anonymous">
                     {% else %}
                         <img src="https://ui-avatars.com/api/?background=4834d4&color=fff&name={{ user.first_name }}" id="playerImg" crossorigin="anonymous">
                     {% endif %}
                 </div>
-                <h2 class="fw-bold mb-1">STUDENT RUN</h2>
-                <p class="text-muted small">MANTÉN [ESPACIO] PARA SALTAR MÁS ALTO</p>
-                <button onclick="game.start()" class="btn btn-dark rounded-pill px-4 mt-2 shadow-sm">EMPEZAR EXAMEN</button>
+                <h2 class="fw-bold mb-1 fs-4 fs-md-2">STUDENT RUN</h2>
+                <p class="text-muted small mb-3">TOCA O PULSA [ESPACIO] PARA SALTAR</p>
+                <button onclick="game.start()" class="btn btn-dark rounded-pill px-4 shadow-sm">JUGAR</button>
             </div>
             
-            <div id="game-over-screen" style="display: none;">
-                <h1 class="text-danger fw-black mb-0">¡SUSPENSO!</h1>
-                <p id="finalScoreText" class="mb-3 text-muted"></p>
+            <div id="game-over-screen" style="display: none;" class="px-3">
+                <h1 class="text-danger fw-black mb-0 fs-3 fs-md-1">¡SUSPENSO!</h1>
+                <p id="finalScoreText" class="mb-3 text-muted small"></p>
                 <button onclick="game.start()" class="btn btn-primary rounded-pill px-5 shadow">
                     REINTENTAR <i class="fas fa-redo ms-2"></i>
                 </button>
@@ -43,29 +43,48 @@
 
 <style>
     :root { --game-bg: #ffffff; }
-    .game-container {
+    
+    /* Contenedor responsivo */
+    .game-wrapper {
         position: relative;
-        display: inline-block;
+        display: block;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
         background: var(--game-bg);
         border-radius: 20px;
         overflow: hidden;
         border: 4px solid #f0f0f0;
-        transition: background 1s ease; /* Para el efecto de cambio de color */
+        touch-action: none; /* Evita el scroll accidental al tocar el juego */
     }
+
+    /* Canvas flexible */
+    #gameCanvas {
+        width: 100% !important;
+        height: auto !important;
+        display: block;
+    }
+
     .game-overlay {
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         display: flex; align-items: center; justify-content: center;
         background: rgba(255,255,255,0.85); transition: 0.3s;
         z-index: 10;
     }
+
     .avatar-preview img {
-        width: 80px; height: 80px; border-radius: 50%;
-        border: 4px solid #4834d4; object-fit: cover;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        width: 60px; height: 60px; border-radius: 50%;
+        border: 3px solid #4834d4; object-fit: cover;
     }
-    .stat-item { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 1.2rem; }
-    .stat-item small { font-size: 0.7rem; color: #636e72; display: block; line-height: 1; }
-    canvas { display: block; }
+    
+    @media (min-width: 768px) {
+        .avatar-preview img { width: 80px; height: 80px; border-width: 4px; }
+    }
+
+    .stat-item { font-family: 'Courier New', Courier, monospace; font-weight: bold; font-size: 1rem; }
+    @media (min-width: 768px) { .stat-item { font-size: 1.2rem; } }
+    
+    .stat-item small { font-size: 0.6rem; color: #636e72; display: block; line-height: 1; }
 </style>
 
 <script>
@@ -75,12 +94,11 @@ class Game {
         this.ctx = this.canvas.getContext('2d');
         this.img = document.getElementById('playerImg');
         
-        // Ajustes de Física de Precisión
         this.baseSpeed = 6.5;
         this.speed = this.baseSpeed;
         this.gravity = 0.8;
         this.jumpForce = 15;
-        this.jumpCutoff = 0.35; // Factor de reducción al soltar la tecla
+        this.jumpCutoff = 0.35;
         
         this.player = {
             x: 80, y: 0, w: 52, h: 52,
@@ -96,31 +114,37 @@ class Game {
     }
 
     init() {
-        // Manejo de entrada (Teclado y Ratón)
-        const handleDown = (e) => {
-            if (e.code === 'Space' || e.type === 'mousedown') {
-                if (this.active && this.player.grounded) {
-                    this.player.dy = -this.jumpForce;
-                    this.player.grounded = false;
-                    this.player.isJumping = true;
-                }
-                if(e.code === 'Space') e.preventDefault();
+        const handleStartJump = (e) => {
+            if (e.type === 'touchstart') e.preventDefault(); // Evita zoom y scroll
+            
+            if (this.active && this.player.grounded) {
+                this.player.dy = -this.jumpForce;
+                this.player.grounded = false;
+                this.player.isJumping = true;
+            } else if (!this.active && document.getElementById('game-over-screen').style.display === 'block') {
+                // Permitir reiniciar tocando la pantalla en game over
+                // this.start(); // Opcional
             }
         };
 
-        const handleUp = (e) => {
-            if (e.code === 'Space' || e.type === 'mouseup') {
-                if (this.player.isJumping && this.player.dy < -3) {
-                    this.player.dy *= this.jumpCutoff; // Corte de inercia para salto variable
-                    this.player.isJumping = false;
-                }
+        const handleEndJump = (e) => {
+            if (this.player.isJumping && this.player.dy < -3) {
+                this.player.dy *= this.jumpCutoff;
+                this.player.isJumping = false;
             }
         };
 
-        window.addEventListener('keydown', handleDown);
-        window.addEventListener('keyup', handleUp);
-        this.canvas.addEventListener('mousedown', handleDown);
-        window.addEventListener('mouseup', handleUp);
+        // Eventos de Teclado
+        window.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); handleStartJump(e); }});
+        window.addEventListener('keyup', (e) => { if(e.code === 'Space') handleEndJump(e); });
+
+        // Eventos de Mouse
+        this.canvas.addEventListener('mousedown', handleStartJump);
+        window.addEventListener('mouseup', handleEndJump);
+
+        // Eventos de Toque (Móvil)
+        this.canvas.addEventListener('touchstart', handleStartJump, {passive: false});
+        this.canvas.addEventListener('touchend', handleEndJump, {passive: false});
     }
 
     start() {
@@ -134,24 +158,14 @@ class Game {
         document.getElementById('overlay').style.background = 'transparent';
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('game-over-screen').style.display = 'none';
-        document.getElementById('gameWrapper').style.background = '#ffffff';
         this.loop();
     }
 
     update() {
-        // Puntuación y Dificultad
         this.score += 0.2;
-        this.speed = this.baseSpeed + (this.score / 45); 
-        
-        // Cambio de color de fondo cada 500 puntos (Progreso visual)
-        if (Math.floor(this.score) % 500 === 0 && this.score > 10) {
-            const b = Math.max(200, 255 - (this.score/10));
-            document.getElementById('gameWrapper').style.background = `rgb(${b}, ${b}, 255, 0.05)`;
-        }
-
+        this.speed = this.baseSpeed + (this.score / 50); 
         document.getElementById('currentScore').innerText = Math.floor(this.score).toString().padStart(5, '0');
 
-        // Física del jugador
         this.player.dy += this.gravity;
         this.player.y += this.player.dy;
 
@@ -163,8 +177,7 @@ class Game {
             this.player.isJumping = false;
         }
 
-        // Generar Obstáculos
-        const minGap = Math.max(220, 480 - (this.speed * 10));
+        const minGap = Math.max(220, 500 - (this.speed * 10));
         if (this.obstacles.length === 0 || (this.canvas.width - this.obstacles[this.obstacles.length-1].x) > minGap) {
             if (Math.random() < 0.05) {
                 const icons = ['📚', '📝', '🎒', '📐', '🧠'];
@@ -177,25 +190,19 @@ class Game {
             }
         }
 
-        // Colisiones
         this.obstacles.forEach((obs, i) => {
             obs.x -= this.speed;
-            
             const pX = this.player.x + this.player.w/2;
             const pY = this.player.y + this.player.h/2;
             const oX = obs.x + obs.w/2;
             const oY = obs.y + obs.h/2;
-            const dist = Math.sqrt((pX - oX)**2 + (pY - oY)**2);
-            
-            if (dist < 38) this.gameOver();
+            if (Math.sqrt((pX - oX)**2 + (pY - oY)**2) < 38) this.gameOver();
             if (obs.x + obs.w < 0) this.obstacles.splice(i, 1);
         });
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Suelo
         this.ctx.strokeStyle = '#2d3436';
         this.ctx.lineWidth = 2;
         this.ctx.beginPath();
@@ -203,30 +210,23 @@ class Game {
         this.ctx.lineTo(this.canvas.width, this.canvas.height - 50);
         this.ctx.stroke();
 
-        // Personaje (Círculo con imagen)
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(this.player.x + this.player.w/2, this.player.y + this.player.h/2, this.player.w/2, 0, Math.PI*2);
         this.ctx.clip();
-        
         if (this.img && this.img.complete) {
             this.ctx.drawImage(this.img, this.player.x, this.player.y, this.player.w, this.player.h);
         } else {
-            this.ctx.fillStyle = '#4834d4';
-            this.ctx.fill();
+            this.ctx.fillStyle = '#4834d4'; this.ctx.fill();
         }
         this.ctx.restore();
         
-        // Borde del personaje
         this.ctx.strokeStyle = this.player.grounded ? '#4834d4' : '#686de0';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
 
-        // Obstáculos
         this.ctx.font = '32px Arial';
-        this.obstacles.forEach(obs => {
-            this.ctx.fillText(obs.icon, obs.x, obs.y + 30);
-        });
+        this.obstacles.forEach(obs => this.ctx.fillText(obs.icon, obs.x, obs.y + 30));
     }
 
     gameOver() {
