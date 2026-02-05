@@ -80,24 +80,20 @@ def public_classmates_list(request):
     from teachers.models import ClassGroup
     from django.db.models import Q
 
-    # 1. Obtenemos los grupos donde está el alumno actual
-    # Usamos .all() para asegurar que traemos la relación
+    # 1. Buscamos los grupos donde está metido el alumno actual
     mis_grupos = ClassGroup.objects.filter(students=request.user)
 
     if not mis_grupos.exists():
         return render(request, 'accounts/classmates_list.html', {'classmates': [], 'no_group': True})
 
-    # 2. Obtenemos los IDs de los perfiles que están en mis grupos
-    # Cambiamos 'students__id' por 'students' para que nos de el ID directo del UserProfile
-    ids_compañeros = mis_grupos.values_list('students', flat=True)
-
-    # 3. Filtramos los perfiles
+    # 2. Obtenemos los perfiles que pertenecen a esos grupos directamente
+    # Filtramos UserProfile que estén en la relación 'students' de mis_grupos
     classmates = UserProfile.objects.filter(
-        id__in=ids_compañeros,
+        student_groups__in=mis_grupos,
         share_with_class=True
     ).exclude(id=request.user.id).distinct()
 
-    # Lógica de buscador
+    # 3. Lógica de buscador
     query = request.GET.get('q')
     if query:
         classmates = classmates.filter(
