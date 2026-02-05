@@ -75,13 +75,13 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="card h-100 border-0 shadow-sm bg-dark text-white overflow-hidden position-relative">
+                    <div class="card h-100 border-0 shadow-sm bg-primary text-white overflow-hidden position-relative" style="background: linear-gradient(45deg, #4e73df, #224abe) !important;">
                         <div class="card-body z-1 position-relative">
-                            <h5 class="fw-bold">Mentes Expertas</h5>
-                            <p class="small opacity-75">Adivina quién sacó este resultado en los tests.</p>
-                            <a href="{% url 'quiz_results_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+                            <h5 class="fw-bold">Ponle Cara</h5>
+                            <p class="small opacity-75">Te damos el nombre, ¿sabes qué foto es?</p>
+                            <a href="{% url 'name_to_face_game' %}" class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
                         </div>
-                        <i class="fas fa-brain position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
+                        <i class="fas fa-id-badge position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25" style="font-size: 5rem; transform: rotate(-15deg);"></i>
                     </div>
                 </div>
 
@@ -94,7 +94,6 @@
 </div>
 
 <style>
-    /* Efecto hover suave para las cards de juegos */
     .card { transition: transform 0.2s ease-in-out; }
     .card:hover { transform: translateY(-5px); }
 </style>
