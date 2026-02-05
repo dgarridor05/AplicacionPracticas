@@ -2,8 +2,8 @@
 {% block title %}Student Runner Pro{% endblock %}
 
 {% block content %}
-<div class="container py-2 py-md-4 text-center">
-    <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2" style="max-width: 800px; margin: 0 auto;">
+<div class="container-fluid py-2 py-md-4 text-center game-main-container">
+    <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4 px-2" style="max-width: 800px; margin: 0 auto; width: 100%;">
         <a href="{% url 'student_home' %}" class="btn btn-sm btn-outline-secondary border-0 shadow-sm">
             <i class="fas fa-chevron-left"></i> <span class="d-none d-sm-inline">Salir</span>
         </a>
@@ -14,7 +14,7 @@
     </div>
 
     <div class="game-wrapper shadow-lg" id="gameWrapper">
-        <canvas id="gameCanvas" width="800" height="250"></canvas>
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
         
         <div id="overlay" class="game-overlay">
             <div id="start-screen" class="px-3">
@@ -44,29 +44,42 @@
 <style>
     :root { --game-bg: #ffffff; }
     
-    /* Contenedor responsivo con bloqueo de gestos nativos */
+    /* Evitamos el scroll elástico en móviles para que no se mueva la pantalla al jugar */
+    body { overflow: hidden; position: fixed; width: 100%; }
+
+    .game-main-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
     .game-wrapper {
         position: relative;
-        display: block;
         width: 100%;
         max-width: 800px;
+        /* En móvil ocupará más espacio vertical proporcionalmente */
+        aspect-ratio: 8 / 10; 
         margin: 0 auto;
         background: var(--game-bg);
         border-radius: 20px;
         overflow: hidden;
         border: 4px solid #f0f0f0;
-        
-        /* IMPORTANTE PARA MÓVIL: Evita que el navegador mueva la página al tocar */
         touch-action: none; 
         -webkit-user-select: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
     }
 
+    /* En pantallas grandes volvemos a un formato más horizontal */
+    @media (min-width: 768px) {
+        .game-wrapper { aspect-ratio: 2 / 1; }
+    }
+
     #gameCanvas {
         width: 100% !important;
-        height: auto !important;
+        height: 100% !important;
         display: block;
+        object-fit: cover; /* Clave para que el dibujo interno no se deforme */
     }
 
     .game-overlay {
@@ -98,14 +111,18 @@ class Game {
         this.img = document.getElementById('playerImg');
         this.wrapper = document.getElementById('gameWrapper');
         
-        this.baseSpeed = 6.5;
+        // Resolución lógica: 800x400 da más aire vertical
+        this.canvas.width = 800;
+        this.canvas.height = 400;
+        
+        this.baseSpeed = 7;
         this.speed = this.baseSpeed;
-        this.gravity = 0.8;
-        this.jumpForce = 15;
+        this.gravity = 0.85;
+        this.jumpForce = 17;
         this.jumpCutoff = 0.35;
         
         this.player = {
-            x: 80, y: 0, w: 52, h: 52,
+            x: 80, y: 0, w: 58, h: 58,
             dy: 0, grounded: false, isJumping: false
         };
 
@@ -119,16 +136,11 @@ class Game {
 
     init() {
         const handleStartJump = (e) => {
-            // Si el juego no está activo, no saltamos (evita conflictos con botones)
             if (!this.active) return;
-            
-            // En móvil prevenimos comportamiento por defecto para evitar lag/scroll
-            if (e.type === 'touchstart' || e.type === 'mousedown') {
-                if (this.player.grounded) {
-                    this.player.dy = -this.jumpForce;
-                    this.player.grounded = false;
-                    this.player.isJumping = true;
-                }
+            if (this.player.grounded) {
+                this.player.dy = -this.jumpForce;
+                this.player.grounded = false;
+                this.player.isJumping = true;
             }
         };
 
@@ -139,44 +151,24 @@ class Game {
             }
         };
 
-        // EVENTOS DE TECLADO
-        window.addEventListener('keydown', (e) => { 
-            if(e.code === 'Space') { 
-                e.preventDefault(); 
-                handleStartJump(e); 
-            }
-        });
-        window.addEventListener('keyup', (e) => { if(e.code === 'Space') handleEndJump(); });
-
-        // EVENTOS TÁCTILES Y RATÓN EN EL CONTENEDOR (Área más grande)
+        // Eventos táctiles mejorados para móvil
         this.wrapper.addEventListener('touchstart', (e) => {
-            if (this.active) {
-                e.preventDefault(); // Bloquea el scroll del móvil
-                handleStartJump(e);
-            }
+            if (this.active) { e.preventDefault(); handleStartJump(e); }
         }, { passive: false });
 
         this.wrapper.addEventListener('touchend', (e) => {
-            if (this.active) {
-                e.preventDefault();
-                handleEndJump();
-            }
+            if (this.active) { e.preventDefault(); handleEndJump(); }
         }, { passive: false });
 
-        this.wrapper.addEventListener('mousedown', (e) => {
-            handleStartJump(e);
-        });
+        // Eventos de ratón y teclado
+        this.wrapper.addEventListener('mousedown', (e) => handleStartJump(e));
         window.addEventListener('mouseup', handleEndJump);
+        window.addEventListener('keydown', (e) => { 
+            if(e.code === 'Space') { e.preventDefault(); handleStartJump(e); }
+        });
 
-        // BOTONES DE INTERFAZ
-        document.getElementById('startBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.start();
-        });
-        document.getElementById('restartBtn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.start();
-        });
+        document.getElementById('startBtn').onclick = (e) => { e.stopPropagation(); this.start(); };
+        document.getElementById('restartBtn').onclick = (e) => { e.stopPropagation(); this.start(); };
     }
 
     start() {
@@ -184,9 +176,9 @@ class Game {
         this.score = 0;
         this.speed = this.baseSpeed;
         this.obstacles = [];
-        this.player.y = this.canvas.height - 110;
+        // Posicionamos al jugador basándonos en el nuevo nivel del suelo
+        this.player.y = this.canvas.height - 150;
         this.player.dy = 0;
-        this.player.grounded = false;
         
         document.getElementById('overlay').style.background = 'transparent';
         document.getElementById('start-screen').style.display = 'none';
@@ -195,14 +187,15 @@ class Game {
     }
 
     update() {
-        this.score += 0.2;
-        this.speed = this.baseSpeed + (this.score / 50); 
+        this.score += 0.15;
+        this.speed = this.baseSpeed + (this.score / 65); 
         document.getElementById('currentScore').innerText = Math.floor(this.score).toString().padStart(5, '0');
 
         this.player.dy += this.gravity;
         this.player.y += this.player.dy;
 
-        const groundLevel = this.canvas.height - 50;
+        // NIVEL DEL SUELO ELEVADO: 100px desde el fondo para evitar que el dedo tape
+        const groundLevel = this.canvas.height - 100;
         if (this.player.y > groundLevel - this.player.h) {
             this.player.y = groundLevel - this.player.h;
             this.player.dy = 0;
@@ -210,14 +203,14 @@ class Game {
             this.player.isJumping = false;
         }
 
-        const minGap = Math.max(220, 500 - (this.speed * 10));
+        const minGap = 280 + (this.speed * 5);
         if (this.obstacles.length === 0 || (this.canvas.width - this.obstacles[this.obstacles.length-1].x) > minGap) {
-            if (Math.random() < 0.05) {
+            if (Math.random() < 0.04) {
                 const icons = ['📚', '📝', '🎒', '📐', '🧠'];
                 this.obstacles.push({
                     x: this.canvas.width,
-                    y: groundLevel - 38,
-                    w: 38, h: 38,
+                    y: groundLevel - 42,
+                    w: 42, h: 42,
                     icon: icons[Math.floor(Math.random() * icons.length)]
                 });
             }
@@ -225,24 +218,29 @@ class Game {
 
         this.obstacles.forEach((obs, i) => {
             obs.x -= this.speed;
+            // Colisión por proximidad
             const pX = this.player.x + this.player.w/2;
             const pY = this.player.y + this.player.h/2;
             const oX = obs.x + obs.w/2;
             const oY = obs.y + obs.h/2;
-            if (Math.sqrt((pX - oX)**2 + (pY - oY)**2) < 38) this.gameOver();
-            if (obs.x + obs.w < 0) this.obstacles.splice(i, 1);
+            if (Math.sqrt((pX - oX)**2 + (pY - oY)**2) < 40) this.gameOver();
+            if (obs.x + obs.w < -50) this.obstacles.splice(i, 1);
         });
     }
 
     draw() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.ctx.strokeStyle = '#2d3436';
-        this.ctx.lineWidth = 2;
+        
+        // Suelo estilizado
+        const groundLevel = this.canvas.height - 100;
+        this.ctx.strokeStyle = '#dfe6e9';
+        this.ctx.lineWidth = 3;
         this.ctx.beginPath();
-        this.ctx.moveTo(0, this.canvas.height - 50);
-        this.ctx.lineTo(this.canvas.width, this.canvas.height - 50);
+        this.ctx.moveTo(0, groundLevel);
+        this.ctx.lineTo(this.canvas.width, groundLevel);
         this.ctx.stroke();
 
+        // Jugador (Círculo con imagen)
         this.ctx.save();
         this.ctx.beginPath();
         this.ctx.arc(this.player.x + this.player.w/2, this.player.y + this.player.h/2, this.player.w/2, 0, Math.PI*2);
@@ -254,12 +252,16 @@ class Game {
         }
         this.ctx.restore();
         
+        // Borde del jugador
         this.ctx.strokeStyle = this.player.grounded ? '#4834d4' : '#686de0';
         this.ctx.lineWidth = 3;
         this.ctx.stroke();
 
-        this.ctx.font = '32px Arial';
-        this.obstacles.forEach(obs => this.ctx.fillText(obs.icon, obs.x, obs.y + 30));
+        // Obstáculos
+        this.ctx.font = '38px Arial';
+        this.obstacles.forEach(obs => {
+            this.ctx.fillText(obs.icon, obs.x, obs.y + 35);
+        });
     }
 
     gameOver() {
@@ -267,7 +269,7 @@ class Game {
         if (this.score > this.highScore) this.highScore = this.score;
         document.getElementById('highScore').innerText = Math.floor(this.highScore).toString().padStart(5, '0');
         document.getElementById('finalScoreText').innerText = `HAS CONSEGUIDO ${Math.floor(this.score)} PUNTOS`;
-        document.getElementById('overlay').style.background = 'rgba(255,255,255,0.9)';
+        document.getElementById('overlay').style.background = 'rgba(255,255,255,0.92)';
         document.getElementById('game-over-screen').style.display = 'block';
     }
 
@@ -279,7 +281,6 @@ class Game {
     }
 }
 
-// Iniciar instancia
 const game = new Game();
 </script>
 {% endblock %}
