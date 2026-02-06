@@ -54,7 +54,8 @@ def face_guess_game(request, group_id=None):
     # Mejora: Detección automática para alumnos
     if request.user.role == 'student':
         group = request.user.student_groups.first()
-        if not group: return render(request, 'minigames/no_students.html')
+        if not group: 
+            return render(request, 'minigames/no_students.html')
         group_id = group.id
     elif not group_id: 
         return select_group_for_game(request, 'face_guess_game')
@@ -63,26 +64,55 @@ def face_guess_game(request, group_id=None):
     # Mejora: Excluir al propio usuario si es alumno
     students = group.students.filter(profile_picture__isnull=False).exclude(id=request.user.id).distinct()
     
-    if not students.exists(): return render(request, 'minigames/no_students.html')
+    if not students.exists(): 
+        return render(request, 'minigames/no_students.html')
     
     if 'face_guess_correct' not in request.session: request.session['face_guess_correct'] = 0
     if 'face_guess_total' not in request.session: request.session['face_guess_total'] = 0
     
     if request.method == 'POST':
         target_id = request.session.get('face_guess_target_id')
-        answer = normalize_text(request.POST.get('answer', ''))
+        # Normalizamos y limpiamos espacios de la respuesta del usuario
+        answer = normalize_text(request.POST.get('answer', '')).strip()
         student = get_object_or_404(UserProfile, id=target_id)
-        valid_answers = [normalize_text(getattr(student, f)) for f in ['username', 'first_name', 'last_name', 'full_name', 'nickname'] if getattr(student, f)]
+        
+        # Recogemos todos los campos posibles para validar
+        fields = ['username', 'first_name', 'last_name', 'full_name', 'nickname']
+        valid_answers = [normalize_text(getattr(student, f)).strip() for f in fields if getattr(student, f)]
+        
         request.session['face_guess_total'] += 1
-        is_correct = answer in valid_answers
-        if is_correct: request.session['face_guess_correct'] += 1
+        
+        # --- Lógica de validación mejorada ---
+        is_correct = False
+        if answer:  # Evitar procesar respuestas vacías
+            if answer in valid_answers:
+                is_correct = True
+            else:
+                # Comprobación parcial (ej. "Juan" coincide con "Juan Alberto")
+                for valid in valid_answers:
+                    if len(answer) > 2 and (answer in valid or valid in answer):
+                        is_correct = True
+                        break
+        # -------------------------------------
+
+        if is_correct: 
+            request.session['face_guess_correct'] += 1
+            
         msg = f"¡Correcto! Es {student.full_name or student.username}" if is_correct else f"Incorrecto. Era: {student.full_name or student.username}"
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest': return get_ajax_response(request, is_correct, msg, 'face_guess')
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest': 
+            return get_ajax_response(request, is_correct, msg, 'face_guess')
+        
         return redirect('face_guess_game', group_id=group_id)
 
-    target_student = random.choice(students.exclude(id=request.session.get('face_guess_last_id')) if students.count() > 1 else students)
+    # Selección del siguiente alumno evitando repetir el último visto
+    last_id = request.session.get('face_guess_last_id')
+    available_students = students.exclude(id=last_id) if students.count() > 1 else students
+    target_student = random.choice(available_students)
+    
     request.session['face_guess_target_id'] = target_student.id
     request.session['face_guess_last_id'] = target_student.id
+    
     return render(request, 'minigames/face_guess_game.html', {
         'student': target_student, 
         'group': group,
