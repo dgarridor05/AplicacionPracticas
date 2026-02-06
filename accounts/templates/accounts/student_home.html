@@ -2,165 +2,200 @@
 {% block title %}Panel del Alumno{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="text-center mb-5">
-    <h1 class="display-4 fw-bold text-success">¡Hola de nuevo, {{ user.username }}! 👋</h1>
-    <p class="lead text-muted">¿Qué quieres hacer hoy en tu grupo?</p>
+<div class="container py-3 py-md-4">
+  <div class="text-center mb-4 mb-md-5">
+    <h1 class="display-5 fw-bold text-success mt-2">¡Hola, {{ user.username }}! 👋</h1>
+    <p class="lead text-muted fs-6">Explora tu grupo y diviértete aprendiendo.</p>
   </div>
 
-  <div class="row g-4">
-    <div class="col-lg-4">
-      <div class="card shadow border-0 h-100">
-        <div class="card-header bg-white py-3">
+  <div class="row g-3 g-lg-4">
+    <div class="col-lg-4 order-2 order-lg-1">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-0">
           <h5 class="mb-0 fw-bold text-center text-primary"><i class="fas fa-user-cog me-2"></i>Mi Cuenta</h5>
         </div>
-        <div class="card-body d-grid gap-2">
-          <a href="{% url 'view_profile' %}" class="btn btn-outline-primary"><i class="fas fa-id-card me-2"></i>Mi
-            Perfil</a>
-          <a href="{% url 'classmates_list' %}" class="btn btn-outline-success"><i class="fas fa-users me-2"></i>Mis
-            Compañeros</a>
-          <a href="{% url 'join_group' %}" class="btn btn-primary"><i class="fas fa-plus-circle me-2"></i>Unirse a una
-            Clase</a>
+        <div class="card-body d-grid gap-2 p-3">
+          <a href="{% url 'view_profile' %}" class="btn btn-outline-primary border-2 rounded-pill"><i class="fas fa-id-card me-2"></i>Mi Perfil</a>
+          <a href="{% url 'classmates_list' %}" class="btn btn-outline-success border-2 rounded-pill"><i class="fas fa-users me-2"></i>Compañeros</a>
+          <a href="{% url 'join_group' %}" class="btn btn-primary rounded-pill shadow-sm"><i class="fas fa-plus-circle me-2"></i>Unirse a Clase</a>
 
-          <hr class="my-3">
+          <div class="bg-light rounded-4 p-3 mt-3">
+            <p class="small text-muted mb-2 fw-bold text-center text-uppercase italic">Tests de Personalidad</p>
+            <div class="d-grid gap-2">
+                <a href="{% url 'take_vark_quiz' %}" class="btn btn-sm btn-info text-white rounded-pill">VARK: Hacer Test</a>
+                <a href="{% url 'take_chapman_quiz' %}" class="btn btn-sm btn-outline-info rounded-pill">Chapman: Hacer Test</a>
+            </div>
+          </div>
 
-          <p class="small text-muted mb-2 fw-bold text-center text-uppercase">Tests de Personalidad</p>
-          <a href="{% url 'take_vark_quiz' %}" class="btn btn-sm btn-outline-info">VARK: Hacer Test</a>
-          <a href="{% url 'vark_result' %}" class="btn btn-sm btn-light border">VARK: Resultados</a>
-          <a href="{% url 'take_chapman_quiz' %}" class="btn btn-sm btn-outline-info mt-1">Chapman: Hacer Test</a>
-          <a href="{% url 'vark_result' %}" class="btn btn-sm btn-light border">Chapman: Resultados</a>
-
-          <a href="{% url 'logout' %}" class="btn btn-link text-danger mt-3 btn-sm text-decoration-none">Cerrar
-            sesión</a>
+          <a href="{% url 'logout' %}" class="btn btn-link text-danger mt-2 btn-sm text-decoration-none">Cerrar sesión</a>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-8">
+    <div class="col-lg-8 order-1 order-lg-2">
+      <div class="d-flex align-items-center mb-3">
+        <h3 class="fw-bold m-0 fs-4">🕹️ Minijuegos</h3>
+        <span class="badge rounded-pill bg-warning text-dark ms-2 badge-pulse">¡NUEVO!</span>
+      </div>
+
       <div class="row g-3">
-        <div class="col-12">
-          <h3 class="fw-bold mb-3 d-flex align-items-center">
-            <span class="badge bg-warning text-dark me-2">NUEVO!</span>
-            🕹️ Minijuegos de Compañeros
-          </h3>
-        </div>
-
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
-               style="background: linear-gradient(45deg, #6a11cb, #2575fc) !important;">
-            <div class="card-body z-1 position-relative">
-              <h5 class="fw-bold">¿Quién es quién?</h5>
-              <p class="small opacity-75">Identifica a tu compañer@ por su foto.</p>
-              <a href="{% url 'face_guess_game' %}"
-                class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #6a11cb, #2575fc);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">¿Quién es quién?</h5>
+              <p class="small opacity-75 mb-3">Adivina por la foto.</p>
+              <a href="{% url 'face_guess_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
             </div>
-            <i class="fas fa-camera-retro position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-              style="font-size: 5rem; transform: rotate(-15deg);"></i>
+            <i class="fas fa-camera-retro card-icon"></i>
           </div>
         </div>
 
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm bg-primary text-white overflow-hidden position-relative"
-            style="background: linear-gradient(45deg, #4e73df, #224abe) !important;">
-            <div class="card-body z-1 position-relative">
-              <h5 class="fw-bold">Ponle Nombre</h5>
-              <p class="small opacity-75">Te damos el nombre, ¿sabes quién es?</p>
-              <a href="{% url 'name_to_face_game' %}"
-                class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #4e73df, #224abe);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">Ponle Nombre</h5>
+              <p class="small opacity-75 mb-3">¿Reconoces el nombre?</p>
+              <a href="{% url 'name_to_face_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
             </div>
-            <i class="fas fa-id-badge position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-              style="font-size: 5rem; transform: rotate(-15deg);"></i>
+            <i class="fas fa-id-badge card-icon"></i>
           </div>
         </div>
 
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm bg-info text-white overflow-hidden position-relative"
-            style="min-height: 140px;">
-            <div class="card-body z-1 position-relative">
-              <h5 class="fw-bold">El Ahorcado</h5>
-              <p class="small opacity-75">¿Puedes adivinar el nombre letra a letra?</p>
-              <a href="{% url 'hangman_game' %}"
-                class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #0dcaf0, #0aa2c0);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">El Ahorcado</h5>
+              <p class="small opacity-75 mb-3">Letra a letra.</p>
+              <a href="{% url 'hangman_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
             </div>
-            <i class="fas fa-spell-check position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-              style="font-size: 5rem; transform: rotate(-15deg);"></i>
+            <i class="fas fa-spell-check card-icon"></i>
           </div>
         </div>
 
         <div class="col-md-6">
-  <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
-    style="background: linear-gradient(45deg, #191414, #1DB954) !important;">
-    <div class="card-body z-1 position-relative">
-      <h5 class="fw-bold">Melómanos</h5>
-      <p class="small opacity-75">¿De quién es esta canción favorita?</p>
-      <a href="{% url 'spotify_guess_game' %}"
-        class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
-    </div>
-    <i class="fab fa-spotify position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-20"
-      style="font-size: 5rem; transform: rotate(-15deg);"></i>
-  </div>
-</div>
-
-        <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
-            style="background: linear-gradient(45deg, #f39c12, #d35400) !important;">
-            <div class="card-body z-1 position-relative">
-              <h5 class="fw-bold">Dino Run 🌵</h5>
-              <p class="small opacity-75">¡Esquiva los libros y rompe el récord!</p>
-              <a href="{% url 'dino_game' %}"
-                class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Saltar</a>
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #191414, #1DB954);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">Melómanos</h5>
+              <p class="small opacity-75 mb-3">Música de tus compañeros.</p>
+              <a href="{% url 'spotify_guess_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Escuchar</a>
             </div>
-            <i class="fas fa-running position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-              style="font-size: 5rem; transform: rotate(-15deg);"></i>
+            <i class="fab fa-spotify card-icon"></i>
           </div>
         </div>
 
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm bg-dark text-white overflow-hidden position-relative"
-               style="background: linear-gradient(45deg, #8e0000, #ff0000) !important;">
-            <div class="card-body z-1 position-relative opacity-50" style="filter: blur(1px);">
-              <h5 class="fw-bold">El Impostor</h5>
-              <p class="small">Encuentra la definición infiltrada...</p>
-              <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 disabled">Bloqueado</button>
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #f39c12, #d35400);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">Dino Run 🌵</h5>
+              <p class="small opacity-75 mb-3">¡Récord de saltos!</p>
+              <a href="{% url 'dino_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Saltar</a>
             </div>
-            <i class="fas fa-user-secret position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-               style="font-size: 5rem; transform: rotate(-15deg);"></i>
-            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center z-2">
-              <span class="badge bg-white text-danger fs-6 shadow-sm border border-danger p-2" 
-                    style="transform: rotate(-5deg); font-family: 'Courier New', Courier, monospace; font-weight: 900;">
-                PRÓXIMAMENTE
-              </span>
-            </div>
+            <i class="fas fa-running card-icon"></i>
           </div>
         </div>
 
-        <div class="col-12 text-center mt-3">
-          <p class="text-muted small">Tienes más minijuegos como
-            <a href="{% url 'student_interests_game' %}"
-              class="badge bg-light text-dark text-decoration-none border hover-link">Adivina Gustos</a>
-            y
-            <a href="{% url 'student_complete_profile_game' %}"
-              class="badge bg-light text-dark text-decoration-none border hover-link">Perfil Completo</a>
-          </p>
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card shadow-lg"
+               style="background: linear-gradient(135deg, #8e0000, #ff0000);">
+            <div class="card-body p-4 z-1 position-relative opacity-50 blur-effect">
+              <h5 class="fw-bold mb-1">El Impostor</h5>
+              <p class="small mb-3">Busca la infiltrada.</p>
+              <button class="btn btn-glass btn-sm rounded-pill px-4 disabled">Próximamente</button>
+            </div>
+            <i class="fas fa-user-secret card-icon"></i>
+            <div class="position-absolute top-50 start-50 translate-middle z-2 w-100 text-center">
+              <span class="badge bg-white text-danger py-2 px-3 shadow fs-6 fw-black promo-stamp">PROXIMAMENTE</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div class="col-12 text-center mt-4">
+        <p class="text-muted small bg-light d-inline-block p-2 rounded-pill px-3">
+          Más: <a href="{% url 'student_interests_game' %}" class="fw-bold text-decoration-none mx-1">Intereses</a> | 
+          <a href="{% url 'student_complete_profile_game' %}" class="fw-bold text-decoration-none mx-1">Perfil</a>
+        </p>
       </div>
     </div>
   </div>
 </div>
 
 <style>
-  .card {
-    transition: transform 0.2s ease-in-out;
+  :root {
+    --card-radius: 1.25rem;
   }
 
-  .card:hover {
-    transform: translateY(-5px);
+  .game-card {
+    border-radius: var(--card-radius);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    min-height: 140px;
   }
 
-  .hover-link:hover {
-    background-color: #e9ecef !important;
-    color: #0d6efd !important;
-    border-color: #0d6efd !important;
+  .game-card:hover {
+    transform: translateY(-8px);
+    shadow: 0 10px 20px rgba(0,0,0,0.2);
+  }
+
+  /* Iconos de las tarjetas ajustados para móvil */
+  .card-icon {
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-size: 4.5rem;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+    transition: transform 0.3s ease;
+  }
+
+  .game-card:hover .card-icon {
+    transform: rotate(-5deg) scale(1.1);
+  }
+
+  /* Botón con efecto cristal */
+  .btn-glass {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+  }
+
+  .btn-glass:hover {
+    background: rgba(255, 255, 255, 0.4);
+    color: white;
+  }
+
+  .blur-effect {
+    filter: blur(2px);
+  }
+
+  .promo-stamp {
+    transform: rotate(-10deg);
+    border: 2px dashed #dc3545;
+    letter-spacing: 1px;
+  }
+
+  .badge-pulse {
+    animation: pulse-orange 2s infinite;
+  }
+
+  @keyframes pulse-orange {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+  }
+
+  /* Ajustes para móviles */
+  @media (max-width: 768px) {
+    .display-5 { font-size: 1.8rem; }
+    .game-card { min-height: 120px; }
+    .card-icon { font-size: 3.5rem; }
+    .order-1 { order: 1 !important; } /* Los juegos arriba en móvil */
+    .order-2 { order: 2 !important; } /* La cuenta abajo en móvil */
   }
 </style>
 {% endblock %}
