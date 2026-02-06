@@ -113,6 +113,25 @@
           </div>
         </div>
 
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm bg-dark text-white overflow-hidden position-relative"
+               style="background: linear-gradient(45deg, #8e0000, #ff0000) !important;">
+            <div class="card-body z-1 position-relative opacity-50" style="filter: blur(1px);">
+              <h5 class="fw-bold">El Impostor</h5>
+              <p class="small">Encuentra la definición infiltrada...</p>
+              <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 disabled">Bloqueado</button>
+            </div>
+            <i class="fas fa-user-secret position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
+               style="font-size: 5rem; transform: rotate(-15deg);"></i>
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center z-2">
+              <span class="badge bg-white text-danger fs-6 shadow-sm border border-danger p-2" 
+                    style="transform: rotate(-5deg); font-family: 'Courier New', Courier, monospace; font-weight: 900;">
+                PRÓXIMAMENTE
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div class="col-12 text-center mt-3">
           <p class="text-muted small">Tienes más minijuegos como
             <a href="{% url 'student_interests_game' %}"
