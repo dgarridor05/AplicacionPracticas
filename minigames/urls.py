@@ -32,4 +32,8 @@ urlpatterns = [
 
     # 8. Dino-Reto (Juego de habilidad)
     path('dino-reto/', views.dino_game, name='dino_game'),
+
+    # 9. El Impostor (Juego de deducción social)
+    path('impostor/', views.impostor_game, name='impostor_game'),
+    path('impostor/<int:group_id>/', views.impostor_game, name='impostor_game'),
 ]

@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+
+<div id="game-container" class="container py-4" style="font-family: 'Outfit', sans-serif; max-width: 500px;">
+    
+    <div class="text-center mb-4">
+        <img src="{% static 'img/iconoRelaciona.jpg' %}" alt="Relaciona Logo" style="height: 80px; width: auto;" class="mb-2">
+        <div class="badge bg-custom-dark px-3 py-2 rounded-pill shadow-sm">
+            <i class="fas fa-lightbulb me-2 text-warning"></i>TEMA: {{ tema|upper }}
+        </div>
+    </div>
+
+    <div id="step-1" class="animate-fade-in">
+        <div class="card border-0 shadow-lg rounded-5 p-4 mb-4 bg-white">
+            <h3 class="fw-800 text-center mb-4 color-relaciona-blue">Configuración</h3>
+            
+            <div class="mb-5 text-center">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-3">¿Cuántos alumnos sois?</label>
+                <div class="d-flex align-items-center justify-content-center gap-4">
+                    <button class="btn btn-relaciona-outline rounded-circle" onclick="adjust('total', -1)">-</button>
+                    <span id="label-total" class="display-5 fw-800 color-relaciona-blue">4</span>
+                    <button class="btn btn-relaciona-outline rounded-circle" onclick="adjust('total', 1)">+</button>
+                </div>
+            </div>
+            
+            <div class="mb-4 text-center">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-3">Número de Impostores</label>
+                <div class="d-flex align-items-center justify-content-center gap-4">
+                    <button class="btn btn-relaciona-outline-orange rounded-circle" onclick="adjust('imp', -1)">-</button>
+                    <span id="label-imp" class="display-5 fw-800 text-orange-rel">1</span>
+                    <button class="btn btn-relaciona-outline-orange rounded-circle" onclick="adjust('imp', 1)">+</button>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-relaciona-gradient w-100 rounded-pill py-3 fw-bold shadow-lg" onclick="prepararRoles()">
+            EMPEZAR PARTIDA <i class="fas fa-play ms-2"></i>
+        </button>
+    </div>
+
+    <div id="step-2" class="d-none animate-fade-in text-center">
+        <h2 id="display-jugador" class="fw-800 color-relaciona-blue mb-0">JUGADOR 1</h2>
+        <p class="text-muted mb-4">Pasa el móvil y mantén pulsado</p>
+
+        <div id="btn-reveal" class="card-reveal shadow-lg rounded-5 mb-4 d-flex align-items-center justify-content-center">
+            <div id="tap-msg">
+                <div class="pulse-icon mb-3">
+                    <i class="fas fa-fingerprint fa-4x text-white"></i>
+                </div>
+                <h4 class="fw-bold text-white">MANTÉN PARA VER</h4>
+            </div>
+
+            <div id="secret-msg" class="d-none px-3">
+                <span class="badge bg-white text-dark mb-2 px-3 py-2 rounded-pill fw-bold" id="role-tag"></span>
+                <h1 class="display-3 fw-800 text-white" id="word-tag">---</h1>
+            </div>
+        </div>
+
+        <button id="btn-next" class="btn btn-dark btn-lg w-100 rounded-pill py-3 d-none fw-bold" onclick="siguienteTurno()">
+            ENTENDIDO, SIGUIENTE <i class="fas fa-arrow-right ms-2"></i>
+        </button>
+    </div>
+
+    <div id="step-3" class="d-none animate-fade-in text-center py-4">
+        <div class="debate-circle mb-4">
+            <i class="fas fa-comments fa-4x text-white"></i>
+        </div>
+        <h2 class="fw-800 color-relaciona-blue">¡A DEBATIR!</h2>
+        <p class="text-muted mb-5">Utilizad vuestras pistas para encontrar al impostor sin revelar vuestra palabra.</p>
+        
+        <button class="btn btn-outline-danger w-100 rounded-pill py-3 mb-3 fw-bold" onclick="revelarGanadores()">
+            FINALIZAR PARTIDA
+        </button>
+    </div>
+</div>
+
+<style>
+    :root {
+        --relaciona-green: #009663;
+        --relaciona-blue: #224260;
+        --relaciona-orange: #f89c2c;
+    }
+
+    body { background-color: #f4f7f6; }
+
+    .fw-800 { font-weight: 800; }
+    .color-relaciona-blue { color: var(--relaciona-blue); }
+    .text-orange-rel { color: var(--relaciona-orange); }
+    .bg-custom-dark { background-color: var(--relaciona-blue); }
+
+    /* Botones Personalizados */
+    .btn-relaciona-outline {
+        border: 3px solid var(--relaciona-blue);
+        color: var(--relaciona-blue);
+        font-weight: bold;
+        width: 55px; height: 55px;
+        transition: 0.2s;
+    }
+    .btn-relaciona-outline-orange {
+        border: 3px solid var(--relaciona-orange);
+        color: var(--relaciona-orange);
+        font-weight: bold;
+        width: 55px; height: 55px;
+    }
+    .btn-relaciona-gradient {
+        background: linear-gradient(135deg, var(--relaciona-green), #00754e);
+        border: none;
+        color: white;
+    }
+
+    /* Tarjeta de Revelar */
+    .card-reveal {
+        min-height: 320px;
+        background: linear-gradient(135deg, var(--relaciona-blue), #1a3249);
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s;
+        border: 8px solid rgba(255,255,255,0.1);
+    }
+    .card-reveal:active { transform: scale(0.97); }
+
+    /* Iconos y Animaciones */
+    .pulse-icon {
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .debate-circle {
+        width: 120px; height: 120px;
+        background: var(--relaciona-blue);
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto;
+        box-shadow: 0 10px 20px rgba(34, 66, 96, 0.3);
+    }
+
+    /* Transiciones */
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+// (El script se mantiene igual, solo asegúrate de que el botón de revelado funcione con los nuevos IDs)
+let totalPlayers = 4, totalImpostors = 1, currentIndex = 0;
+let roles = [];
+const palabraC = "{{ palabra_correcta }}", pistaI = "{{ pista_impostor }}";
+
+function adjust(type, val) {
+    if(type === 'total') { totalPlayers = Math.max(3, totalPlayers + val); }
+    else { totalImpostors = Math.max(1, Math.min(totalPlayers - 1, totalImpostors + val)); }
+    document.getElementById('label-total').innerText = totalPlayers;
+    document.getElementById('label-imp').innerText = totalImpostors;
+}
+
+function prepararRoles() {
+    roles = new Array(totalPlayers).fill('civil');
+    for(let i=0; i<totalImpostors; i++) roles[i] = 'impostor';
+    roles.sort(() => Math.random() - 0.5);
+    document.getElementById('step-1').classList.add('d-none');
+    document.getElementById('step-2').classList.remove('d-none');
+    actualizarInterfaz();
+}
+
+function actualizarInterfaz() {
+    document.getElementById('display-jugador').innerText = `JUGADOR ${currentIndex + 1}`;
+    document.getElementById('role-tag').innerText = roles[currentIndex] === 'impostor' ? 'ERES EL IMPOSTOR' : 'ERES CIVIL';
+    document.getElementById('word-tag').innerText = roles[currentIndex] === 'impostor' ? pistaI : palabraC;
+    document.getElementById('btn-next').classList.add('d-none');
+}
+
+const revealCard = document.getElementById('btn-reveal');
+const show = () => { 
+    document.getElementById('tap-msg').classList.add('d-none'); 
+    document.getElementById('secret-msg').classList.remove('d-none');
+    document.getElementById('btn-next').classList.remove('d-none');
+    revealCard.style.background = roles[currentIndex] === 'impostor' ? 'linear-gradient(135deg, #d63031, #a22324)' : 'linear-gradient(135deg, #009663, #00754e)';
+};
+const hide = () => { 
+    document.getElementById('tap-msg').classList.remove('d-none'); 
+    document.getElementById('secret-msg').classList.add('d-none');
+    revealCard.style.background = 'linear-gradient(135deg, #224260, #1a3249)';
+};
+
+revealCard.addEventListener('mousedown', show);
+revealCard.addEventListener('mouseup', hide);
+revealCard.addEventListener('touchstart', (e) => { e.preventDefault(); show(); });
+revealCard.addEventListener('touchend', hide);
+
+function siguienteTurno() {
+    currentIndex++;
+    if(currentIndex < totalPlayers) {
+        actualizarInterfaz();
+        hide();
+    } else {
+        document.getElementById('step-2').classList.add('d-none');
+        document.getElementById('step-3').classList.remove('d-none');
+    }
+}
+
+function revelarGanadores() {
+    let imps = roles.map((r, i) => r === 'impostor' ? (i + 1) : null).filter(n => n);
+    alert("¡FIN! Los impostores eran los jugadores: " + imps.join(", "));
+    location.reload();
+}
+</script>
+{% endblock %}

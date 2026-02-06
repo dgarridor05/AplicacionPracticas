@@ -135,7 +135,7 @@
           </div>
         </div>
 
-        <div class="col-md-6">
+        <!--<div class="col-md-6">
           <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card shadow-lg"
                style="background: linear-gradient(135deg, #8e0000, #ff0000);">
             <div class="card-body p-4 z-1 position-relative opacity-50 blur-effect">
@@ -149,7 +149,18 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
+      <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+               style="background: linear-gradient(135deg, #8e0000, #ff0000);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">El Impostor</h5>
+              <p class="small opacity-75 mb-3">Busca la pista infiltrada.</p>
+              <a href="{% url 'impostor_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Detectar</a>
+            </div>
+            <i class="fas fa-user-secret card-icon"></i>
+            </div>
+        </div>
 
       <div class="col-12 text-center mt-4">
         <p class="text-muted small bg-light d-inline-block p-2 rounded-pill px-3">

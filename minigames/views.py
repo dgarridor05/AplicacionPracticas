@@ -456,3 +456,34 @@ def dino_game(request):
     return render(request, 'minigames/dino_game.html', {
         'group': group,
     })
+
+@login_required
+def impostor_game(request, group_id=None):
+    """
+    Juego del Impostor: Dinámica de 'Pass & Play' (dispositivo único).
+    Los alumnos deben descubrir quién tiene la pista falsa o quién es Mr. Blanco.
+    """
+    # EL PROFESOR PUEDE EDITAR ESTA LISTA PARA ADAPTARLA A SUS CLASES
+    # 'p' es la palabra para los civiles (correcta)
+    # 'i' es la pista que recibe el impostor (relacionada pero diferente)
+    biblioteca_palabras = [
+        {'tema': 'Biología', 'p': 'Mitocondria', 'i': 'Energía celular'},
+        {'tema': 'Historia', 'p': 'Revolución Francesa', 'i': 'Caída de la monarquía'},
+        {'tema': 'Mates', 'p': 'Hipotenusa', 'i': 'Lado de un triángulo'},
+        {'tema': 'Lengua', 'p': 'Metáfora', 'i': 'Recurso literario'},
+        {'tema': 'Geografía', 'p': 'Amazonas', 'i': 'Río caudaloso'},
+        {'tema': 'Física', 'p': 'Gravedad', 'i': 'Aceleración constante'},
+        {'tema': 'Química', 'p': 'Tabla Periódica', 'i': 'Elementos ordenados'},
+    ]
+
+    # Selección aleatoria del pack de palabras para esta partida
+    pack = random.choice(biblioteca_palabras)
+
+    context = {
+        'palabra_correcta': pack['p'],
+        'pista_impostor': pack['i'],
+        'tema': pack['tema'],
+        'group_id': group_id,  # Mantiene la compatibilidad con tus URLs
+    }
+    
+    return render(request, 'minigames/impostor_game.html', context)
