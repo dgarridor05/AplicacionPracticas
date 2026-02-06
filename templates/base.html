@@ -111,8 +111,7 @@
     <header class="d-lg-none py-3 text-center animate-fade-in">
         <a href="{% if user.is_authenticated %}{% if user.role == 'teacher' %}{% url 'teacher_home' %}{% else %}{% url 'student_home' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">
             <div class="d-flex align-items-center justify-content-center">
-                <img src="{% static 'img/iconoRelaciona.png' %}" alt="Logo" height="30" class="me-2">
-                <h4 class="m-0 fw-bold" style="font-family: 'Outfit'; color: var(--color-primary);">RELACIONA</h4>
+                <img src="{% static 'img/iconoRelaciona.png' %}" alt="Logo" height="45">
             </div>
         </a>
     </header>
@@ -120,8 +119,7 @@
     <nav class="navbar navbar-expand-lg navbar-desktop">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{% if user.is_authenticated %}{% if user.role == 'teacher' %}{% url 'teacher_home' %}{% else %}{% url 'student_home' %}{% endif %}{% else %}{% url 'login' %}{% endif %}">
-                <img src="{% static 'img/iconoRelaciona.png' %}" alt="Logo" height="35" class="me-2">
-                <span class="fw-bold" style="color: var(--color-primary);">RELACIONA</span>
+                <img src="{% static 'img/iconoRelaciona.png' %}" alt="Logo" height="40">
             </a>
 
             <div class="collapse navbar-collapse justify-content-end">
