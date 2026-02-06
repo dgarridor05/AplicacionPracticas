@@ -46,14 +46,15 @@
         </div>
 
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm bg-danger text-white overflow-hidden position-relative">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
+               style="background: linear-gradient(45deg, #6a11cb, #2575fc) !important;">
             <div class="card-body z-1 position-relative">
               <h5 class="fw-bold">¿Quién es quién?</h5>
               <p class="small opacity-75">Identifica a tu compañer@ por su foto.</p>
               <a href="{% url 'face_guess_game' %}"
                 class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
             </div>
-            <i class="fas fa-user-secret position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
+            <i class="fas fa-camera-retro position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
               style="font-size: 5rem; transform: rotate(-15deg);"></i>
           </div>
         </div>
@@ -87,17 +88,18 @@
         </div>
 
         <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm bg-success text-white overflow-hidden position-relative">
-            <div class="card-body z-1 position-relative">
-              <h5 class="fw-bold">Melómanos</h5>
-              <p class="small opacity-75">¿De quién es esta canción favorita?</p>
-              <a href="{% url 'spotify_guess_game' %}"
-                class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
-            </div>
-            <i class="fab fa-spotify position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-25"
-              style="font-size: 5rem; transform: rotate(-15deg);"></i>
-          </div>
-        </div>
+  <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
+    style="background: linear-gradient(45deg, #191414, #1DB954) !important;">
+    <div class="card-body z-1 position-relative">
+      <h5 class="fw-bold">Melómanos</h5>
+      <p class="small opacity-75">¿De quién es esta canción favorita?</p>
+      <a href="{% url 'spotify_guess_game' %}"
+        class="btn btn-light btn-sm fw-bold rounded-pill px-3 shadow-sm">Jugar</a>
+    </div>
+    <i class="fab fa-spotify position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-20"
+      style="font-size: 5rem; transform: rotate(-15deg);"></i>
+  </div>
+</div>
 
         <div class="col-md-6">
           <div class="card h-100 border-0 shadow-sm text-white overflow-hidden position-relative"
