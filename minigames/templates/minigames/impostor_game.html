@@ -7,49 +7,53 @@
     
     <div class="text-center mb-4">
         <div class="mb-2">
-            <i class="fas fa-microscope fa-3x" style="color: #009663;"></i>
+            <i class="fas fa-user-secret fa-3x" style="color: #ff4b2b;"></i>
         </div>
-        <h5 class="fw-bold color-relaciona-blue mb-3">Relaciona BioErgon Lab</h5>
+        <h5 class="fw-bold color-impostor-red mb-3">Máster Profesorado UEx</h5>
         <div class="badge bg-custom-dark px-3 py-2 rounded-pill shadow-sm">
-            <i class="fas fa-lightbulb me-2 text-warning"></i>TEMA: {{ tema|upper }}
+            <i class="fas fa-bullseye me-2 text-warning"></i>TEMA: {{ tema }}
         </div>
     </div>
 
     <div id="step-1" class="animate-fade-in">
-        <div class="card border-0 shadow-lg rounded-5 p-4 mb-4 bg-white text-center">
-            <h3 class="fw-800 mb-4 color-relaciona-blue">Configuración</h3>
+        <div class="card border-0 shadow-lg rounded-5 p-4 mb-4 bg-white text-center border-top border-4 border-danger">
+            <h3 class="fw-800 mb-4 color-impostor-dark">Configuración</h3>
             
-            <div class="mb-5">
-                <label class="form-label fw-bold text-muted small text-uppercase mb-3">¿Cuántos alumnos sois?</label>
+            <div class="mb-4">
+                <label class="form-label fw-bold text-muted small text-uppercase mb-3">¿Cuántos sois?</label>
                 <div class="d-flex align-items-center justify-content-center gap-4">
-                    <button type="button" class="btn btn-relaciona-outline rounded-circle" onclick="adjust('total', -1)">-</button>
-                    <span id="label-total" class="display-5 fw-800 color-relaciona-blue">4</span>
-                    <button type="button" class="btn btn-relaciona-outline rounded-circle" onclick="adjust('total', 1)">+</button>
+                    <button type="button" class="btn btn-impostor-outline rounded-circle" onclick="adjust('total', -1)">-</button>
+                    <span id="label-total" class="display-5 fw-800 color-impostor-dark">4</span>
+                    <button type="button" class="btn btn-impostor-outline rounded-circle" onclick="adjust('total', 1)">+</button>
                 </div>
             </div>
             
             <div class="mb-4">
-                <label class="form-label fw-bold text-muted small text-uppercase mb-3">Número de Impostores</label>
+                <label class="form-label fw-bold text-muted small text-uppercase mb-3">Nº de Impostores</label>
                 <div class="d-flex align-items-center justify-content-center gap-4">
-                    <button type="button" class="btn btn-relaciona-outline-orange rounded-circle" onclick="adjust('imp', -1)">-</button>
+                    <button type="button" class="btn btn-impostor-outline-orange rounded-circle" onclick="adjust('imp', -1)">-</button>
                     <span id="label-imp" class="display-5 fw-800 text-orange-rel">1</span>
-                    <button type="button" class="btn btn-relaciona-outline-orange rounded-circle" onclick="adjust('imp', 1)">+</button>
+                    <button type="button" class="btn btn-impostor-outline-orange rounded-circle" onclick="adjust('imp', 1)">+</button>
                 </div>
             </div>
+
+            <div class="alert alert-danger rounded-4 mb-0 py-2 border-0 bg-opacity-10 bg-danger">
+                <small class="fw-bold text-danger"><i class="fas fa-comment-slash me-1"></i> REGLA: Solo una palabra técnica por turno.</small>
+            </div>
         </div>
-        <button class="btn btn-relaciona-gradient w-100 rounded-pill py-3 fw-bold shadow-lg" onclick="prepararRoles()">
-            EMPEZAR PARTIDA <i class="fas fa-play ms-2"></i>
+        <button class="btn btn-impostor-gradient w-100 rounded-pill py-3 fw-bold shadow-lg" onclick="prepararRoles()">
+            INICIAR MISIÓN <i class="fas fa-rocket ms-2"></i>
         </button>
     </div>
 
     <div id="step-2" class="d-none animate-fade-in text-center">
-        <h2 id="display-jugador" class="fw-800 color-relaciona-blue mb-0">JUGADOR 1</h2>
-        <p class="text-muted mb-4">Pasa el móvil y mantén pulsado</p>
+        <h2 id="display-jugador" class="fw-800 color-impostor-dark mb-0">JUGADOR 1</h2>
+        <p class="text-muted mb-4">Pasa el dispositivo y mantén pulsado</p>
 
         <div id="btn-reveal" class="card-reveal shadow-lg rounded-5 mb-4 d-flex align-items-center justify-content-center">
             <div id="tap-msg">
                 <div class="pulse-icon mb-3">
-                    <i class="fas fa-fingerprint fa-4x text-white"></i>
+                    <i class="fas fa-id-badge fa-4x text-white"></i>
                 </div>
                 <h4 class="fw-bold text-white">MANTÉN PARA VER</h4>
             </div>
@@ -60,81 +64,74 @@
             </div>
         </div>
 
-        <button id="btn-next" class="btn btn-dark btn-lg w-100 rounded-pill py-3 d-none fw-bold" onclick="siguienteTurno()">
-            ENTENDIDO, SIGUIENTE <i class="fas fa-arrow-right ms-2"></i>
+        <button id="btn-next" class="btn btn-dark btn-lg w-100 rounded-pill py-3 d-none fw-bold shadow" onclick="siguienteTurno()">
+            CONFIRMADO <i class="fas fa-check-circle ms-2"></i>
         </button>
     </div>
 
     <div id="step-3" class="d-none animate-fade-in text-center py-4">
-        <div class="debate-circle mb-4">
-            <i class="fas fa-comments fa-4x text-white"></i>
+        <div class="debate-circle mb-4 shadow-lg">
+            <i class="fas fa-exclamation-triangle fa-3x text-white"></i>
         </div>
-        <h2 class="fw-800 color-relaciona-blue">¡A DEBATIR!</h2>
-        <p class="text-muted mb-5">Utilizad vuestras pistas para encontrar al impostor sin revelar vuestra palabra.</p>
+        <h2 class="fw-800 color-impostor-red">¡EMERGENCIA!</h2>
+        <p class="text-muted mb-5 px-3">Hay un <b>impostor</b> entre nosotros. Debatid con una sola palabra.</p>
         
-        <button class="btn btn-outline-danger w-100 rounded-pill py-3 mb-3 fw-bold" onclick="revelarGanadores()">
-            FINALIZAR PARTIDA
+        <button id="btn-ver-impostor" class="btn btn-outline-dark w-100 rounded-pill py-3 mb-3 fw-bold border-2" onclick="revelarImpostor()">
+            REVELAR IMPOSTOR
         </button>
+
+        <a href="" class="btn btn-impostor-gradient w-100 rounded-pill py-3 fw-bold shadow-lg">
+            NUEVA PARTIDA <i class="fas fa-redo ms-2"></i>
+        </a>
     </div>
 </div>
 
 <style>
     :root {
-        --relaciona-green: #009663;
-        --relaciona-blue: #224260;
-        --relaciona-orange: #f89c2c;
+        --imp-red: #ff4b2b;
+        --imp-orange: #ff416c;
+        --imp-dark: #2c3e50;
+        --imp-bg-dark: #1a1a1a;
     }
     .fw-800 { font-weight: 800; }
-    .color-relaciona-blue { color: var(--relaciona-blue); }
-    .text-orange-rel { color: var(--relaciona-orange); }
-    .bg-custom-dark { background-color: var(--relaciona-blue); }
+    .color-impostor-red { color: var(--imp-red); }
+    .color-impostor-dark { color: var(--imp-dark); }
+    .text-orange-rel { color: #f39c12; }
+    .bg-custom-dark { background-color: var(--imp-dark); }
 
-    .btn-relaciona-outline {
-        border: 3px solid var(--relaciona-blue);
-        color: var(--relaciona-blue);
-        font-weight: bold;
-        width: 55px; height: 55px;
+    .btn-impostor-outline { border: 3px solid var(--imp-dark); color: var(--imp-dark); font-weight: bold; width: 55px; height: 55px; }
+    .btn-impostor-outline-orange { border: 3px solid #f39c12; color: #f39c12; font-weight: bold; width: 55px; height: 55px; }
+    
+    .btn-impostor-gradient { 
+        background: linear-gradient(135deg, #ff4b2b, #ff416c); 
+        border: none; 
+        color: white; 
+        transition: all 0.3s;
     }
-    .btn-relaciona-outline-orange {
-        border: 3px solid var(--relaciona-orange);
-        color: var(--relaciona-orange);
-        font-weight: bold;
-        width: 55px; height: 55px;
-    }
-    .btn-relaciona-gradient {
-        background: linear-gradient(135deg, var(--relaciona-green), #00754e);
-        border: none; color: white;
-    }
+    .btn-impostor-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 75, 43, 0.3); color: white; }
 
     .card-reveal {
         min-height: 320px;
-        background: linear-gradient(135deg, var(--relaciona-blue), #1a3249);
+        background: linear-gradient(135deg, var(--imp-dark), #1c2833);
         cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
+        transition: all 0.2s;
+        border: none;
     }
 
     .pulse-icon { animation: pulse 1.5s infinite; }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-    .debate-circle {
-        width: 100px; height: 100px;
-        background: var(--relaciona-blue);
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
+    .debate-circle { 
+        width: 100px; height: 100px; 
+        background: var(--imp-red); 
+        border-radius: 50%; 
+        display: flex; align-items: center; justify-content: center; 
         margin: 0 auto;
+        border: 5px solid white;
     }
 
     .animate-fade-in { animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
@@ -160,7 +157,7 @@ function prepararRoles() {
 
 function actualizarInterfaz() {
     document.getElementById('display-jugador').innerText = `JUGADOR ${currentIndex + 1}`;
-    document.getElementById('role-tag').innerText = roles[currentIndex] === 'impostor' ? 'ERES EL IMPOSTOR' : 'ERES CIVIL';
+    document.getElementById('role-tag').innerText = roles[currentIndex] === 'impostor' ? '🚨 ERES EL IMPOSTOR' : '🛡️ ERES CIVIL';
     document.getElementById('word-tag').innerText = roles[currentIndex] === 'impostor' ? pistaI : palabraC;
     document.getElementById('btn-next').classList.add('d-none');
 }
@@ -171,12 +168,13 @@ const show = (e) => {
     document.getElementById('tap-msg').classList.add('d-none'); 
     document.getElementById('secret-msg').classList.remove('d-none');
     document.getElementById('btn-next').classList.remove('d-none');
-    revealCard.style.background = roles[currentIndex] === 'impostor' ? 'linear-gradient(135deg, #d63031, #a22324)' : 'linear-gradient(135deg, #009663, #00754e)';
+    // Si es impostor rojo fuego, si es civil un azul oscuro/negro
+    revealCard.style.background = roles[currentIndex] === 'impostor' ? 'linear-gradient(135deg, #d63031, #eb4d4b)' : 'linear-gradient(135deg, #2c3e50, #000000)';
 };
 const hide = () => { 
     document.getElementById('tap-msg').classList.remove('d-none'); 
     document.getElementById('secret-msg').classList.add('d-none');
-    revealCard.style.background = 'linear-gradient(135deg, #224260, #1a3249)';
+    revealCard.style.background = 'linear-gradient(135deg, #2c3e50, #1c2833)';
 };
 
 revealCard.addEventListener('mousedown', show);
@@ -195,10 +193,10 @@ function siguienteTurno() {
     }
 }
 
-function revelarGanadores() {
+function revelarImpostor() {
     let imps = roles.map((r, i) => r === 'impostor' ? (i + 1) : null).filter(n => n);
-    alert("¡PARTIDA FINALIZADA!\nLos impostores eran los jugadores: " + imps.join(", "));
-    location.reload();
+    alert("📢 ARCHIVO DESCLASIFICADO\n\nImpostor detectado: JUGADOR " + imps.join(", ") + "\n\nLa palabra de los civiles era: " + palabraC.toUpperCase());
+    document.getElementById('btn-ver-impostor').classList.add('disabled');
 }
 </script>
 {% endblock %}

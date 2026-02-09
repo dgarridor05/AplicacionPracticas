@@ -460,30 +460,42 @@ def dino_game(request):
 @login_required
 def impostor_game(request, group_id=None):
     """
-    Juego del Impostor: Dinámica de 'Pass & Play' (dispositivo único).
-    Los alumnos deben descubrir quién tiene la pista falsa o quién es Mr. Blanco.
+    Juego del Impostor con control de historial para no repetir temas.
     """
-    # EL PROFESOR PUEDE EDITAR ESTA LISTA PARA ADAPTARLA A SUS CLASES
-    # 'p' es la palabra para los civiles (correcta)
-    # 'i' es la pista que recibe el impostor (relacionada pero diferente)
     biblioteca_palabras = [
-        {'tema': 'Biología', 'p': 'Mitocondria', 'i': 'Energía celular'},
-        {'tema': 'Historia', 'p': 'Revolución Francesa', 'i': 'Caída de la monarquía'},
-        {'tema': 'Mates', 'p': 'Hipotenusa', 'i': 'Lado de un triángulo'},
-        {'tema': 'Lengua', 'p': 'Metáfora', 'i': 'Recurso literario'},
-        {'tema': 'Geografía', 'p': 'Amazonas', 'i': 'Río caudaloso'},
-        {'tema': 'Física', 'p': 'Gravedad', 'i': 'Aceleración constante'},
-        {'tema': 'Química', 'p': 'Tabla Periódica', 'i': 'Elementos ordenados'},
+        {'tema': 'Futuro', 'p': 'Calidad de Vida', 'i': 'Estabilidad Económica'},
+        {'tema': 'Pedagogía', 'p': 'Bosque-Escuela', 'i': 'Pedagogía Verde'},
+        {'tema': 'Metodología', 'p': 'Pedagogía del Flow', 'i': 'Gamificación'},
+        {'tema': 'EF Especializada', 'p': 'Aprendizaje de Aventura', 'i': 'Pedagogía Experidencial'},
+        {'tema': 'Filosofía Educativa', 'p': 'Pedagogía Crítica', 'i': 'Transformación Social'},
+        {'tema': 'Ocio', 'p': 'Pedagogía del Ocio', 'i': 'Recreación Deportiva'},
+        {'tema': 'Inclusión', 'p': 'Interculturalidad', 'i': 'Pedagogía Social'},
+        {'tema': 'Evaluación', 'p': 'Competencia', 'i': 'Capacidad'}
     ]
 
-    # Selección aleatoria del pack de palabras para esta partida
-    pack = random.choice(biblioteca_palabras)
+    # 1. Recuperar el historial de la sesión
+    historial = request.session.get('impostor_history', [])
+
+    # 2. Filtrar palabras disponibles
+    opciones_disponibles = [p for p in biblioteca_palabras if p['tema'] not in historial]
+
+    # 3. Si no quedan opciones (o es la primera vez), reseteamos
+    if not opciones_disponibles:
+        opciones_disponibles = biblioteca_palabras
+        historial = []
+
+    # 4. Elegir palabra y actualizar historial en la sesión
+    pack = random.choice(opciones_disponibles)
+    historial.append(pack['tema'])
+    
+    request.session['impostor_history'] = historial
+    request.session.modified = True  # Asegura que Django guarde los cambios
 
     context = {
         'palabra_correcta': pack['p'],
         'pista_impostor': pack['i'],
-        'tema': pack['tema'],
-        'group_id': group_id,  # Mantiene la compatibilidad con tus URLs
+        'tema': pack['tema'].upper(),
+        'group_id': group_id,
     }
-    
+
     return render(request, 'minigames/impostor_game.html', context)
