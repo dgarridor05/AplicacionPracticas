@@ -499,3 +499,25 @@ def impostor_game(request, group_id=None):
     }
 
     return render(request, 'minigames/impostor_game.html', context)
+
+@login_required
+def charadas_game(request, group_id=None):
+    """
+    Juego de mímica y charadas (tipo Heads Up).
+    """
+    biblioteca_charadas = {
+        'PRESENTACIÓN': ['Profesor', 'Delegado', 'Cafetería', 'Examen', 'Prácticas', 'Campus', 'Gimnasio'],
+        'CONCEPTOS_MÁSTER': ['Pedagogía', 'Inclusión', 'Didáctica', 'LOMLOE', 'Evaluación', 'Gamificación', 'Motivación'],
+        'ACCIÓN': ['Correr', 'Silbar', 'Aplaudir', 'Saltar', 'Nadar', 'Dormir', 'Escribir'],
+        'DEPORTES': ['Baloncesto', 'Yoga', 'Fútbol', 'Escalada', 'Senderismo', 'Tenis', 'Voleibol']
+    }
+    
+    # Convertimos a JSON para pasarlo a JavaScript fácilmente
+    import json
+    context = {
+        'biblioteca_json': json.dumps(biblioteca_charadas),
+        'categorias': biblioteca_charadas.keys(),
+        'group_id': group_id,
+    }
+    
+    return render(request, 'minigames/charadas_game.html', context)

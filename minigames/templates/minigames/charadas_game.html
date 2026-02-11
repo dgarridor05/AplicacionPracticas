@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="game-container" class="container py-4 text-center" style="max-width: 600px; font-family: 'Outfit', sans-serif;">
+    
+    <div id="setup-screen" class="animate-fade-in">
+        <h2 class="fw-bold mb-4">CHARADAS MÁSTER</h2>
+        <p class="text-muted">Elige una categoría y pon el móvil en tu frente <b>en horizontal</b></p>
+        
+        <div class="row g-3 mb-4">
+            {% for cat in categorias %}
+            <div class="col-6">
+                <button class="btn btn-outline-dark w-100 py-3 fw-bold shadow-sm" onclick="startGame('{{ cat }}')">
+                    {{ cat }}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="play-screen" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark text-white d-flex flex-column align-items-center justify-content-center" style="z-index: 9999;">
+        
+        <div id="rotation-warning" class="d-none position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex flex-column align-items-center justify-content-center" style="z-index: 10001;">
+            <i class="fas fa-sync-alt fa-3x mb-3 animate-spin"></i>
+            <h4 class="fw-bold">GIRA EL MÓVIL</h4>
+        </div>
+
+        <div class="position-absolute top-0 end-0 p-3">
+            <h2 id="timer" class="fw-bold display-6" style="opacity: 0.8;">60</h2>
+        </div>
+        
+        <div id="word-display" class="text-center px-5 w-100">
+            <h1 id="current-word" class="fw-800" style="font-size: 12vw; line-height: 1.1; letter-spacing: -2px;">LISTO?</h1>
+            <p id="instruction" class="mt-3 opacity-50 fw-bold text-uppercase" style="font-size: 1rem; letter-spacing: 2px;">
+                <i class="fas fa-arrow-left me-2"></i> PASAR | ACERTO <i class="fas fa-arrow-right ms-2"></i>
+            </p>
+        </div>
+
+        <div class="position-absolute top-0 start-0 h-100 w-50" onclick="skipWord()" style="cursor: pointer;"></div>
+        <div class="position-absolute top-0 end-0 h-100 w-50" onclick="correctWord()" style="cursor: pointer;"></div>
+    </div>
+
+    <div id="result-screen" class="d-none animate-fade-in">
+        <h1 class="display-3 fw-bold">¡TIEMPO!</h1>
+        <div class="card shadow-lg p-4 my-4 rounded-5 border-0">
+            <h2 class="text-success fw-bold">Aciertos: <span id="final-score">0</span></h2>
+        </div>
+        <button class="btn btn-dark btn-lg w-100 rounded-pill py-3 fw-bold" onclick="location.reload()">
+            <i class="fas fa-redo me-2"></i> OTRO JUGADOR
+        </button>
+    </div>
+</div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+    #play-screen { user-select: none; -webkit-user-select: none; overflow: hidden; }
+    
+    /* Animación de rotación */
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin { animation: spin 2s linear infinite; }
+
+    /* Forzar el aviso de rotación si está en vertical */
+    @media screen and (orientation: portrait) {
+        #rotation-warning { display: flex !important; }
+    }
+
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* Flash visual más intenso para que se vea desde fuera */
+    .flash-correct { background-color: rgba(40, 167, 69, 0.8) !important; }
+    .flash-skip { background-color: rgba(220, 53, 69, 0.8) !important; }
+</style>
+
+<script>
+    const biblioteca = JSON.parse('{{ biblioteca_json|safe }}');
+    let palabrasActuales = [];
+    let score = 0;
+    let timeLeft = 60;
+    let timerInterval;
+
+    function startGame(categoria) {
+        palabrasActuales = [...biblioteca[categoria]].sort(() => Math.random() - 0.5);
+        score = 0;
+        timeLeft = 60;
+        
+        document.getElementById('setup-screen').classList.add('d-none');
+        document.getElementById('play-screen').classList.remove('d-none');
+        
+        nextWord();
+        startTimer();
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = timeLeft;
+            if (timeLeft <= 0) endGame();
+        }, 1000);
+    }
+
+    function nextWord() {
+        if (palabrasActuales.length > 0) {
+            const word = palabrasActuales.pop().toUpperCase();
+            document.getElementById('current-word').innerText = word;
+            
+            // Ajuste dinámico si la palabra es muy larga
+            const display = document.getElementById('current-word');
+            display.style.fontSize = word.length > 10 ? '9vw' : '12vw';
+        } else {
+            endGame();
+        }
+    }
+
+    function correctWord() {
+        score++;
+        if (navigator.vibrate) navigator.vibrate(100); // Feedback táctil
+        flashBackground('flash-correct');
+        nextWord();
+    }
+
+    function skipWord() {
+        if (navigator.vibrate) navigator.vibrate([50, 50, 50]); // Triple vibración corta para error
+        flashBackground('flash-skip');
+        nextWord();
+    }
+
+    function flashBackground(className) {
+        const bg = document.getElementById('play-screen');
+        bg.classList.add(className);
+        setTimeout(() => bg.classList.remove(className), 200);
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        document.getElementById('play-screen').classList.add('d-none');
+        document.getElementById('result-screen').classList.remove('d-none');
+        document.getElementById('final-score').innerText = score;
+    }
+</script>
+{% endblock %}

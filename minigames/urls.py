@@ -36,4 +36,8 @@ urlpatterns = [
     # 9. El Impostor (Juego de deducción social)
     path('impostor/', views.impostor_game, name='impostor_game'),
     path('impostor/<int:group_id>/', views.impostor_game, name='impostor_game'),
+
+    # 10. Charadas (Adivina la palabra en la frente)
+    path('charadas/', views.charadas_game, name='charadas_game'),
+    path('charadas/<int:group_id>/', views.charadas_game, name='charadas_game'),
 ]
