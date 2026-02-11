@@ -74,73 +74,18 @@
         <span class="badge rounded-pill bg-warning text-dark ms-2 badge-pulse">¡NUEVO!</span>
       </div>
 
-      <div class="row g-3">
-        <div class="col-md-6">
+      <div class="col-md-6">
           <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: linear-gradient(135deg, #6a11cb, #2575fc);">
+            style="background: linear-gradient(135deg, #00b09b, #96c93d);">
             <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1">¿Quién es quién?</h5>
-              <p class="small opacity-75 mb-3">Adivina por la foto.</p>
-              <a href="{% url 'face_guess_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
+              <h5 class="fw-bold mb-1">Charadas</h5>
+              <p class="small opacity-75 mb-3">¡Mímica y acción en equipo!</p>
+              <a href="{% url 'charadas_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Empezar</a>
             </div>
-            <i class="fas fa-camera-retro card-icon"></i>
+            <i class="fas fa-theater-masks card-icon"></i>
           </div>
         </div>
 
-        <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: linear-gradient(135deg, #4e73df, #224abe);">
-            <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1">Ponle Nombre</h5>
-              <p class="small opacity-75 mb-3">¿Reconoces el nombre?</p>
-              <a href="{% url 'name_to_face_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
-            </div>
-            <i class="fas fa-id-badge card-icon"></i>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: radial-gradient(circle at top left, #2c3e50, #000000) !important; border: 4px solid #5d4037 !important;">
-            <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1 chalk-text"
-                style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; letter-spacing: 1px;">
-                El Ahorcado
-              </h5>
-              <p class="small opacity-75 mb-3">¿Podrás salvarlo letra a letra?</p>
-              <a href="{% url 'hangman_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">
-                Escribir Tiza
-              </a>
-            </div>
-            <i class="fas fa-chalkboard position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-20"
-              style="font-size: 5rem; transform: rotate(-10deg);"></i>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: linear-gradient(135deg, #191414, #1DB954);">
-            <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1">Melómanos</h5>
-              <p class="small opacity-75 mb-3">Música de tus compañeros.</p>
-              <a href="{% url 'spotify_guess_game' %}"
-                class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Escuchar</a>
-            </div>
-            <i class="fab fa-spotify card-icon"></i>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: linear-gradient(135deg, #f39c12, #d35400);">
-            <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1">Dino Run 🌵</h5>
-              <p class="small opacity-75 mb-3">¡Récord de saltos!</p>
-              <a href="{% url 'dino_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Saltar</a>
-            </div>
-            <i class="fas fa-running card-icon"></i>
-          </div>
-        </div>
 
         <!--<div class="col-md-6">
           <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card shadow-lg"
@@ -168,22 +113,79 @@
             <i class="fas fa-user-secret card-icon"></i>
           </div>
         </div>
+
         <div class="col-md-6">
           <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
-            style="background: linear-gradient(135deg, #00b09b, #96c93d);">
+            style="background: linear-gradient(135deg, #f39c12, #d35400);">
             <div class="card-body p-4 z-1 position-relative">
-              <h5 class="fw-bold mb-1">Charadas</h5>
-              <p class="small opacity-75 mb-3">¡Mímica y acción en equipo!</p>
-              <a href="{% url 'charadas_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Empezar</a>
+              <h5 class="fw-bold mb-1">Dino Run 🌵</h5>
+              <p class="small opacity-75 mb-3">¡Récord de saltos!</p>
+              <a href="{% url 'dino_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Saltar</a>
             </div>
-            <i class="fas fa-theater-masks card-icon"></i>
+            <i class="fas fa-running card-icon"></i>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+            style="background: linear-gradient(135deg, #191414, #1DB954);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">Melómanos</h5>
+              <p class="small opacity-75 mb-3">Música de tus compañeros.</p>
+              <a href="{% url 'spotify_guess_game' %}"
+                class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Escuchar</a>
+            </div>
+            <i class="fab fa-spotify card-icon"></i>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+            style="background: linear-gradient(135deg, #4e73df, #224abe);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">Ponle Nombre</h5>
+              <p class="small opacity-75 mb-3">¿Reconoces el nombre?</p>
+              <a href="{% url 'name_to_face_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
+            </div>
+            <i class="fas fa-id-badge card-icon"></i>
+          </div>
+        </div>
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+            style="background: linear-gradient(135deg, #6a11cb, #2575fc);">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1">¿Quién es quién?</h5>
+              <p class="small opacity-75 mb-3">Adivina por la foto.</p>
+              <a href="{% url 'face_guess_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">Jugar</a>
+            </div>
+            <i class="fas fa-camera-retro card-icon"></i>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card h-100 border-0 shadow-sm text-white overflow-hidden game-card"
+            style="background: radial-gradient(circle at top left, #2c3e50, #000000) !important; border: 4px solid #5d4037 !important;">
+            <div class="card-body p-4 z-1 position-relative">
+              <h5 class="fw-bold mb-1 chalk-text"
+                style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; letter-spacing: 1px;">
+                El Ahorcado
+              </h5>
+              <p class="small opacity-75 mb-3">¿Podrás salvarlo letra a letra?</p>
+              <a href="{% url 'hangman_game' %}" class="btn btn-glass btn-sm fw-bold rounded-pill px-4">
+                Escribir Tiza
+              </a>
+            </div>
+            <i class="fas fa-chalkboard position-absolute end-0 bottom-0 mb-n3 me-n2 opacity-20"
+              style="font-size: 5rem; transform: rotate(-10deg);"></i>
           </div>
         </div>
 
         <div class="col-12 text-center mt-4">
           <p class="text-muted small bg-light d-inline-block p-2 rounded-pill px-3">
             Más: <a href="{% url 'student_interests_game' %}" class="fw-bold text-decoration-none mx-1">Intereses</a> |
-            <a href="{% url 'student_complete_profile_game' %}" class="fw-bold text-decoration-none mx-1">Perfil</a>
+            <a href="{% url 'student_complete_profile_game' %}" class="fw-bold text-decoration-none mx-1">Adivina Perfil</a>
           </p>
         </div>
       </div>
