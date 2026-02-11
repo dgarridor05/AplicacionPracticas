@@ -22,7 +22,7 @@
         
         <div id="rotation-warning" class="d-none position-absolute top-0 start-0 w-100 h-100 bg-dark d-flex flex-column align-items-center justify-content-center" style="z-index: 10001;">
             <i class="fas fa-sync-alt fa-3x mb-3 animate-spin"></i>
-            <h4 class="fw-bold">GIRA EL MÓVIL</h4>
+            <h4 class="fw-bold">GIRA EL MÓVIL EN HORIZONTAL</h4>
         </div>
 
         <div class="position-absolute top-0 end-0 p-3">
@@ -55,21 +55,45 @@
     .fw-800 { font-weight: 800; }
     #play-screen { user-select: none; -webkit-user-select: none; overflow: hidden; }
     
-    /* Animación de rotación */
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .animate-spin { animation: spin 2s linear infinite; }
 
-    /* Forzar el aviso de rotación si está en vertical */
+    /* MEJORA: OCULTAR NAVEGACIÓN EN HORIZONTAL SOLO EN ESTE JUEGO */
+    @media screen and (orientation: landscape) {
+        /* Ocultamos Header, Nav y Bottom Nav de tu base.html */
+        header, .navbar-desktop, .bottom-nav { 
+            display: none !important; 
+        }
+
+        /* Quitamos paddings y márgenes que sobran */
+        body { 
+            padding-bottom: 0 !important; 
+            margin: 0 !important;
+        }
+
+        main.container {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+        }
+
+        /* Ocultamos el aviso de rotación si ya está en horizontal */
+        #rotation-warning { display: none !important; }
+    }
+
+    /* Mostrar aviso si está en vertical DENTRO del juego */
     @media screen and (orientation: portrait) {
-        #rotation-warning { display: flex !important; }
+        #play-screen:not(.d-none) #rotation-warning { 
+            display: flex !important; 
+        }
     }
 
     .animate-fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* Flash visual más intenso para que se vea desde fuera */
-    .flash-correct { background-color: rgba(40, 167, 69, 0.8) !important; }
-    .flash-skip { background-color: rgba(220, 53, 69, 0.8) !important; }
+    .flash-correct { background-color: rgba(40, 167, 69, 0.9) !important; }
+    .flash-skip { background-color: rgba(220, 53, 69, 0.9) !important; }
 </style>
 
 <script>
@@ -80,16 +104,29 @@
     let timerInterval;
 
     function startGame(categoria) {
-        palabrasActuales = [...biblioteca[categoria]].sort(() => Math.random() - 0.5);
-        score = 0;
-        timeLeft = 60;
-        
-        document.getElementById('setup-screen').classList.add('d-none');
-        document.getElementById('play-screen').classList.remove('d-none');
-        
-        nextWord();
-        startTimer();
+    // Intentar activar pantalla completa
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen().catch(err => {
+            console.log("Error intentando activar pantalla completa: " + err.message);
+        });
+    } else if (elem.webkitRequestFullscreen) { /* Safari/iOS */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
     }
+
+    // Lógica original del juego
+    palabrasActuales = [...biblioteca[categoria]].sort(() => Math.random() - 0.5);
+    score = 0;
+    timeLeft = 60;
+    
+    document.getElementById('setup-screen').classList.add('d-none');
+    document.getElementById('play-screen').classList.remove('d-none');
+    
+    nextWord();
+    startTimer();
+}
 
     function startTimer() {
         timerInterval = setInterval(() => {
@@ -102,10 +139,8 @@
     function nextWord() {
         if (palabrasActuales.length > 0) {
             const word = palabrasActuales.pop().toUpperCase();
-            document.getElementById('current-word').innerText = word;
-            
-            // Ajuste dinámico si la palabra es muy larga
             const display = document.getElementById('current-word');
+            display.innerText = word;
             display.style.fontSize = word.length > 10 ? '9vw' : '12vw';
         } else {
             endGame();
@@ -114,13 +149,13 @@
 
     function correctWord() {
         score++;
-        if (navigator.vibrate) navigator.vibrate(100); // Feedback táctil
+        if (navigator.vibrate) navigator.vibrate(100);
         flashBackground('flash-correct');
         nextWord();
     }
 
     function skipWord() {
-        if (navigator.vibrate) navigator.vibrate([50, 50, 50]); // Triple vibración corta para error
+        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
         flashBackground('flash-skip');
         nextWord();
     }
@@ -132,10 +167,18 @@
     }
 
     function endGame() {
-        clearInterval(timerInterval);
-        document.getElementById('play-screen').classList.add('d-none');
-        document.getElementById('result-screen').classList.remove('d-none');
-        document.getElementById('final-score').innerText = score;
+    clearInterval(timerInterval);
+    
+    // Salir de pantalla completa
+    if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {}); // Ignoramos si ya se había salido
+    } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
     }
+
+    document.getElementById('play-screen').classList.add('d-none');
+    document.getElementById('result-screen').classList.remove('d-none');
+    document.getElementById('final-score').innerText = score;
+}
 </script>
 {% endblock %}
