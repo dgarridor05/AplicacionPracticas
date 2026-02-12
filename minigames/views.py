@@ -470,7 +470,49 @@ def impostor_game(request, group_id=None):
         {'tema': 'Filosofía Educativa', 'p': 'Pedagogía Crítica', 'i': 'Transformación Social'},
         {'tema': 'Ocio', 'p': 'Pedagogía del Ocio', 'i': 'Recreación Deportiva'},
         {'tema': 'Inclusión', 'p': 'Interculturalidad', 'i': 'Pedagogía Social'},
-        {'tema': 'Evaluación', 'p': 'Competencia', 'i': 'Capacidad'}
+        {'tema': 'Evaluación', 'p': 'Competencia', 'i': 'Capacidad'},
+        # Enseñanza e Iniciación
+    {'tema': 'Modelos', 'p': 'Modelo Técnico', 'i': 'Modelo Comprensivo'},
+    {'tema': 'Iniciación', 'p': 'Deporte Escolar', 'i': 'Deporte Federado'},
+    {'tema': 'Estructura', 'p': 'Táctica', 'i': 'Estrategia'},
+    {'tema': 'Feedback', 'p': 'Conocimiento de los Resultados', 'i': 'Conocimiento de la Ejecución'},
+    {'tema': 'Aprendizaje', 'p': 'Práctica Global', 'i': 'Práctica Analítica'},
+    {'tema': 'Diseño', 'p': 'Tarea Jugada', 'i': 'Ejercicio'},
+
+    # Historia y Epistemología
+    {'tema': 'Grecia', 'p': 'Gimnasio', 'i': 'Palestra'},
+    {'tema': 'Grecia', 'p': 'Esparta', 'i': 'Atenas'},
+    {'tema': 'Edad Media', 'p': 'Justa', 'i': 'Torneo'},
+    {'tema': 'Profesión', 'p': 'Colegiación', 'i': 'Asociacionismo'},
+    {'tema': 'Roma', 'p': 'Circo Romano', 'i': 'Anfiteatro'},
+    {'tema': 'Valores', 'p': 'Juego Limpio', 'i': 'Deportividad'},
+
+    # Psicología del Deporte
+    {'tema': 'Cognición', 'p': 'Atención', 'i': 'Concentración'},
+    {'tema': 'Estado', 'p': 'Ansiedad', 'i': 'Estrés'},
+    {'tema': 'Motivación', 'p': 'Intrínseca', 'i': 'Extrínseca'},
+    {'tema': 'Conducta', 'p': 'Refuerzo', 'i': 'Castigo'},
+    {'tema': 'Personalidad', 'p': 'Rasgo', 'i': 'Estado'},
+    {'tema': 'Social', 'p': 'Liderazgo Autocrático', 'i': 'Liderazgo Democrático'},
+
+    # Danza y Expresión
+    {'tema': 'Laban', 'p': 'Espacio', 'i': 'Tiempo'},
+    {'tema': 'Arte', 'p': 'Coreografía', 'i': 'Improvisación'},
+    {'tema': 'Ritmo', 'p': 'Pulso', 'i': 'Acento'},
+    {'tema': 'Composición', 'p': 'Canon', 'i': 'Unísono'},
+    {'tema': 'Cuerpo', 'p': 'Esquema Corporal', 'i': 'Imagen Corporal'},
+
+    # Atletismo
+    {'tema': 'Carreras', 'p': 'Velocidad', 'i': 'Resistencia'},
+    {'tema': 'Saltos', 'p': 'Longitud', 'i': 'Triple Salto'},
+    {'tema': 'Vallas', 'p': 'Pierna de Ataque', 'i': 'Pierna de Recobro'},
+    {'tema': 'Lanzamientos', 'p': 'Peso', 'i': 'Disco'},
+    {'tema': 'Medición', 'p': 'Anemómetro', 'i': 'Cronómetro'},
+    {'tema': 'Velocidad', 'p': 'Amplitud de Zancada', 'i': 'Frecuencia de Zancada'},
+
+    # Vida Universitaria UEx
+    {'tema': 'Evaluación', 'p': 'Examen Parcial', 'i': 'Examen Final'},
+    {'tema': 'Título', 'p': 'CAFYD', 'i': 'Magisterio EF'}
     ]
 
     # 1. Recuperar el historial de la sesión
@@ -506,10 +548,135 @@ def charadas_game(request, group_id=None):
     Juego de mímica y charadas (tipo Heads Up).
     """
     biblioteca_charadas = {
-        'PRESENTACIÓN': ['Profesor', 'Delegado', 'Cafetería', 'Examen', 'Prácticas', 'Campus', 'Gimnasio'],
-        'CONCEPTOS_MÁSTER': ['Pedagogía', 'Inclusión', 'Didáctica', 'LOMLOE', 'Evaluación', 'Gamificación', 'Motivación'],
-        'ACCIÓN': ['Correr', 'Silbar', 'Aplaudir', 'Saltar', 'Nadar', 'Dormir', 'Escribir'],
-        'DEPORTES': ['Baloncesto', 'Yoga', 'Fútbol', 'Escalada', 'Senderismo', 'Tenis', 'Voleibol']
+        'ENSEÑANZA E INICIACIÓN': [
+    # --- De los Temas 1 y 2 (Estructura y Habilidades) ---
+    'Habilidad Motriz', 'Deporte Individual', 'Deporte de Equipo', 'Adversario', 
+    'Blanco y Diana', 'Cancha Dividida', 'Incertidumbre', 'Espacio Común', 
+    'Reglamento', 'Falta Técnica', 'Fuera de Juego',
+
+    # --- De los Temas 3 y 4 (Modelos y Pericia) ---
+    'Talento Deportivo', 'Modelo Técnico', 'Modelo Comprensivo', 'Creatividad', 
+    'Gesto Deportivo', 'Repetición', 'Toma de Decisiones', 'Estrategia', 
+    'Rendimiento Experto', 'Novato',
+
+    # --- De los Temas 5, 6, 7 y 8 (Iniciación y Entrenador) ---
+    'Iniciación Deportiva', 'Deporte Escolar', 'Competición', 'Victoria', 
+    'Derrota', 'Juego Limpio', 'Entrenador', 'Silbato', 'Pizarra Táctica', 
+    'Cronómetro', 'Sustitución', 'Tiempo Muerto', 'Edad Madurativa', 'Estímulo'
+],
+
+        'EPISTEMOLOGÍA E HISTORIA': [
+    # --- Bloque Epistemología (Ciencia y Profesión) ---
+    'Método Científico', 'Investigación', 'Laboratorio', 'Profesor de EF', 
+    'Entrenador', 'Gestión Deportiva', 'Recreación', 'Director Deportivo',
+    'Código Ético', 'Juego Limpio', 'Colegio Profesional', 'Pre-colegiación',
+    'Igualdad', 'Diversidad', 'Deporte Espectáculo', 'Violencia Deportiva',
+
+    # --- Bloque Historia (Antigüedad y Medievo) ---
+    'Prehistoria', 'Caza y Supervivencia', 'Grecia Antigua', 'Juegos Olímpicos', 
+    'Lucha Canaria', 'Maratón', 'Ilíada y Odisea', 'Platón', 'Aristóteles', 
+    'Gladiador', 'Caballero Medieval', 'Torneo', 'Justa', 'Artes Guerreras',
+
+    # --- Bloque Historia (Moderna y Contemporánea) ---
+    'Renacimiento', 'Humanismo', 'Inglaterra', 'Burguesía', 'Reglamento', 
+    'Pierre de Coubertin', 'Anillos Olímpicos', 'Antorcha', 'Ideología Política', 
+    'Capitalismo', 'Dopaje'
+],
+    
+        'PSICOLOGÍA DEL DEPORTE': [
+    # --- Tema 1 y 2 (Introducción y Procesos Cognitivos) ---
+    'Psicólogo del Deporte', 'Atención', 'Concentración', 'Percepción', 
+    'Sensación', 'Memoria', 'Procesamiento de Información', 'Falso Recuerdo',
+
+    # --- Tema 3 y 4 (Aprendizaje e Intervención) ---
+    'Condicionamiento Clásico', 'Recompensa', 'Castigo', 'Observación', 
+    'Imitación', 'Modificación de Conducta', 'Evaluación', 'Hábito de Sueño',
+
+    # --- Tema 5 y 6 (Emoción, Personalidad y Motivación) ---
+    'Personalidad', 'Emoción', 'Ansiedad', 'Estrés', 'Activación', 
+    'Afrontamiento', 'Relajación', 'Autocontrol', 'Motivación', 
+    'Abandono Deportivo', 'Éxito', 'Fracaso',
+
+    # --- Tema 7 y 8 (Social y Ciclo Vital) ---
+    'Liderazgo', 'Cohesión de Grupo', 'Comunicación', 'Role-playing', 
+    'Dinámica de Grupo', 'Infancia', 'Tercera Edad', 'Retirada Deportiva'
+],
+
+        'DANZA Y EXPRESIÓN CORPORAL': [
+    # --- Tema 1 y 2 (Fundamentos y Factores) ---
+    'Danza', 'Técnica de Estilo', 'Técnica Creativa', 'Cuerpo', 'Espacio', 
+    'Tiempo', 'Energía', 'Fluidez', 'Dimensión Expresiva', 'Comunicación',
+
+    # --- Tema 3, 4 y 5 (Creación y Proyectos) ---
+    'Proyecto Artístico', 'Simbolización', 'Feminismo', 'Identidad', 
+    'Inventiva', 'Comparación', 'Combinación', 'Observador', 
+    'Impresionismo', 'Análisis', 'Contexto',
+
+    # --- Tema 6 y 7 (Didáctica y AFA) ---
+    'Actividades Físico Artísticas', 'Docente Mediador', 'Escenario', 
+    'Recursos Musicales', 'Dinámica de Grupo', 'Reflexión', 
+    'Evaluación', 'Coreografía', 'Puesta en Escena', 'Inclusión'
+],
+
+        'INICIACIÓN AL ATLETISMO': [
+    # --- Bloque I y II (Generalidades y Carreras) ---
+    'Pista Cubierta', 'Aire Libre', 'Juez de Pista', 'Técnica de Carrera', 
+    'Salida de Tacos', 'Foto-finish', 'Carrera de Velocidad', 'Maratón', 
+    'Testigo', 'Zona de Transferencia', 'Paso de Valla', 'Descalificación',
+
+    # --- Bloque III (Saltos) ---
+    'Salto de Longitud', 'Triple Salto', 'Salto de Altura', 'Fosbury Flop', 
+    'Tabla de Batida', 'Foso de Arena', 'Listón', 'Nulo', 'Viento a Favor',
+
+    # --- Bloque IV (Lanzamientos y Otros) ---
+    'Lanzamiento de Peso', 'Artefacto', 'Círculo de Lanzamiento', 'Parada', 
+    'Lanzamiento Nulo', 'Fase de Impulso', 'Fase de Vuelo', 'Cronómetro', 
+    'Educación Física', 'Escuela Deportiva'
+],
+
+        'PRESENTACIÓN': [
+    # --- Personajes y Gente ---
+    'Profesor', 'Delegado', 'Subdelegado', 'Bedel', 'Conserje', 'Alumno de Tercero', 
+    'Novato', 'Graduado', 'Decano', 'Rector', 'Secretaria', 'Personal de Limpieza',
+
+    # --- Lugares del Campus y alrededores ---
+    'Cafetería', 'Gimnasio', 'Pabellón', 'Piscina', 'Pistas de Tenis', 'Laboratorio', 
+    'Biblioteca', 'Reprografía', 'Salón de Actos', 'Despacho', 'Parking', 'Parada de Bus', 
+    'Residencia', 'Césped', 'Cantina', 'Vestuarios',
+
+    # --- Objetos y Material ---
+    'Mochila', 'Carnet Universitario', 'Apuntes', 'Silbato', 'Cronómetro', 
+    'Ordenador', 'Proyector', 'Pizarra', 'Tupper', 'Café', 'Botella de Agua', 
+    'Chándal', 'Zapatillas', 'Cascos', 'Examen',
+
+    # --- Situaciones y Vida Universitaria ---
+    'Prácticas', 'Matrícula', 'Beca', 'Fiesta Universitaria', 'TFG', 'Erasmus', 
+    'Exposición Oral', 'Trabajo en Grupo', 'Nota de Corte', 'Suspenso', 'Aprobado', 
+    'Matrícula de Honor', 'Revisión de Examen'
+],
+        'DEPORTES': [
+    # --- Deportes de Equipo (Clásicos y sala) ---
+    'Baloncesto', 'Fútbol', 'Voleibol', 'Balonmano', 'Rugby', 'Waterpolo', 
+    'Fútbol Sala', 'Hockey Hierba', 'Hockey Patines', 'Béisbol', 'Softbol',
+
+    # --- Deportes de Raqueta y Implemento ---
+    'Tenis', 'Pádel', 'Bádminton', 'Tenis de Mesa', 'Squash', 'Pickleball',
+
+    # --- Deportes Individuales y Gimnásticos ---
+    'Atletismo', 'Natación', 'Gimnasia Rítmica', 'Gimnasia Artística', 
+    'Halterofilia', 'Ciclismo', 'Triatlón', 'Patinaje', 'Esgrima',
+
+    # --- Deportes de Combate ---
+    'Boxeo', 'Judo', 'Karate', 'Taekwondo', 'Lucha Libre', 'Kickboxing',
+
+    # --- Deportes de Naturaleza y Aventura ---
+    'Escalada', 'Senderismo', 'Piragüismo', 'Surf', 'Snowboard', 'Esquí', 
+    'Orientación', 'Barranquismo', 'Vela', 'Equitación',
+
+    # --- Deportes Alternativos y Nuevas Tendencias ---
+    'Yoga', 'Pilates', 'Crossfit', 'Ultimate Frisbee', 'Parkour', 
+    'Skateboarding', 'Golf', 'Tiro con Arco', 'Ajedrez Deportivo'
+],
     }
     
     # Convertimos a JSON para pasarlo a JavaScript fácilmente
