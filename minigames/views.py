@@ -458,6 +458,38 @@ def dino_game(request):
     })
 
 @login_required
+def puzzle_game(request, group_id=None):
+    """Puzzle 3x3 con imagen de un compañero de grupo."""
+
+    # Si es alumno, siempre jugamos con su clase.
+    if request.user.role == 'student':
+        group = request.user.student_groups.first()
+        if not group:
+            return render(request, 'minigames/no_students.html')
+        group_id = group.id
+    elif not group_id:
+        return select_group_for_game(request, 'puzzle_game')
+
+    group = get_object_or_404(ClassGroup, id=group_id)
+
+    # Seleccionamos un compañero (con foto) al azar.
+    # Excluimos al propio alumno si es alumno.
+    students = group.students.filter(profile_picture__isnull=False)
+    if request.user.role == 'student':
+        students = students.exclude(id=request.user.id)
+
+    if not students.exists():
+        return render(request, 'minigames/no_students.html')
+
+    target = random.choice(list(students))
+
+    return render(request, 'minigames/puzzle.html', {
+        'group': group,
+        'image_url': target.profile_picture.url if target.profile_picture else None,
+        'target_name': target.full_name or target.username,
+    })
+
+@login_required
 def impostor_game(request, group_id=None):
     """
     Juego del Impostor con control de historial para no repetir temas.

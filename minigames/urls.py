@@ -33,7 +33,11 @@ urlpatterns = [
     # 8. Dino-Reto (Juego de habilidad)
     path('dino-reto/', views.dino_game, name='dino_game'),
 
-    # 9. El Impostor (Juego de deducción social)
+    # 9. Puzzle (Sube tu imagen y arma el rompe-cabezas)
+    path('puzzle/', views.puzzle_game, name='puzzle_game'),
+    path('puzzle/<int:group_id>/', views.puzzle_game, name='puzzle_game'),
+
+    # 10. El Impostor (Juego de deducción social)
     path('impostor/', views.impostor_game, name='impostor_game'),
     path('impostor/<int:group_id>/', views.impostor_game, name='impostor_game'),
 

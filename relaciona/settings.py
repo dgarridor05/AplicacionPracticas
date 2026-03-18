@@ -3,9 +3,9 @@ import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
+
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
@@ -46,6 +46,17 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
+# Aseguramos que cloudinary se configure (para que CloudinaryField no falle al firmar uploads)
+try:
+    import cloudinary
+    cloudinary.config(
+        cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+        api_key=os.getenv('CLOUDINARY_API_KEY'),
+        api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    )
+except ImportError:
+    pass
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
@@ -77,16 +88,24 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'relaciona.wsgi.application'
-
+print("Cargando .env desde:", BASE_DIR / ".env")
+print("DB_NAME:", os.getenv("DB_NAME"))
+print("DB_USER:", os.getenv("DB_USER"))
+print("DB_PASSWORD:", os.getenv("DB_PASSWORD"))
+print("DB_HOST:", os.getenv("DB_HOST"))
+print("DB_PORT:", os.getenv("DB_PORT"))
 # BLOQUE DATABASES LIMPIO - SIN DJ_DATABASE_URL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME', 'postgres'),
-        'USER': os.getenv('DB_USER', 'Adsuar'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'Adsuar16012026'),
-        'HOST': os.getenv('DB_HOST', 'relaciona-alumnos.cfgeq2augno3.eu-west-3.rds.amazonaws.com'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        'NAME': os.getenv('DB_NAME', '').strip(),
+        'USER': os.getenv('DB_USER', '').strip(),
+        'PASSWORD': os.getenv('DB_PASSWORD', '').strip(),
+        'HOST': os.getenv('DB_HOST', '').strip(),
+        'PORT': os.getenv('DB_PORT', '').strip(),
+        'OPTIONS': {
+            'options': '-c client_encoding=UTF8 -c lc_messages=C',
+        },
     }
 }
 

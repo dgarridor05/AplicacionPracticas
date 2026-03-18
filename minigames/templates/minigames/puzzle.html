@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+
+<div id="game-container" class="container py-4" style="font-family: 'Outfit', sans-serif; max-width: 500px;">
+
+    <!-- STEP 1: Selección de compañero -->
+    <div id="step-1" class="text-center animate-fade-in">
+        <h2 class="fw-800 mb-4">🧩 Puzzle 3x3</h2>
+        <p class="small text-muted mb-3">Arma el rompecabezas y descubre quién es tu compañero.</p>
+        <div class="d-flex justify-content-center mb-3">
+            <img src="{{ image_url }}" alt="Foto misteriosa" class="rounded-4 shadow-sm" style="width: 220px; height: 220px; object-fit: cover;" />
+        </div>
+        <button class="btn btn-impostor-gradient w-100 rounded-pill py-3 fw-bold" onclick="iniciarPuzzle()">
+            EMPEZAR
+        </button>
+    </div>
+
+    <!-- STEP 2: Juego -->
+    <div id="step-2" class="d-none text-center animate-fade-in">
+        <h3 class="fw-bold mb-3">Reordena la imagen</h3>
+        <div id="puzzle" style="
+            width: 300px;
+            height: 300px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+        "></div>
+    </div>
+
+    <!-- STEP 3: Victoria -->
+    <div id="step-3" class="d-none text-center animate-fade-in py-4">
+        <h2 class="fw-800 text-success">🎉 ¡Completado!</h2>
+        <p class="lead">Era <strong>{{ target_name }}</strong>.</p>
+        <div class="d-flex justify-content-center mb-4">
+            <img src="{{ image_url }}" alt="Foto de {{ target_name }}" class="rounded-4 shadow-sm" style="width: 180px; height: 180px; object-fit: cover;" />
+        </div>
+        <button onclick="location.reload()" class="btn btn-dark mt-3 w-100 rounded-pill py-3 fw-bold">
+            NUEVO JUEGO
+        </button>
+    </div>
+
+</div>
+
+<style>
+:root {
+    --imp-red: #ff4b2b;
+    --imp-orange: #ff416c;
+    --imp-dark: #2c3e50;
+}
+
+.fw-800 { font-weight: 800; }
+
+.btn-impostor-gradient { 
+    background: linear-gradient(135deg, #ff4b2b, #ff416c); 
+    border: none; 
+    color: white; 
+    transition: all 0.3s;
+}
+.btn-impostor-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(255, 75, 43, 0.3); color: white; }
+
+.pieza {
+    width: 100%;
+    height: 100%;
+    background-size: 300px 300px;
+    cursor: pointer;
+    border: 1px solid #fff;
+}
+
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<script>
+let piezas = [];
+let seleccionada = null;
+let imagenURL = "{{ image_url|escapejs }}";
+
+function iniciarPuzzle() {
+    if (!imagenURL) {
+        alert("No se encontró la imagen para el puzzle.");
+        return;
+    }
+
+    document.getElementById("step-1").classList.add("d-none");
+    document.getElementById("step-2").classList.remove("d-none");
+
+    crearPuzzle();
+}
+
+function crearPuzzle() {
+    const puzzle = document.getElementById("puzzle");
+    puzzle.innerHTML = "";
+    piezas = [];
+
+    for (let i = 0; i < 9; i++) {
+        piezas.push(i);
+    }
+
+    piezas.sort(() => Math.random() - 0.5);
+
+    piezas.forEach((pos, index) => {
+        const div = document.createElement("div");
+        div.classList.add("pieza");
+
+        const x = pos % 3;
+        const y = Math.floor(pos / 3);
+
+        div.style.backgroundImage = `url(${imagenURL})`;
+        div.style.backgroundPosition = `-${x * 100}px -${y * 100}px`;
+
+        div.dataset.correct = pos;
+        div.onclick = () => seleccionar(div);
+
+        puzzle.appendChild(div);
+    });
+}
+
+function seleccionar(div) {
+    if (!seleccionada) {
+        seleccionada = div;
+        div.style.border = "3px solid red";
+    } else {
+        intercambiar(seleccionada, div);
+        seleccionada.style.border = "1px solid #fff";
+        seleccionada = null;
+        comprobarVictoria();
+    }
+}
+
+function intercambiar(a, b) {
+    let tempBg = a.style.backgroundPosition;
+    let tempCorrect = a.dataset.correct;
+
+    a.style.backgroundPosition = b.style.backgroundPosition;
+    a.dataset.correct = b.dataset.correct;
+
+    b.style.backgroundPosition = tempBg;
+    b.dataset.correct = tempCorrect;
+}
+
+function comprobarVictoria() {
+    const piezasDOM = document.querySelectorAll(".pieza");
+    let correcto = true;
+
+    piezasDOM.forEach((pieza, i) => {
+        if (parseInt(pieza.dataset.correct) !== i) {
+            correcto = false;
+        }
+    });
+
+    if (correcto) {
+        document.getElementById("step-2").classList.add("d-none");
+        document.getElementById("step-3").classList.remove("d-none");
+    }
+}
+</script>
+{% endblock %}
