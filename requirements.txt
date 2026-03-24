@@ -9,3 +9,6 @@ crispy-bootstrap5==2024.2
 psycopg2-binary
 django-environ
 python-dotenv
+channels==4.0.0
+daphne==4.0.0
+asgiref==3.8.1

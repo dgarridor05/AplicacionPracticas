@@ -2,114 +2,135 @@
 {% block title %}Mensajería | RELACIONA{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-4" style="max-width: 1200px;">
-    <div class="row">
-        <!-- Lista de conversaciones -->
-        <div class="col-md-4 col-lg-3">
-            <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0 fw-bold text-primary">
-                        <i class="fas fa-comments me-2"></i>Mensajería
-                    </h5>
-                    {% if unread_chats_count > 0 %}
-                    <small class="text-muted">{{ unread_chats_count }} chat{{ unread_chats_count|pluralize:"s" }} sin leer</small>
-                    {% endif %}
-                </div>
+<div class="container-fluid mt-4" style="max-width: 1400px;">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="fw-bold text-primary">
+                <i class="fas fa-comments me-2"></i>Mensajería
+            </h3>
+            {% if unread_chats_count > 0 %}
+            <small class="text-muted">{{ unread_chats_count }} chat{{ unread_chats_count|pluralize:"s" }} sin leer</small>
+            {% endif %}
+        </div>
+    </div>
+    {% if conversations %}
+    <div class="row g-2">
+        {% for conv in conversations %}
+        <div class="col-12">
+            <div class="card shadow-sm conversation-card" style="border-radius: 15px; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;">
+                <!-- Unread Badge -->
+                {% if conv.unread_count_for_user > 0 %}
+                <span class="badge bg-success rounded-pill position-absolute top-0 end-0 m-2" style="z-index: 10;">
+                    {{ conv.unread_count_for_user }}
+                </span>
+                {% endif %}
 
-                <div class="card-body p-0" style="max-height: 70vh; overflow-y: auto;">
-                    {% if conversations %}
-                    <div class="list-group list-group-flush">
-                        {% for conv in conversations %}
-                        <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action border-0 px-3 py-3 {% if conv.unread_count_for_user > 0 %}bg-light{% endif %}">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    {% if conv.is_group %}
-                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-                                    {% else %}
-                                    {% if conv.other_profile_picture %}
-                                    <img src="{{ conv.other_profile_picture.url }}" class="rounded-circle object-fit-cover shadow-sm" style="width: 50px; height: 50px; border: 2px solid #e9ecef;" alt="Foto">
-                                    {% else %}
-                                    <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px; border: 2px solid #e9ecef;">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    {% endif %}
-                                    {% endif %}
-                                </div>
-
-                                <div class="flex-grow-1 min-w-0">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="min-w-0 flex-grow-1">
-                                            <div class="fw-bold text-truncate">
-                                                {% if conv.is_group %}
-                                                {{ conv.name|default:'Chat grupal' }}
-                                                {% else %}
-                                                {{ conv.other_nickname|default:conv.other_username }}
-                                                {% endif %}
-                                            </div>
-                                            <small class="text-muted text-truncate d-block">
-                                                {% if conv.is_group %}
-                                                Grupo: {{ conv.class_group.name }}
-                                                {% else %}
-                                                {{ conv.other_username }}
-                                                {% endif %}
-                                            </small>
-                                        </div>
-                                        {% if conv.unread_count_for_user > 0 %}
-                                        <span class="badge bg-success rounded-pill ms-2 flex-shrink-0">{{ conv.unread_count_for_user }}</span>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <div class="opacity-25 mb-3">
-                            <i class="fas fa-comments fa-3x text-muted"></i>
+                <!-- Horizontal Layout: Profile | Message | Actions -->
+                <div class="card-body d-flex align-items-center gap-3 py-3">
+                    <!-- 1. Profile Picture (Left) -->
+                    <div class="flex-shrink-0">
+                        {% if conv.is_group %}
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; min-width: 60px;">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <h6 class="text-muted">No tienes conversaciones</h6>
-                        <p class="small text-muted mb-3">Ve a Compañeros de clase para iniciar un chat.</p>
-                        <a href="{% url 'classmates_list' %}" class="btn btn-outline-primary btn-sm">Ver compañeros</a>
+                        {% else %}
+                        {% if conv.other_profile_picture %}
+                        <img src="{{ conv.other_profile_picture.url }}" class="rounded-circle object-fit-cover shadow-sm" style="width: 60px; height: 60px; min-width: 60px; border: 2px solid #e9ecef;" alt="Foto">
+                        {% else %}
+                        <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; min-width: 60px; border: 2px solid #e9ecef;">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                        {% endif %}
                     </div>
-                    {% endif %}
+
+                    <!-- 2. Message Area (Center - Clickable) -->
+                    <a href="{% url 'conversation_detail' conv.id %}" class="flex-grow-1 min-w-0 text-decoration-none text-dark conversation-message-link">
+                        <div style="cursor: pointer;">
+                            <h6 class="fw-bold mb-1" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                {% if conv.is_group %}
+                                {{ conv.name|default:'Chat grupal' }}
+                                {% else %}
+                                {{ conv.other_nickname|default:conv.other_username }}
+                                {% endif %}
+                            </h6>
+                            <small class="text-muted d-block" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {% if conv.last_message_sender %}
+                                <strong>{{ conv.last_message_sender }}:</strong> {{ conv.last_message_text }}
+                                {% else %}
+                                <em>Sin mensajes aún</em>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </a>
+
+                    <!-- 3. Action Buttons (Right) -->
+                    <div class="flex-shrink-0 d-flex gap-2">
+                        <a href="{% url 'conversation_detail' conv.id %}" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+                            <i class="fas fa-comment me-1"></i>Ver chat
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Área de chat vacío -->
-        <div class="col-md-8 col-lg-9 d-none d-md-block">
-            <div class="card shadow-sm h-100" style="border-radius: 15px;">
-                <div class="card-body d-flex align-items-center justify-content-center text-center py-5">
-                    <div>
-                        <div class="opacity-25 mb-4">
-                            <i class="fas fa-comment-dots fa-5x text-muted"></i>
-                        </div>
-                        <h4 class="text-muted mb-3">Selecciona una conversación</h4>
-                        <p class="text-muted">Elige un chat de la lista para ver los mensajes</p>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm text-center" style="border-radius: 15px;">
+                <div class="card-body py-5">
+                    <div class="opacity-25 mb-4">
+                        <i class="fas fa-comments fa-5x text-muted"></i>
                     </div>
+                    <h4 class="text-muted mb-3">No tienes conversaciones</h4>
+                    <p class="text-muted mb-4">Ve a Compañeros de clase para iniciar un chat</p>
+                    <a href="{% url 'classmates_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-users me-2"></i>Ver compañeros
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 <style>
-.object-fit-cover {
-    object-fit: cover;
-}
-
-.list-group-item:hover {
-    background-color: #f8f9fa !important;
-}
-
-@media (max-width: 767.98px) {
-    .container-fluid {
-        padding-left: 15px;
-        padding-right: 15px;
+    .object-fit-cover {
+        object-fit: cover;
     }
-}
+
+    .conversation-card {
+        border: 1px solid #e9ecef;
+    }
+
+    .conversation-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+        background-color: #f8f9fa !important;
+    }
+
+    .conversation-message-link {
+        transition: all 0.3s ease;
+    }
+
+    .conversation-card:hover .conversation-message-link {
+        color: #0d6efd !important;
+    }
+
+    .conversation-card .card-body {
+        padding: 1rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .conversation-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .card-body {
+            padding: 0.75rem !important;
+        }
+    }
 </style>
 {% endblock %}

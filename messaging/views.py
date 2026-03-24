@@ -32,10 +32,42 @@ def conversation_list(request):
                 conv.other_nickname = None
                 conv.other_profile_picture = None
                 conv.other_full_name = None
+        
+        # Agregar último mensaje de la conversación
+        last_msg = conv.messages.select_related('sender').order_by('-created_at').first()
+        if last_msg:
+            conv.last_message_text = last_msg.text[:50] + ('...' if len(last_msg.text) > 50 else '')
+            conv.last_message_sender = last_msg.sender.username
+            conv.last_message_time = last_msg.created_at
+        else:
+            conv.last_message_text = 'Sin mensajes'
+            conv.last_message_sender = None
+            conv.last_message_time = None
+
+    # Obtener el último mensaje de todas las conversaciones
+    last_message = None
+    last_message_conversation = None
+    if conversations:
+        last_msg_obj = Message.objects.filter(
+            conversation__participants=user
+        ).select_related('sender', 'conversation').order_by('-created_at').first()
+        
+        if last_msg_obj:
+            last_message = last_msg_obj
+            last_message_conversation = last_msg_obj.conversation
+            
+            # Agregar info del otro participante al último mensaje
+            if not last_message_conversation.is_group:
+                other = last_message_conversation.participants.exclude(id=user.id).first()
+                last_message_conversation.other_username = other.username if other else 'Usuario desconocido'
+                last_message_conversation.other_nickname = other.nickname if other else None
+                last_message_conversation.other_profile_picture = other.profile_picture if other else None
 
     return render(request, 'messaging/conversation_list.html', {
         'conversations': conversations,
         'unread_chats_count': unread_chats_count,
+        'last_message': last_message,
+        'last_message_conversation': last_message_conversation,
     })
 
 
