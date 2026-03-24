@@ -26,6 +26,7 @@ urlpatterns = [
     path('profesor/', include('teachers.urls')),
     path('cuestionarios/', include('quizzes.urls')),
     path('minijuegos/', include('minigames.urls')),
+    path('mensajeria/', include('messaging.urls')),
 
     path('', lambda request: redirect('login')),
 ]

@@ -110,24 +110,29 @@ def public_classmates_list(request):
 @login_required
 def public_student_profile(request, student_id):
     from teachers.models import ClassGroup
-    
-    # 1. Obtenemos al estudiante (si existe y quiere compartir)
-    student = get_object_or_404(UserProfile, id=student_id, role='student', share_with_class=True)
-    
-    # 2. Verificación de seguridad
-    if request.user.role == 'teacher':
-        # El profesor puede verlo si es su alumno
-        pass 
-    else:
-        # Si es alumno, verificamos que compartan al menos un grupo
+
+    # 1. Comprobamos que el usuario exista y sea alumno
+    try:
+        student = UserProfile.objects.get(id=student_id, role='student')
+    except UserProfile.DoesNotExist:
+        messages.error(request, 'El perfil solicitado no existe.')
+        return redirect('classmates_list')
+
+    # 1.a Si ha decidido no compartir, mostramos un mensaje amigable
+    if not student.share_with_class and request.user.role != 'teacher':
+        messages.error(request, 'El alumno no ha compartido su perfil.')
+        return redirect('classmates_list')
+
+    # 2. Verificación de seguridad para alumnos
+    if request.user.role != 'teacher':
         comparten_grupo = ClassGroup.objects.filter(
             students=request.user
         ).filter(
             students=student
         ).exists()
-        
+
         if not comparten_grupo:
-            messages.error(request, "No tienes permiso para ver este perfil.")
+            messages.error(request, 'No tienes permiso para ver este perfil.')
             return redirect('classmates_list')
 
     return render(request, 'accounts/public_student_profile.html', {

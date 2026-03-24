@@ -128,6 +128,14 @@
                         <li class="nav-item"><span class="text-muted fw-medium">Hola, {{ user.first_name }}</span></li>
                         {% if user.role == 'student' %}
                             <li class="nav-item"><a href="{% url 'student_home' %}" class="nav-link fw-semibold">Inicio</a></li>
+                            <li class="nav-item">
+                                <a href="{% url 'conversation_list' %}" class="nav-link fw-semibold position-relative">
+                                    Mensajería
+                                    {% if unread_chats_count > 0 %}
+                                    <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">{{ unread_chats_count }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
                             <li class="nav-item"><a href="{% url 'view_student_profile' %}" class="nav-link fw-semibold">Mi Perfil</a></li>
                         {% elif user.role == 'teacher' %}
                             <li class="nav-item"><a href="{% url 'teacher_home' %}" class="nav-link fw-semibold">Panel</a></li>
@@ -166,6 +174,13 @@
         <a href="{% url 'classmates_list' %}" class="nav-item-mobile {% if 'clase' in request.path %}active{% endif %}">
             <i class="fas fa-users"></i>
             <span>Clase</span>
+        </a>
+        <a href="{% url 'conversation_list' %}" class="nav-item-mobile {% if 'mensajeria' in request.path %}active{% endif %} position-relative">
+            <i class="fas fa-comments"></i>
+            <span>Chats</span>
+            {% if unread_chats_count > 0 %}
+            <span class="badge bg-danger rounded-pill position-absolute" style="top: -5px; right: -5px; font-size: 0.6rem; padding: 2px 5px;">{{ unread_chats_count }}</span>
+            {% endif %}
         </a>
         {% endif %}
 

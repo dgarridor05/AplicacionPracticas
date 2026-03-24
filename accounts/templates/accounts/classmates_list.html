@@ -25,9 +25,7 @@
     <div class="row g-3">
       {% for classmate in classmates %}
       <div class="col-12 classmate-card">
-        <a href="{% url 'public_student_profile' classmate.id %}"
-          class="text-decoration-none card h-100 border-0 shadow-sm hover-row transition-all"
-          style="border-radius: 15px;">
+        <div class="card h-100 border-0 shadow-sm hover-row transition-all" style="border-radius: 15px;">
           <div class="card-body d-flex align-items-center p-3">
 
             <div class="me-3">
@@ -56,13 +54,14 @@
               </small>
             </div>
 
-            <div class="ms-2">
-              <span class="badge rounded-pill px-3 py-2 bg-light text-success border">
+            <div class="ms-2 text-end">
+              <a href="{% url 'start_private_conversation' classmate.id %}" class="btn btn-sm btn-primary me-2">Chatear</a>
+              <a href="{% url 'public_student_profile' classmate.id %}" class="badge rounded-pill px-3 py-2 bg-light text-success border text-decoration-none">
                 Ver perfil <i class="fas fa-chevron-right ms-1 small"></i>
-              </span>
+              </a>
             </div>
           </div>
-        </a>
+        </div>
       </div>
       {% endfor %}
     </div>

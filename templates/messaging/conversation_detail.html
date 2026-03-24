@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Chat | RELACIONA{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4" style="max-width: 1200px;">
+    <div class="row">
+        <!-- Lista de conversaciones (solo en desktop) -->
+        <div class="col-md-4 col-lg-3 d-none d-md-block">
+            <div class="card shadow-sm h-100" style="border-radius: 15px;">
+                <div class="card-header bg-white border-0 py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-comments me-2"></i>Conversaciones
+                    </h6>
+                </div>
+
+                <div class="card-body p-0" style="max-height: 70vh; overflow-y: auto;">
+                    {% for conv in conversations %}
+                    <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action border-0 px-3 py-3 {% if conv.id == conversation.id %}bg-primary text-white{% elif conv.unread_count_for_user > 0 %}bg-light{% endif %}">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                {% if conv.is_group %}
+                                <div class="{% if conv.id == conversation.id %}bg-white text-primary{% else %}bg-primary text-white{% endif %} rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                {% else %}
+                                {% if conv.other_profile_picture %}
+                                <img src="{{ conv.other_profile_picture.url }}" class="rounded-circle object-fit-cover shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef;" alt="Foto">
+                                {% else %}
+                                <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+
+                            <div class="flex-grow-1 min-w-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="min-w-0 flex-grow-1">
+                                        <div class="fw-bold text-truncate">
+                                            {% if conv.is_group %}
+                                            {{ conv.name|default:'Chat grupal' }}
+                                            {% else %}
+                                            {{ conv.other_nickname|default:conv.other_username }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if conv.unread_count_for_user > 0 %}
+                                    <span class="badge {% if conv.id == conversation.id %}bg-white text-primary{% else %}bg-success{% endif %} rounded-pill ms-2 flex-shrink-0">{{ conv.unread_count_for_user }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Área de chat -->
+        <div class="col-md-8 col-lg-9">
+            <div class="card shadow-sm h-100" style="border-radius: 15px;">
+                <!-- Header del chat -->
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <a href="{% url 'conversation_list' %}" class="btn btn-sm btn-outline-secondary me-3 d-md-none">
+                                <i class="fas fa-arrow-left"></i>
+                            </a>
+
+                            {% if other_participant %}
+                            {% if other_participant.profile_picture %}
+                            <img src="{{ other_participant.profile_picture.url }}" class="rounded-circle object-fit-cover me-3" style="width: 45px; height: 45px; border: 2px solid #e9ecef;" alt="Foto">
+                            {% else %}
+                            <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px; border: 2px solid #e9ecef;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            {% endif %}
+                            {% else %}
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            {% endif %}
+
+                            <div>
+                                <h6 class="mb-0 fw-bold">
+                                    {% if other_participant %}
+                                    {{ other_participant.nickname|default:other_participant.username }}
+                                    {% else %}
+                                    {{ conversation.name|default:'Chat grupal' }}
+                                    {% endif %}
+                                </h6>
+                                {% if conversation.class_group %}
+                                <small class="text-muted">Clase: {{ conversation.class_group.name }}</small>
+                                {% elif other_participant %}
+                                <small class="text-muted">{{ other_participant.username }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center">
+                            {% if other_participant %}
+                            <a href="{% url 'public_student_profile' other_participant.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                <i class="fas fa-user"></i> Ver perfil
+                            </a>
+                            {% endif %}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'conversation_list' %}">Ver todas las conversaciones</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="return confirm('¿Estás seguro de que quieres salir de este chat?')">Salir del chat</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mensajes -->
+                <div class="card-body" style="height: calc(100vh - 300px); overflow-y: auto; padding: 20px;">
+                    {% for msg in chat_messages %}
+                    <div class="mb-4 {% if msg.sender == user %}text-end{% else %}text-start{% endif %}">
+                        <div class="d-inline-block" style="max-width: 70%;">
+                            {% if msg.sender != user %}
+                            <div class="d-flex align-items-center mb-1">
+                                {% if msg.sender.profile_picture %}
+                                <img src="{{ msg.sender.profile_picture.url }}" class="rounded-circle me-2" style="width: 30px; height: 30px; border: 1px solid #e9ecef;" alt="Foto">
+                                {% else %}
+                                <div class="bg-light text-muted rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px; border: 1px solid #e9ecef;">
+                                    <i class="fas fa-user fa-xs"></i>
+                                </div>
+                                {% endif %}
+                                <small class="text-muted fw-bold">{{ msg.sender.nickname|default:msg.sender.username }}</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="py-2 px-3 rounded-3 shadow-sm" style="background: {% if msg.sender == user %}#007bff; color: white;{% else %}#f8f9fa; color: #333;{% endif %} border-radius: 18px;">
+                                <div>{{ msg.text|linebreaksbr }}</div>
+                                <small class="{% if msg.sender == user %}text-white-50{% else %}text-muted{% endif %} mt-1 d-block">{{ msg.created_at|date:'d/m/Y H:i' }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <div class="opacity-25 mb-3">
+                            <i class="fas fa-comment-dots fa-4x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted">Aún no hay mensajes</h5>
+                        <p class="text-muted">¡Sé el primero en escribir algo!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Formulario de envío -->
+                <div class="card-footer bg-white border-0 py-3">
+                    <form method="post" id="messageForm">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <textarea class="form-control border-0 bg-light" name="text" placeholder="Escribe tu mensaje..." rows="2" style="border-radius: 20px; resize: none;" required></textarea>
+                            <button type="submit" class="btn btn-primary ms-2" style="border-radius: 50px; width: 50px; height: 50px;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.object-fit-cover {
+    object-fit: cover;
+}
+
+.card {
+    border: none !important;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08) !important;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa !important;
+}
+
+.list-group-item.active {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+@media (max-width: 767.98px) {
+    .container-fluid {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .card-body {
+        height: calc(100vh - 250px) !important;
+    }
+}
+
+/* Auto-scroll al final de los mensajes */
+.card-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.card-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.card-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>
+
+<script>
+// Auto-scroll al final de los mensajes
+document.addEventListener('DOMContentLoaded', function() {
+    const messageContainer = document.querySelector('.card-body');
+    if (messageContainer) {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+});
+
+// Auto-resize del textarea
+document.querySelector('textarea[name="text"]').addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+});
+</script>
+{% endblock %}
