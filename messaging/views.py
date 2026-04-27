@@ -11,11 +11,19 @@ from .models import Conversation, ConversationMember, Message
 @login_required
 def conversation_list(request):
     user = request.user
-    conversations = Conversation.objects.filter(participants=user).order_by('-updated_at')
+    
+    # Optimización: usar prefetch_related y select_related para evitar N+1 queries
+    conversations = Conversation.objects.filter(participants=user).order_by('-updated_at').prefetch_related(
+        'participants',
+        'messages__sender'
+    ).select_related()
 
+    # Calcular conteos de no leídos de manera eficiente
     unread_chats_count = 0
+    
     for conv in conversations:
         conv.unread_count_for_user = conv.unread_count(user)
+        
         if conv.unread_count_for_user > 0:
             unread_chats_count += 1
 
@@ -33,9 +41,10 @@ def conversation_list(request):
                 conv.other_profile_picture = None
                 conv.other_full_name = None
         
-        # Agregar último mensaje de la conversación
-        last_msg = conv.messages.select_related('sender').order_by('-created_at').first()
-        if last_msg:
+        # Agregar último mensaje de la conversación (ya prefetched)
+        messages_list = list(conv.messages.all().order_by('-created_at')[:1])
+        if messages_list:
+            last_msg = messages_list[0]
             conv.last_message_text = last_msg.text[:50] + ('...' if len(last_msg.text) > 50 else '')
             conv.last_message_sender = last_msg.sender.username
             conv.last_message_time = last_msg.created_at
@@ -44,7 +53,7 @@ def conversation_list(request):
             conv.last_message_sender = None
             conv.last_message_time = None
 
-    # Obtener el último mensaje de todas las conversaciones
+    # Obtener el último mensaje de todas las conversaciones de manera eficiente
     last_message = None
     last_message_conversation = None
     if conversations:
@@ -76,10 +85,15 @@ def conversation_detail(request, conversation_id):
     user = request.user
     conversation = get_object_or_404(Conversation.objects.filter(participants=user), id=conversation_id)
 
-    # Obtener todas las conversaciones para la lista lateral
-    conversations = Conversation.objects.filter(participants=user).order_by('-updated_at')
+    # Optimización: obtener conversaciones de manera eficiente
+    conversations = Conversation.objects.filter(participants=user).order_by('-updated_at').prefetch_related(
+        'participants',
+        'messages__sender'
+    )
+
     for conv in conversations:
         conv.unread_count_for_user = conv.unread_count(user)
+        
         if not conv.is_group:
             other_participant = conv.participants.exclude(id=user.id).first()
             if other_participant:

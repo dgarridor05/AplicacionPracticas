@@ -207,3 +207,103 @@ def chapman_result(request):
     context['category'] = full_category
 
     return render(request, "quizzes/chapman_result.html", context)
+
+
+@login_required
+def take_social_quiz(request):
+    if request.user.role != 'student':
+        return redirect('login')
+
+    questionnaire = get_object_or_404(Questionnaire, title__iexact="Estilos de Interacción Social")
+    questions = questionnaire.question_set.prefetch_related('options')
+
+    if request.method == "POST":
+        UserAnswer.objects.filter(user=request.user, question__in=questions).delete()
+
+        # Get all unique categories from the questionnaire's options
+        categories = set()
+        for question in questions:
+            for option in question.options.all():
+                categories.add(option.category)
+        scores = {cat: 0 for cat in categories}
+
+        for question in questions:
+            selected_id = request.POST.get(f"question_{question.id}")
+            if selected_id:
+                option = Option.objects.get(id=selected_id)
+                UserAnswer.objects.create(
+                    user=request.user,
+                    question=question,
+                    selected_option=option
+                )
+                scores[option.category] += option.value
+
+        dominant = max(scores, key=scores.get)
+
+        UserResult.objects.update_or_create(
+            user=request.user,
+            questionnaire=questionnaire,
+            defaults={"dominant_category": dominant}
+        )
+
+        return redirect("social_result")
+
+    return render(request, "quizzes/social_quiz.html", {
+        "questionnaire": questionnaire,
+        "questions": questions
+    })
+
+
+@login_required
+def social_result(request):
+    try:
+        result = UserResult.objects.get(user=request.user, questionnaire__title="Estilos de Interacción Social")
+    except UserResult.DoesNotExist:
+        messages.warning(request, "Primero debes realizar el test de Estilos de Interacción Social para ver tus resultados.")
+        return redirect('take_social_quiz')
+
+    category = result.dominant_category
+
+    messages_dict = {
+        'C': {
+            'label': 'Colaborativo',
+            'description': "Te sientes cómodo/a trabajando en equipo y aprendiendo a través de la interacción con otros. Disfrutas de las discusiones grupales, los debates y el aprendizaje colaborativo. Te motiva compartir ideas y aprender de las perspectivas de tus compañeros.",
+            'tips': [
+                "Participa activamente en grupos de estudio.",
+                "Busca oportunidades para debatir y discutir temas.",
+                "Comparte tus conocimientos con otros estudiantes."
+            ]
+        },
+        'I': {
+            'label': 'Independiente',
+            'description': "Prefieres estudiar y aprender por tu cuenta, sin distracciones externas. Te concentras mejor en entornos tranquilos y valoras la autonomía en tu proceso de aprendizaje. Te sientes cómodo/a resolviendo problemas individualmente.",
+            'tips': [
+                "Estudia en lugares tranquilos y sin interrupciones.",
+                "Desarrolla técnicas de estudio personales.",
+                "Toma decisiones de aprendizaje de forma autónoma."
+            ]
+        },
+        'P': {
+            'label': 'Práctico',
+            'description': "Aprendes mejor cuando puedes aplicar los conceptos a situaciones reales y concretas. Te motivan las actividades prácticas, los experimentos y los proyectos que tienen un resultado tangible. Valoras el aprendizaje hands-on.",
+            'tips': [
+                "Busca oportunidades para aplicar lo que aprendes.",
+                "Participa en proyectos prácticos y experimentos.",
+                "Relaciona los conceptos teóricos con situaciones reales."
+            ]
+        },
+        'R': {
+            'label': 'Reflexivo',
+            'description': "Disfrutas analizando ideas profundas y abstractas. Te gusta pensar críticamente sobre los conceptos, explorar diferentes perspectivas y reflexionar sobre el significado más amplio de lo que aprendes. Valoras el pensamiento profundo.",
+            'tips': [
+                "Dedica tiempo a reflexionar sobre los temas estudiados.",
+                "Analiza diferentes perspectivas de un mismo concepto.",
+                "Escribe diarios de aprendizaje o reflexiones personales."
+            ]
+        }
+    }
+
+    context = messages_dict[category]
+    context['category'] = category
+
+    return render(request, "quizzes/social_result.html", context)

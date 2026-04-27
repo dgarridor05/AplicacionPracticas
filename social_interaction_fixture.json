@@ -1,0 +1,234 @@
+[
+  {
+    "model": "quizzes.questionnaire",
+    "pk": 3,
+    "fields": {
+      "title": "Estilos de Interacción Social",
+      "description": "Test para conocer tus preferencias de interacción social en el aprendizaje. Elige la opción que más te represente en cada par."
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 200,
+    "fields": {
+      "questionnaire": 3,
+      "text": "1"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2000,
+    "fields": {
+      "question": 200,
+      "text": "Me gusta trabajar en equipo y discutir ideas con mis compañeros.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2001,
+    "fields": {
+      "question": 200,
+      "text": "Prefiero estudiar solo y resolver problemas por mi cuenta.",
+      "category": "I",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 201,
+    "fields": {
+      "questionnaire": 3,
+      "text": "2"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2002,
+    "fields": {
+      "question": 201,
+      "text": "Disfruto de actividades prácticas y experimentos en clase.",
+      "category": "P",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2003,
+    "fields": {
+      "question": 201,
+      "text": "Me gusta reflexionar sobre conceptos teóricos y analizar ideas.",
+      "category": "R",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 202,
+    "fields": {
+      "questionnaire": 3,
+      "text": "3"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2004,
+    "fields": {
+      "question": 202,
+      "text": "Me motiva competir con otros estudiantes para mejorar mis calificaciones.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2005,
+    "fields": {
+      "question": 202,
+      "text": "Me enfoco en mi propio progreso sin comparar con los demás.",
+      "category": "I",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 203,
+    "fields": {
+      "questionnaire": 3,
+      "text": "4"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2006,
+    "fields": {
+      "question": 203,
+      "text": "Aprendo mejor cuando puedo aplicar lo que estudio a situaciones reales.",
+      "category": "P",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2007,
+    "fields": {
+      "question": 203,
+      "text": "Me gusta pensar profundamente sobre temas abstractos.",
+      "category": "R",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 204,
+    "fields": {
+      "questionnaire": 3,
+      "text": "5"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2008,
+    "fields": {
+      "question": 204,
+      "text": "Me siento cómodo/a presentando proyectos en grupo frente a la clase.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2009,
+    "fields": {
+      "question": 204,
+      "text": "Prefiero hacer presentaciones individuales o por escrito.",
+      "category": "I",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 205,
+    "fields": {
+      "questionnaire": 3,
+      "text": "6"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2010,
+    "fields": {
+      "question": 205,
+      "text": "Me gusta resolver problemas paso a paso con instrucciones claras.",
+      "category": "P",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2011,
+    "fields": {
+      "question": 205,
+      "text": "Disfruto explorando ideas creativas y no convencionales.",
+      "category": "R",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 206,
+    "fields": {
+      "questionnaire": 3,
+      "text": "7"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2012,
+    "fields": {
+      "question": 206,
+      "text": "Aprendo mejor cuando puedo discutir y debatir con otros.",
+      "category": "C",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2013,
+    "fields": {
+      "question": 206,
+      "text": "Me concentro mejor en un entorno tranquilo y sin distracciones.",
+      "category": "I",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.question",
+    "pk": 207,
+    "fields": {
+      "questionnaire": 3,
+      "text": "8"
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2014,
+    "fields": {
+      "question": 207,
+      "text": "Me motiva ver resultados concretos de mi trabajo.",
+      "category": "P",
+      "value": 1
+    }
+  },
+  {
+    "model": "quizzes.option",
+    "pk": 2015,
+    "fields": {
+      "question": 207,
+      "text": "Valoro el proceso de aprendizaje más que los resultados finales.",
+      "category": "R",
+      "value": 1
+    }
+  }
+]

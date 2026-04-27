@@ -13,4 +13,11 @@ CHAPMAN_CHOICES = [
     ('E', 'Contacto o Presencia Física y Emocional'),
 ]
 
-ALL_CATEGORIES = list({c[0]: c for c in VARK_CHOICES + CHAPMAN_CHOICES}.values())
+SOCIAL_CHOICES = [
+    ('C', 'Colaborativo'),
+    ('I', 'Independiente'),
+    ('P', 'Práctico'),
+    ('R', 'Reflexivo'),
+]
+
+ALL_CATEGORIES = list({c[0]: c for c in VARK_CHOICES + CHAPMAN_CHOICES + SOCIAL_CHOICES}.values())
